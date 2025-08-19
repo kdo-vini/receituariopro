@@ -94,6 +94,16 @@
             line-height: 1.6;
             overflow-x: hidden;
         }
+        .stat-number,
+.stat-unit {
+  font-size: 48px; /* mesmo tamanho do número */
+  font-weight: 800;
+  display: inline-block;
+  vertical-align: baseline; /* gruda na mesma linha */
+  line-height: 1; /* evita espaço extra */
+  margin: 0; /* tira espaçamento extra */
+}
+
         
         /* Loading Animation */
         .page-loader {
@@ -885,7 +895,7 @@
         }
         
         .plan-price span {
-            font-size: 1rem;
+            font-size: 2.9rem;
             color: var(--text-light);
         }
         
@@ -1181,22 +1191,24 @@
     <section class="stats">
         <div class="stats-container">
             <div class="stat-item fade-in">
-                <span class="stat-number" data-target="80">0</span><span style="font-size: 3rem; font-weight: 800;">%</span>
+                <span class="stat-number" data-target="80" data-unit="%">0</span>
                 <span class="stat-label">Médicos escrevem à mão</span>
             </div>
+
             <div class="stat-item fade-in">
-                <span class="stat-number" data-target="2">0</span><span style="font-size: 3rem; font-weight: 800;">h</span>
+                <span class="stat-number" data-target="2.0" data-unit="h">0</span>
                 <span class="stat-label">Economizadas por dia</span>
             </div>
+
             <div class="stat-item fade-in">
-                <span class="stat-number" data-target="30">0</span><span style="font-size: 3rem; font-weight: 800;">s</span>
+                <span class="stat-number" data-target="30" data-unit="s">0</span>
                 <span class="stat-label">Por receituário</span>
             </div>
+
             <div class="stat-item fade-in">
-                <span class="stat-number" data-target="100">0</span><span style="font-size: 3rem; font-weight: 800;">%</span>
+                <span class="stat-number" data-target="100" data-unit="%">0</span>
                 <span class="stat-label">Conformidade LGPD</span>
             </div>
-        </div>
     </section>
 
     <!-- Why Choose Section -->
@@ -1345,7 +1357,7 @@
                 <p class="plan-description">Ideal para experimentar</p>
                 <ul class="plan-features">
                     <li>Até 30 receituários/mês</li>
-                    <li>Templates básicos</li>
+                    <li>Templates padrão</li>
                     <li>Assinatura digital</li>
                     <li>Exportação PDF/PNG</li>
                     <li>Suporte por email</li>
@@ -1357,11 +1369,11 @@
             <div class="pricing-card featured fade-in">
                 <h3 class="plan-name">Essencial</h3>
                 <div class="plan-price">
-                    <span class="price-annual">R$ 29</span>
+                    <span class="price-annual" style="display: inline;">R$ 29</span>
                     <span class="price-monthly" style="display: none;">R$ 39</span>
                     <span>/mês</span>
                 </div>
-                <p class="plan-description price-annual">R$ 348/ano (pago à vista)</p>
+                <p class="plan-description price-annual" style="display: block;">R$ 348/ano (pago à vista)</p>
                 <p class="plan-description price-monthly" style="display: none;">Cobrado mensalmente</p>
                 <ul class="plan-features">
                     <li><strong>Receituários ilimitados</strong></li>
@@ -1454,7 +1466,7 @@
                     Vocês oferecem suporte?
                 </summary>
                 <p style="margin-top: 1rem; color: var(--text-light); line-height: 1.8;">
-                    Sim! Oferecemos suporte completo via chat, email e telefone. Nossa equipe está sempre pronta para 
+                    Sim! Oferecemos suporte completo via WhatsApp e e-mail. Nossa equipe está sempre pronta para 
                     ajudar você a aproveitar ao máximo o sistema.
                 </p>
             </details>
@@ -1481,24 +1493,16 @@
             </div>
             
             <div class="footer-column">
-                <h3>Empresa</h3>
-                <a href="#">Sobre Nós</a>
-                <a href="#">Blog</a>
-                <a href="#">Carreiras</a>
-                <a href="#">Contato</a>
+                <h3>Suporte</h3>
+                <a href="#faq">FAQ</a>
+                <a href="mailto:techne.br@gmail.com">Contato</a>
+                <a href="mailto:techne.br@gmail.com">Ajuda</a>
             </div>
-            
-            <div class="footer-column">
-                <h3>Legal</h3>
-                <a href="#">Termos de Uso</a>
-                <a href="#">Privacidade</a>
-                <a href="#">LGPD</a>
-                <a href="#">Cookies</a>
-            </div>
+
         </div>
         
         <div class="footer-bottom">
-            <p>&copy; 2024 Receituário Pro. Todos os direitos reservados. CNPJ: 00.000.000/0001-00</p>
+            <p>&copy; 2024 Receituário Pro. Todos os direitos reservados.</p>
         </div>
     </footer>
 
@@ -1531,36 +1535,38 @@
             });
         });
 
-        // Animated Counter
-        const animateCounters = () => {
-            const counters = document.querySelectorAll('.stat-number');
-            
-            counters.forEach(counter => {
-                const target = parseFloat(counter.getAttribute('data-target'));
-                const increment = target / 100;
-                let current = 0;
-                
-                const updateCounter = () => {
-                    if (current < target) {
-                        current += increment;
-                        if (target < 10) {
-                            counter.textContent = current.toFixed(1);
-                        } else {
-                            counter.textContent = Math.ceil(current).toLocaleString('pt-BR');
-                        }
-                        requestAnimationFrame(updateCounter);
-                    } else {
-                        if (target < 10) {
-                            counter.textContent = target.toFixed(1);
-                        } else {
-                            counter.textContent = Math.ceil(target).toLocaleString('pt-BR');
-                        }
-                    }
-                };
-                
-                updateCounter();
-            });
+        // Stats counter animation fix
+const animateCounters = () => {
+    const counters = document.querySelectorAll('.stat-number');
+    
+    counters.forEach(counter => {
+        const target = parseFloat(counter.getAttribute('data-target'));
+        const unit = counter.getAttribute('data-unit') || ""; // <- pega unidade
+        const increment = target / 100;
+        let current = 0;
+        
+        const updateCounter = () => {
+            if (current < target) {
+                current += increment;
+                if (target < 10) {
+                    counter.textContent = current.toFixed(1) + unit;
+                } else {
+                    counter.textContent = Math.ceil(current) + unit;
+                }
+                requestAnimationFrame(updateCounter);
+            } else {
+                if (target < 10) {
+                    counter.textContent = target.toFixed(1) + unit;
+                } else {
+                    counter.textContent = Math.ceil(target) + unit;
+                }
+            }
         };
+        
+        updateCounter();
+    });
+};
+
 
         // Intersection Observer for Animations
         const observerOptions = {

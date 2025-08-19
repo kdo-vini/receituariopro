@@ -3,209 +3,881 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Sistema de Geração de Receituários Médicos Digital">
-    <meta name="author" content="Receituário Digital">
+    <title>Receituário Pro - Sistema Profissional de Prescrições</title>
     
-    <title>Receituário Digital - Sistema de Prescrições Médicas</title>
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
-    <!-- External Libraries -->
+    <!-- Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
-    <!-- Styles -->
-    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        :root {
+            --primary: #667eea;
+            --primary-dark: #5a67d8;
+            --secondary: #764ba2;
+            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --text-dark: #1a202c;
+            --text-light: #718096;
+            --white: #ffffff;
+            --gray-light: #f7fafc;
+            --success: #48bb78;
+            --error: #f56565;
+            --warning: #ed8936;
+            
+            /* Template Colors */
+            --template-blue: #3182ce;
+            --template-green: #48bb78;
+            --template-red: #e53e3e;
+            --template-gray: #718096;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 15px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
+
+        .prescription-count {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-white {
+            background: white;
+            color: var(--primary);
+        }
+
+        .btn-white:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            min-height: calc(100vh - 200px);
+        }
+
+        .sidebar {
+            background: var(--gray-light);
+            padding: 25px;
+            border-right: 1px solid #e2e8f0;
+        }
+
+        .profile-section {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .profile-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .profile-header h3 {
+            color: var(--text-dark);
+            font-size: 16px;
+        }
+
+        .edit-profile-btn {
+            background: var(--primary);
+            color: white;
+            padding: 5px 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .logo-upload {
+            border: 2px dashed #cbd5e0;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .logo-upload:hover {
+            border-color: var(--primary);
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .logo-preview {
+            width: 120px;
+            height: 60px;
+            object-fit: contain;
+            margin: 0 auto;
+        }
+
+        .template-selector {
+            margin-bottom: 20px;
+        }
+
+        .template-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .template-card {
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .template-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .template-card.active {
+            border-color: var(--primary);
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .template-card.locked {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .template-card.locked::after {
+            content: '🔒';
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            font-size: 16px;
+        }
+
+        .template-preview {
+            height: 60px;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: #a0aec0;
+        }
+
+        .template-blue .template-preview {
+            background: linear-gradient(to bottom, #ebf8ff 0%, white 30%);
+        }
+
+        .template-green .template-preview {
+            background: linear-gradient(to bottom, #f0fff4 0%, white 30%);
+        }
+
+        .template-red .template-preview {
+            background: linear-gradient(to bottom, #fff5f5 0%, white 30%);
+        }
+
+        .template-gray .template-preview {
+            background: linear-gradient(to bottom, #f7fafc 0%, white 30%);
+        }
+
+        .form-section {
+            margin-bottom: 20px;
+        }
+
+        .form-section label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-dark);
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .template-selector-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .template-btn {
+            flex: 1;
+            padding: 8px;
+            border: 2px solid #e2e8f0;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 13px;
+        }
+
+        .template-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .preview-container {
+            padding: 30px;
+            background: #f8f9fa;
+            display: flex;
+            justify-content: center;
+            overflow-y: auto;
+        }
+
+        .prescription-preview {
+            width: 210mm;
+            min-height: 297mm;
+            background: white;
+            padding: 40px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        /* Template Styles */
+        .prescription-preview.template-blue .prescription-header {
+            background: linear-gradient(to right, #ebf8ff 0%, white 100%);
+            border-left: 4px solid var(--template-blue);
+        }
+
+        .prescription-preview.template-green .prescription-header {
+            background: linear-gradient(to right, #f0fff4 0%, white 100%);
+            border-left: 4px solid var(--template-green);
+        }
+
+        .prescription-preview.template-red .prescription-header {
+            background: linear-gradient(to right, #fff5f5 0%, white 100%);
+            border-left: 4px solid var(--template-red);
+        }
+
+        .prescription-preview.template-gray .prescription-header {
+            background: linear-gradient(to right, #f7fafc 0%, white 100%);
+            border-left: 4px solid var(--template-gray);
+        }
+
+        .prescription-preview.header-centered .prescription-header {
+            text-align: center;
+            border-left: none;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .prescription-preview.header-lateral .prescription-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .prescription-header {
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+        }
+
+        .clinic-logo {
+            max-width: 150px;
+            max-height: 60px;
+            object-fit: contain;
+            margin-bottom: 15px;
+        }
+
+        .clinic-logo-placeholder {
+            width: 150px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .doctor-info h2 {
+            color: var(--text-dark);
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+        .doctor-info p {
+            color: var(--text-light);
+            margin: 3px 0;
+            font-size: 14px;
+        }
+
+        .patient-info {
+            margin-bottom: 30px;
+            padding: 15px;
+            background: var(--gray-light);
+            border-radius: 8px;
+        }
+
+        .prescription-content {
+            min-height: 400px;
+            margin-bottom: 30px;
+        }
+
+        .prescription-content textarea {
+            width: 100%;
+            min-height: 400px;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            line-height: 1.8;
+            resize: vertical;
+        }
+
+        .prescription-footer {
+            margin-top: 60px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .clinic-contact {
+            text-align: center;
+            color: var(--text-light);
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+
+        .qr-code-space {
+            width: 100px;
+            height: 100px;
+            border: 2px dashed #cbd5e0;
+            margin: 20px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #a0aec0;
+            font-size: 12px;
+        }
+
+        .signature-section {
+            margin-top: 50px;
+            text-align: center;
+        }
+
+        .signature-canvas {
+            border: 2px dashed #e2e8f0;
+            border-radius: 8px;
+            cursor: crosshair;
+            background: white;
+            margin: 20px auto;
+        }
+
+        .action-buttons {
+            padding: 20px 30px;
+            background: white;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .btn-primary {
+            background: var(--gradient);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* Profile Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            margin-bottom: 25px;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-dark);
+            font-weight: 500;
+        }
+
+        .optional-tag {
+            font-size: 12px;
+            color: var(--text-light);
+            font-weight: normal;
+        }
+
+        /* Upgrade Banner */
+        .upgrade-banner {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .upgrade-banner h4 {
+            margin-bottom: 8px;
+        }
+
+        .upgrade-banner p {
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .btn-upgrade {
+            background: white;
+            color: #f59e0b;
+            padding: 8px 20px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                border-right: none;
+                border-bottom: 1px solid #e2e8f0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .prescription-preview {
+                width: 100%;
+                min-height: auto;
+                padding: 20px;
+            }
+            
+            .template-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
-    <!-- Main Container -->
-    <div class="container" role="main">
-        
-        <!-- Application Header -->
-        <header class="header">
-            <h1>📋 Receituário Digital</h1>
-            <p>Sistema de Geração de Receituários Médicos</p>
-        </header>
-
-        <!-- Control Panel Section -->
-        <section class="controls" aria-label="Controles do Receituário">
-            
-            <!-- Template Selection -->
-            <nav class="template-selector" role="navigation" aria-label="Tipo de Receituário">
-                <button class="template-btn active" 
-                        data-template="medicacao" 
-                        aria-pressed="true">
-                    💊 Medicação
-                </button>
-                <button class="template-btn" 
-                        data-template="exames" 
-                        aria-pressed="false">
-                    🔬 Exames
-                </button>
-                <button class="template-btn" 
-                        data-template="procedimentos" 
-                        aria-pressed="false">
-                    🏥 Procedimentos
-                </button>
-                <button class="template-btn" 
-                        data-template="livre" 
-                        aria-pressed="false">
-                    📝 Livre
-                </button>
-            </nav>
-
-            <!-- Patient Information Form -->
-            <form class="patient-form" id="patientForm">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="patientName">Nome do Paciente:</label>
-                        <input type="text" 
-                               id="patientName" 
-                               name="patientName"
-                               placeholder="Digite o nome do paciente"
-                               autocomplete="name"
-                               required>
-                    </div>
-                    <div class="form-group">
-                        <label for="prescriptionDate">Data:</label>
-                        <input type="date" 
-                               id="prescriptionDate" 
-                               name="prescriptionDate"
-                               required>
-                    </div>
+    <!-- Include Supabase Config -->
+    <script src="js/supabase-config.js"></script>
+    
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>
+                <img src="img/saas-logo.png" alt="Logo" style="height: 32px;">
+                Receituário Pro
+            </h1>
+            <div class="header-actions">
+                <div class="prescription-count" id="prescriptionCount">
+                    <span id="countText">0/30</span> receituários este mês
                 </div>
-            </form>
-        </section>
+                <div class="user-info">
+                    <span id="userName">Carregando...</span>
+                </div>
+                <button class="btn btn-white" onclick="logout()">Sair</button>
+            </div>
+        </div>
 
-        <!-- Prescription Preview Section -->
-        <section class="preview-container" aria-label="Visualização do Receituário">
-            <article class="prescription-preview" id="prescriptionPreview">
-                
-                <!-- Prescription Header with Clinic Info -->
-                <header class="prescription-header">
-                    <div class="clinic-logo" id="clinicLogo">CLÍNICA MÉDICA</div>
-                    <div class="doctor-info">
-                        <h2 id="doctorName">Dr. João Silva</h2>
-                        <p id="doctorCRM">CRM: 12345-SP</p>
-                        <p id="doctorSpecialty">Especialista em Clínica Geral</p>
-                        <p id="doctorPhone">Tel: (11) 98765-4321</p>
+        <div class="main-layout">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <!-- Profile Section -->
+                <div class="profile-section">
+                    <div class="profile-header">
+                        <h3>Meu Perfil</h3>
+                        <button class="edit-profile-btn" onclick="openProfileModal()">Editar</button>
                     </div>
-                </header>
-
-                <!-- Patient Information Display -->
-                <div class="patient-info">
-                    <p>
-                        <strong>Paciente:</strong> 
-                        <span id="patientDisplay">_________________________</span>
-                    </p>
-                    <p>
-                        <strong>Data:</strong> 
-                        <span id="dateDisplay">__/__/____</span>
-                    </p>
-                </div>
-
-                <!-- Main Prescription Content -->
-                <div class="prescription-content">
-                    <textarea id="prescriptionText" 
-                              name="prescriptionContent"
-                              placeholder="Digite aqui o conteúdo do receituário..."
-                              aria-label="Conteúdo da Prescrição"></textarea>
-                </div>
-
-                <!-- Digital Signature Section -->
-                <footer class="signature-section">
-                    <div class="signature-container">
-                        <!-- Signature Canvas -->
-                        <canvas id="signatureCanvas" 
-                                class="signature-canvas" 
-                                width="300" 
-                                height="100"
-                                aria-label="Área de Assinatura Digital"></canvas>
-                        
-                        <!-- Signature Controls -->
-                        <div class="signature-controls" id="signatureControls">
-                            <button type="button" 
-                                    class="btn btn-secondary" 
-                                    id="clearSignatureBtn">
-                                Limpar
-                            </button>
-                            <button type="button" 
-                                    class="btn btn-primary" 
-                                    id="uploadSignatureBtn">
-                                Upload
-                            </button>
-                            <input type="file" 
-                                   id="signatureUpload" 
-                                   accept="image/*" 
-                                   style="display: none;" 
-                                   aria-label="Upload de Assinatura">
+                    
+                    <div class="logo-upload" onclick="document.getElementById('logoInput').click()">
+                        <input type="file" id="logoInput" accept="image/*" style="display: none;" onchange="handleLogoUpload(event)">
+                        <img id="logoPreview" class="logo-preview" style="display: none;">
+                        <div id="logoPlaceholder">
+                            <p style="color: #a0aec0;">📷 Clique para adicionar logo</p>
+                            <small style="color: #cbd5e0;">PNG/JPG até 1MB</small>
                         </div>
                     </div>
                     
-                    <!-- Doctor Signature Line -->
-                    <div class="signature-line">
-                        <p class="doctor-name" id="signatureDoctorName">Dr. João Silva</p>
-                        <p class="doctor-crm" id="signatureDoctorCRM">CRM: 12345-SP</p>
+                    <div style="font-size: 14px; color: var(--text-dark);">
+                        <strong id="profileName">Dr. Nome</strong><br>
+                        <span id="profileCRM" style="color: var(--text-light);">CRM: 00000-UF</span>
                     </div>
-                </footer>
-            </article>
-        </section>
-
-        <!-- Action Buttons Section -->
-        <section class="action-buttons" aria-label="Ações">
-            <!-- Paper Size Selection -->
-            <fieldset class="paper-size-selector">
-                <legend>Tamanho do papel:</legend>
-                <div class="radio-group">
-                    <label>
-                        <input type="radio" 
-                               name="paperSize" 
-                               value="a4" 
-                               checked>
-                        A4
-                    </label>
-                    <label>
-                        <input type="radio" 
-                               name="paperSize" 
-                               value="a5">
-                        A5
-                    </label>
-                    <label>
-                        <input type="radio" 
-                               name="paperSize" 
-                               value="letter">
-                        Carta
-                    </label>
                 </div>
-            </fieldset>
-            
-            <!-- Export and Save Buttons -->
-            <button type="button" 
-                    class="btn btn-primary" 
-                    id="generatePdfBtn">
-                📄 Gerar PDF
-            </button>
-            <button type="button" 
-                    class="btn btn-primary" 
-                    id="generatePngBtn">
-                🖼️ Gerar Imagem
-            </button>
-            <button type="button" 
-                    class="btn btn-secondary" 
-                    id="saveHistoryBtn">
-                💾 Salvar Histórico
-            </button>
-        </section>
+
+                <!-- Upgrade Banner (for freemium users) -->
+                <div class="upgrade-banner" id="upgradeBanner" style="display: none;">
+                    <h4>🚀 Desbloqueie Templates Premium!</h4>
+                    <p>Acesse cores, layouts e personalização completa</p>
+                    <button class="btn-upgrade" onclick="upgradeNow()">Fazer Upgrade</button>
+                </div>
+
+                <!-- Template Selection -->
+                <div class="template-selector">
+                    <h3 style="margin-bottom: 15px; font-size: 16px;">Templates</h3>
+                    
+                    <!-- Template Type -->
+                    <div class="template-selector-buttons">
+                        <button class="template-btn active" onclick="selectTemplateType('medicacao')">💊 Medicação</button>
+                        <button class="template-btn" onclick="selectTemplateType('exames')">🔬 Exames</button>
+                        <button class="template-btn" onclick="selectTemplateType('procedimentos')">🏥 Procedimentos</button>
+                        <button class="template-btn" onclick="selectTemplateType('controle')">📋 Controle Especial</button>
+                    </div>
+                    
+                    <!-- Color Themes -->
+                    <h4 style="margin: 15px 0 10px; font-size: 14px;">Tema de Cores</h4>
+                    <div class="template-grid">
+                        <div class="template-card active" onclick="selectColorTheme('default')">
+                            <div class="template-preview">Padrão</div>
+                            <small>Clássico</small>
+                        </div>
+                        <div class="template-card template-blue locked" onclick="selectColorTheme('blue')">
+                            <div class="template-preview">Azul</div>
+                            <small>Clínico</small>
+                        </div>
+                        <div class="template-card template-green locked" onclick="selectColorTheme('green')">
+                            <div class="template-preview">Verde</div>
+                            <small>Saúde</small>
+                        </div>
+                        <div class="template-card template-red locked" onclick="selectColorTheme('red')">
+                            <div class="template-preview">Vermelho</div>
+                            <small>Urgência</small>
+                        </div>
+                    </div>
+                    
+                    <!-- Header Layout -->
+                    <h4 style="margin: 15px 0 10px; font-size: 14px;">Layout do Cabeçalho</h4>
+                    <select class="form-control" id="headerLayout" onchange="updateHeaderLayout()" disabled>
+                        <option value="default">Padrão</option>
+                        <option value="centered">Centralizado 🔒</option>
+                        <option value="lateral">Lateral 🔒</option>
+                        <option value="minimal">Minimalista 🔒</option>
+                    </select>
+                </div>
+
+                <!-- Patient Info -->
+                <div class="form-section">
+                    <label for="patientName">Nome do Paciente</label>
+                    <input type="text" id="patientName" class="form-control" placeholder="Digite o nome do paciente">
+                </div>
+
+                <div class="form-section">
+                    <label for="prescriptionDate">Data</label>
+                    <input type="date" id="prescriptionDate" class="form-control">
+                </div>
+            </div>
+
+            <!-- Preview Area -->
+            <div class="preview-container">
+                <div class="prescription-preview" id="prescriptionPreview">
+                    <!-- Header -->
+                    <div class="prescription-header">
+                        <div id="clinicLogoContainer">
+                            <div class="clinic-logo-placeholder">CLÍNICA</div>
+                        </div>
+                        <div class="doctor-info">
+                            <h2 id="doctorName">Dr. Nome do Médico</h2>
+                            <p id="doctorCRM">CRM: 00000-UF</p>
+                            <p id="doctorSpecialty">Especialidade</p>
+                            <p id="doctorPhone">Telefone: (00) 00000-0000</p>
+                        </div>
+                    </div>
+
+                    <!-- Patient Info -->
+                    <div class="patient-info">
+                        <p><strong>Paciente:</strong> <span id="patientDisplay">_________________________</span></p>
+                        <p><strong>Data:</strong> <span id="dateDisplay">__/__/____</span></p>
+                    </div>
+
+                    <!-- Content -->
+                    <div class="prescription-content">
+                        <textarea id="prescriptionText" placeholder="Digite aqui o conteúdo do receituário...
+
+Para medicações:
+- Nome do medicamento - Dosagem
+  Posologia: Como tomar
+  Quantidade: X caixas
+
+Para exames:
+- Solicito:
+  • Exame 1
+  • Exame 2"></textarea>
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="prescription-footer">
+                        <!-- QR Code Space -->
+                        <div class="qr-code-space" id="qrCodeSpace" style="display: none;">
+                            QR Code
+                        </div>
+                        
+                        <!-- Clinic Contact -->
+                        <div class="clinic-contact" id="clinicContact" style="display: none;">
+                            <p id="clinicAddress"></p>
+                            <p id="clinicCNPJ"></p>
+                        </div>
+                        
+                        <!-- Signature -->
+                        <div class="signature-section">
+                            <canvas id="signatureCanvas" class="signature-canvas" width="300" height="100"></canvas>
+                            <div style="border-top: 2px solid #333; width: 300px; margin: 10px auto;">
+                                <p id="signatureName" style="margin-top: 10px;">Dr. Nome do Médico</p>
+                                <p id="signatureCRM" style="color: var(--text-light); font-size: 13px;">CRM: 00000-UF</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <button class="btn btn-secondary" onclick="clearSignature()">Limpar Assinatura</button>
+            <button class="btn btn-primary" onclick="generatePDF()">📄 Gerar PDF</button>
+            <button class="btn btn-primary" onclick="generatePNG()">🖼️ Gerar PNG</button>
+            <button class="btn btn-primary" onclick="savePrescription()">💾 Salvar Histórico</button>
+        </div>
     </div>
 
-    <!-- Toast Notification (Hidden by default) -->
-    <div id="toast" class="toast" role="alert" aria-live="polite"></div>
+    <!-- Profile Modal -->
+    <div class="modal" id="profileModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Editar Perfil Profissional</h2>
+            </div>
+            
+            <form id="profileForm">
+                <div class="form-group">
+                    <label>Nome Completo</label>
+                    <input type="text" id="profileFormName" class="form-control" required>
+                </div>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Conselho</label>
+                        <select id="profileFormCouncil" class="form-control" required>
+                            <option value="CRM">CRM</option>
+                            <option value="CRO">CRO</option>
+                            <option value="COREN">COREN</option>
+                            <option value="CRF">CRF</option>
+                            <option value="CREFITO">CREFITO</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Número / UF</label>
+                        <input type="text" id="profileFormCRM" class="form-control" placeholder="12345-SP" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Especialidade</label>
+                    <input type="text" id="profileFormSpecialty" class="form-control" placeholder="Ex: Clínica Geral">
+                </div>
+                
+                <div class="form-group">
+                    <label>Telefone</label>
+                    <input type="tel" id="profileFormPhone" class="form-control" placeholder="(11) 98765-4321">
+                </div>
+                
+                <div class="form-group">
+                    <label>Endereço da Clínica <span class="optional-tag">(opcional)</span></label>
+                    <input type="text" id="profileFormAddress" class="form-control" placeholder="Rua Example, 123 - Cidade/UF">
+                </div>
+                
+                <div class="form-group">
+                    <label>CNPJ <span class="optional-tag">(opcional)</span></label>
+                    <input type="text" id="profileFormCNPJ" class="form-control" placeholder="00.000.000/0001-00">
+                </div>
+                
+                <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                    <button type="button" class="btn btn-secondary" onclick="closeProfileModal()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar Perfil</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-    <!-- JavaScript Modules -->
-    <script src="js/config.js"></script>
-    <script src="js/templates.js"></script>
-    <script src="js/signature.js"></script>
-    <script src="js/export.js"></script>
-    <script src="js/storage.js"></script>
-    <script src="js/ui.js"></script>
-    <script src="js/app.js"></script>
-</body>
-</html>
+    <script>
+        // ========================================
+        // GLOBAL VARIABLES
+        // ========================================
+        let currentUser = null;
+        let currentSubscription = null;
+        let currentTemplate = 'medicacao';
+        let currentColorTheme = 'default';
+        let currentHeaderLayout = 'default';
+        let userLogo = null;
+        let prescriptionCount = 0;
+        let isDrawing = false;
+
+        // ========================================
+        // INITIALIZATION
+        // ========================================
+        async function initializeApp() {
+            // Check authentication
+            const session = await checkSession();
+            if (!session) {
+                window.location.href = 'auth.html';
+                return;
+            }
+
+            // Load user data
+            await loadUserData(session.user.id);
+            
+            // Load user subscription
+            await loadUserSubscription(session.user.id);
+            
+            // Initialize components
+            initializeDate();
+            initializeSignature();
+            setupEventListeners();
+            
+            // Load prescription count
+            await updatePrescriptionCount();
+        }
+
+        // Load user data
+        async function loadUserData(userId) {
+            try {
+                const { data: user

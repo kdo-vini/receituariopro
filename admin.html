@@ -6,6 +6,9 @@
     <meta name="robots" content="noindex, nofollow">
     <title>Admin - Receituário Pro</title>
     
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
@@ -1114,28 +1117,61 @@
         </div>
     </div>
     
+    <!-- Incluir configuração do Supabase -->
+    <script src="js/supabase-config.js"></script>
+    
     <script>
-        // Admin credentials (in production, this would be in backend)
-        const ADMIN_EMAIL = 'admin@receituariopro.com.br';
-        const ADMIN_PASSWORD = 'Admin@2025'; // In production, use hashed password
+        // ========================================
+        // INTEGRAÇÃO COM SUPABASE
+        // ========================================
         
-        // Check if already logged in
-        if (localStorage.getItem('adminLoggedIn') === 'true') {
+        // Verificar se é admin
+        async function checkAdminAccess() {
+            const session = await checkSession();
+            
+            if (!session) {
+                window.location.href = 'auth.html';
+                return;
+            }
+            
+            const { data: user } = await supabaseClient
+                .from('users')
+                .select('*')
+                .eq('id', session.user.id)
+                .single();
+            
+            if (!user || !user.is_admin) {
+                alert('Acesso negado. Área administrativa.');
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            // Mostrar dashboard
             showDashboard();
+            loadDashboardData();
         }
         
-        // Login form handler
-        document.getElementById('adminLoginForm').addEventListener('submit', (e) => {
+        // Carregar ao iniciar
+        checkAdminAccess();
+        
+        // Login form handler REAL
+        document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
             const email = document.getElementById('adminEmail').value;
             const password = document.getElementById('adminPassword').value;
             
-            if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
-                localStorage.setItem('adminLoggedIn', 'true');
-                showDashboard();
-            } else {
-                alert('Credenciais inválidas!');
+            try {
+                const result = await loginAdmin(email, password);
+                
+                if (result.success) {
+                    showDashboard();
+                    loadDashboardData();
+                } else {
+                    alert(result.error || 'Credenciais inválidas');
+                }
+            } catch (error) {
+                alert('Erro ao fazer login');
             }
         });
         
@@ -1145,10 +1181,141 @@
             document.getElementById('dashboard').classList.add('active');
         }
         
-        // Logout
-        function logout() {
-            localStorage.removeItem('adminLoggedIn');
-            window.location.reload();
+        // Logout REAL
+        async function logout() {
+            await logoutUser();
+            window.location.href = 'index.html';
+        }
+        
+        // Carregar dados do dashboard
+        async function loadDashboardData() {
+            try {
+                // Buscar estatísticas
+                const stats = await getDashboardStats();
+                
+                if (stats.success) {
+                    // Atualizar cards de estatísticas
+                    document.querySelector('.stat-value').textContent = stats.data.totalUsers || '0';
+                    document.querySelectorAll('.stat-value')[1].textContent = stats.data.pendingValidations || '0';
+                    document.querySelectorAll('.stat-value')[2].textContent = 'R$ ' + (stats.data.monthlyRevenue || 0);
+                    document.querySelectorAll('.stat-value')[3].textContent = stats.data.monthlyPrescriptions || '0';
+                }
+                
+                // Carregar profissionais pendentes
+                await loadPendingProfessionals();
+                
+            } catch (error) {
+                console.error('Erro ao carregar dashboard:', error);
+            }
+        }
+        
+        // Carregar profissionais pendentes
+        async function loadPendingProfessionals() {
+            try {
+                const result = await getPendingProfessionals();
+                
+                if (result.success) {
+                    const tbody = document.getElementById('validationsList');
+                    tbody.innerHTML = '';
+                    
+                    result.data.forEach(prof => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${new Date(prof.created_at).toLocaleDateString('pt-BR')}</td>
+                            <td>${prof.name}</td>
+                            <td>${prof.council}-${prof.state}</td>
+                            <td>${prof.registration_number}</td>
+                            <td>${prof.email}</td>
+                            <td><span class="status-badge pending">Pendente</span></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn-action btn-view" onclick="viewProfessional('${prof.id}')">Ver</button>
+                                    <button class="btn-action btn-approve" onclick="approveProfessionalReal('${prof.id}')">Aprovar</button>
+                                    <button class="btn-action btn-reject" onclick="rejectProfessionalReal('${prof.id}')">Rejeitar</button>
+                                </div>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                    
+                    if (result.data.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">Nenhuma validação pendente</td></tr>';
+                    }
+                }
+            } catch (error) {
+                console.error('Erro ao carregar pendentes:', error);
+            }
+        }
+        
+        // Aprovar profissional REAL
+        async function approveProfessionalReal(userId) {
+            if (!confirm('Aprovar este profissional?')) return;
+            
+            try {
+                const result = await approveProfessional(userId);
+                
+                if (result.success) {
+                    alert('Profissional aprovado com sucesso!');
+                    loadPendingProfessionals();
+                    loadDashboardData();
+                } else {
+                    alert('Erro ao aprovar profissional');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro ao processar aprovação');
+            }
+        }
+        
+        // Rejeitar profissional REAL
+        async function rejectProfessionalReal(userId) {
+            const reason = prompt('Motivo da rejeição:');
+            if (!reason) return;
+            
+            try {
+                const result = await rejectProfessional(userId, reason);
+                
+                if (result.success) {
+                    alert('Profissional rejeitado.');
+                    loadPendingProfessionals();
+                    loadDashboardData();
+                } else {
+                    alert('Erro ao rejeitar profissional');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro ao processar rejeição');
+            }
+        }
+        
+        // Ver detalhes do profissional
+        async function viewProfessional(userId) {
+            try {
+                const { data: prof } = await supabaseClient
+                    .from('users')
+                    .select('*')
+                    .eq('id', userId)
+                    .single();
+                
+                if (prof) {
+                    document.getElementById('modalName').textContent = prof.name || '-';
+                    document.getElementById('modalEmail').textContent = prof.email || '-';
+                    document.getElementById('modalCouncil').textContent = `${prof.council}-${prof.state}` || '-';
+                    document.getElementById('modalRegister').textContent = prof.registration_number || '-';
+                    document.getElementById('modalSpecialty').textContent = prof.specialty || '-';
+                    document.getElementById('modalPhone').textContent = prof.phone || '-';
+                    document.getElementById('modalDate').textContent = new Date(prof.created_at).toLocaleDateString('pt-BR');
+                    document.getElementById('modalStatus').textContent = prof.status || '-';
+                    
+                    document.getElementById('professionalModal').classList.add('show');
+                }
+            } catch (error) {
+                console.error('Erro ao buscar profissional:', error);
+            }
+        }
+        
+        function closeModal() {
+            document.getElementById('professionalModal').classList.remove('show');
         }
         
         // Sidebar navigation
@@ -1164,8 +1331,32 @@
                 const page = link.dataset.page;
                 document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
                 document.getElementById(page + 'Page').classList.add('active');
+                
+                // Carregar dados específicos da página
+                if (page === 'validations') {
+                    loadPendingProfessionals();
+                } else if (page === 'professionals') {
+                    loadAllProfessionals();
+                }
             });
         });
+        
+        // Carregar todos os profissionais
+        async function loadAllProfessionals() {
+            try {
+                const { data } = await supabaseClient
+                    .from('users')
+                    .select('*')
+                    .neq('is_admin', true)
+                    .order('created_at', { ascending: false });
+                
+                // Atualizar tabela de profissionais
+                // Implementar renderização da tabela
+                console.log('Profissionais:', data);
+            } catch (error) {
+                console.error('Erro ao carregar profissionais:', error);
+            }
+        }
         
         // Tab navigation
         document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -1178,70 +1369,10 @@
                 
                 // Show corresponding tab content
                 document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-                document.getElementById(tab + 'Tab').classList.add('active');
+                const tabContent = document.getElementById(tab + 'Tab');
+                if (tabContent) tabContent.classList.add('active');
             });
         });
-        
-        // Professional actions
-        function viewProfessional(id) {
-            // Mock data - in production, fetch from database
-            const professionals = {
-                1: {
-                    name: 'Dr. Carlos Silva',
-                    email: 'carlos@email.com',
-                    council: 'CRM-SP',
-                    register: '98765',
-                    specialty: 'Cardiologia',
-                    phone: '(11) 98765-4321',
-                    date: '18/08/2025',
-                    status: 'Pendente'
-                },
-                2: {
-                    name: 'Dra. Maria Santos',
-                    email: 'maria@email.com',
-                    council: 'CRO-RJ',
-                    register: '54321',
-                    specialty: 'Ortodontia',
-                    phone: '(21) 97654-3210',
-                    date: '17/08/2025',
-                    status: 'Pendente'
-                }
-            };
-            
-            const prof = professionals[id] || {};
-            
-            document.getElementById('modalName').textContent = prof.name || '-';
-            document.getElementById('modalEmail').textContent = prof.email || '-';
-            document.getElementById('modalCouncil').textContent = prof.council || '-';
-            document.getElementById('modalRegister').textContent = prof.register || '-';
-            document.getElementById('modalSpecialty').textContent = prof.specialty || '-';
-            document.getElementById('modalPhone').textContent = prof.phone || '-';
-            document.getElementById('modalDate').textContent = prof.date || '-';
-            document.getElementById('modalStatus').textContent = prof.status || '-';
-            
-            document.getElementById('professionalModal').classList.add('show');
-        }
-        
-        function closeModal() {
-            document.getElementById('professionalModal').classList.remove('show');
-        }
-        
-        function approveProfessional(id) {
-            if (confirm('Aprovar este profissional?')) {
-                alert('Profissional aprovado! Email de confirmação será enviado.');
-                // In production: update database, send email
-                location.reload();
-            }
-        }
-        
-        function rejectProfessional(id) {
-            const reason = prompt('Motivo da rejeição:');
-            if (reason) {
-                alert('Profissional rejeitado. Email de notificação será enviado.');
-                // In production: update database, send email with reason
-                location.reload();
-            }
-        }
         
         // Settings form
         document.getElementById('settingsForm')?.addEventListener('submit', (e) => {
