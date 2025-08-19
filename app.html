@@ -25,12 +25,6 @@
             --success: #48bb78;
             --error: #f56565;
             --warning: #ed8936;
-            
-            /* Template Colors */
-            --template-blue: #3182ce;
-            --template-green: #48bb78;
-            --template-red: #e53e3e;
-            --template-gray: #718096;
         }
 
         * {
@@ -55,6 +49,7 @@
             overflow: hidden;
         }
 
+        /* Header */
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -100,6 +95,10 @@
             font-weight: 500;
             cursor: pointer;
             transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
         .btn-white {
@@ -112,19 +111,21 @@
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
 
+        /* Main Layout */
         .main-layout {
             display: grid;
-            grid-template-columns: 350px 1fr;
+            grid-template-columns: 320px 1fr;
             min-height: calc(100vh - 200px);
         }
 
+        /* Sidebar Controls */
         .sidebar {
             background: var(--gray-light);
             padding: 25px;
             border-right: 1px solid #e2e8f0;
         }
 
-        .profile-section {
+        .controls-section {
             background: white;
             padding: 20px;
             border-radius: 12px;
@@ -132,129 +133,20 @@
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
         }
 
-        .profile-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .profile-header h3 {
+        .controls-section h3 {
             color: var(--text-dark);
             font-size: 16px;
-        }
-
-        .edit-profile-btn {
-            background: var(--primary);
-            color: white;
-            padding: 5px 12px;
-            border: none;
-            border-radius: 6px;
-            font-size: 12px;
-            cursor: pointer;
-        }
-
-        .logo-upload {
-            border: 2px dashed #cbd5e0;
-            border-radius: 8px;
-            padding: 20px;
-            text-align: center;
             margin-bottom: 15px;
-            cursor: pointer;
-            transition: all 0.3s;
         }
 
-        .logo-upload:hover {
-            border-color: var(--primary);
-            background: rgba(102, 126, 234, 0.05);
+        /* Patient Info */
+        .form-group {
+            margin-bottom: 15px;
         }
 
-        .logo-preview {
-            width: 120px;
-            height: 60px;
-            object-fit: contain;
-            margin: 0 auto;
-        }
-
-        .template-selector {
-            margin-bottom: 20px;
-        }
-
-        .template-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .template-card {
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            padding: 15px;
-            cursor: pointer;
-            transition: all 0.3s;
-            position: relative;
-        }
-
-        .template-card:hover {
-            border-color: var(--primary);
-            transform: translateY(-2px);
-        }
-
-        .template-card.active {
-            border-color: var(--primary);
-            background: rgba(102, 126, 234, 0.05);
-        }
-
-        .template-card.locked {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        .template-card.locked::after {
-            content: '🔒';
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            font-size: 16px;
-        }
-
-        .template-preview {
-            height: 60px;
-            background: white;
-            border: 1px solid #e2e8f0;
-            border-radius: 4px;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 10px;
-            color: #a0aec0;
-        }
-
-        .template-blue .template-preview {
-            background: linear-gradient(to bottom, #ebf8ff 0%, white 30%);
-        }
-
-        .template-green .template-preview {
-            background: linear-gradient(to bottom, #f0fff4 0%, white 30%);
-        }
-
-        .template-red .template-preview {
-            background: linear-gradient(to bottom, #fff5f5 0%, white 30%);
-        }
-
-        .template-gray .template-preview {
-            background: linear-gradient(to bottom, #f7fafc 0%, white 30%);
-        }
-
-        .form-section {
-            margin-bottom: 20px;
-        }
-
-        .form-section label {
+        .form-group label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 5px;
             color: var(--text-dark);
             font-weight: 500;
             font-size: 14px;
@@ -275,21 +167,29 @@
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
-        .template-selector-buttons {
-            display: flex;
+        /* Template Selector */
+        .template-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
             gap: 10px;
             margin-bottom: 15px;
         }
 
         .template-btn {
-            flex: 1;
-            padding: 8px;
+            padding: 12px 8px;
             border: 2px solid #e2e8f0;
             background: white;
             border-radius: 8px;
             cursor: pointer;
             transition: all 0.3s;
-            font-size: 13px;
+            font-size: 12px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .template-btn:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
         }
 
         .template-btn.active {
@@ -298,6 +198,25 @@
             border-color: var(--primary);
         }
 
+        /* Paper Size */
+        .paper-size-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .paper-size-group label {
+            display: flex;
+            align-items: center;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .paper-size-group input {
+            margin-right: 5px;
+        }
+
+        /* Preview Area */
         .preview-container {
             padding: 30px;
             background: #f8f9fa;
@@ -315,54 +234,26 @@
             position: relative;
         }
 
-        /* Template Styles */
-        .prescription-preview.template-blue .prescription-header {
-            background: linear-gradient(to right, #ebf8ff 0%, white 100%);
-            border-left: 4px solid var(--template-blue);
-        }
-
-        .prescription-preview.template-green .prescription-header {
-            background: linear-gradient(to right, #f0fff4 0%, white 100%);
-            border-left: 4px solid var(--template-green);
-        }
-
-        .prescription-preview.template-red .prescription-header {
-            background: linear-gradient(to right, #fff5f5 0%, white 100%);
-            border-left: 4px solid var(--template-red);
-        }
-
-        .prescription-preview.template-gray .prescription-header {
+        /* Prescription Header */
+        .prescription-header {
+            padding: 20px;
+            margin-bottom: 30px;
             background: linear-gradient(to right, #f7fafc 0%, white 100%);
-            border-left: 4px solid var(--template-gray);
-        }
-
-        .prescription-preview.header-centered .prescription-header {
-            text-align: center;
-            border-left: none;
-            border-bottom: 2px solid #e2e8f0;
-        }
-
-        .prescription-preview.header-lateral .prescription-header {
+            border-left: 4px solid #e2e8f0;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             gap: 20px;
         }
 
-        .prescription-header {
-            padding: 20px;
-            margin-bottom: 30px;
-            border-radius: 8px;
-        }
-
         .clinic-logo {
-            max-width: 150px;
+            max-width: 120px;
             max-height: 60px;
             object-fit: contain;
-            margin-bottom: 15px;
         }
 
         .clinic-logo-placeholder {
-            width: 150px;
+            width: 120px;
             height: 60px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             border-radius: 8px;
@@ -371,21 +262,22 @@
             justify-content: center;
             color: white;
             font-weight: bold;
-            margin-bottom: 15px;
+            font-size: 14px;
         }
 
         .doctor-info h2 {
             color: var(--text-dark);
-            font-size: 20px;
+            font-size: 18px;
             margin-bottom: 5px;
         }
 
         .doctor-info p {
             color: var(--text-light);
-            margin: 3px 0;
-            font-size: 14px;
+            margin: 2px 0;
+            font-size: 13px;
         }
 
+        /* Patient Info */
         .patient-info {
             margin-bottom: 30px;
             padding: 15px;
@@ -393,6 +285,16 @@
             border-radius: 8px;
         }
 
+        .patient-info p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        .patient-info strong {
+            color: var(--text-dark);
+        }
+
+        /* Prescription Content */
         .prescription-content {
             min-height: 400px;
             margin-bottom: 30px;
@@ -407,46 +309,49 @@
             font-size: 14px;
             line-height: 1.8;
             resize: vertical;
+            font-family: inherit;
         }
 
-        .prescription-footer {
-            margin-top: 60px;
-            padding-top: 20px;
-            border-top: 1px solid #e2e8f0;
+        .prescription-content textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
-        .clinic-contact {
-            text-align: center;
-            color: var(--text-light);
-            font-size: 13px;
-            margin-bottom: 20px;
-        }
-
-        .qr-code-space {
-            width: 100px;
-            height: 100px;
-            border: 2px dashed #cbd5e0;
-            margin: 20px auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #a0aec0;
-            font-size: 12px;
-        }
-
+        /* Signature Section */
         .signature-section {
             margin-top: 50px;
             text-align: center;
         }
 
-        .signature-canvas {
-            border: 2px dashed #e2e8f0;
-            border-radius: 8px;
-            cursor: crosshair;
+        .signature-display {
+            max-width: 250px;
+            max-height: 80px;
+            object-fit: contain;
+            margin: 0 auto 10px;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
             background: white;
-            margin: 20px auto;
         }
 
+        .signature-line {
+            border-top: 2px solid #333;
+            width: 250px;
+            margin: 10px auto;
+            padding-top: 10px;
+        }
+
+        .signature-line p {
+            margin: 5px 0;
+            color: var(--text-dark);
+        }
+
+        .signature-line .doctor-crm {
+            color: var(--text-light);
+            font-size: 12px;
+        }
+
+        /* Action Buttons */
         .action-buttons {
             padding: 20px 30px;
             background: white;
@@ -454,6 +359,7 @@
             display: flex;
             justify-content: center;
             gap: 15px;
+            flex-wrap: wrap;
         }
 
         .btn-primary {
@@ -480,97 +386,57 @@
             border-radius: 8px;
             font-weight: 600;
             cursor: pointer;
+            transition: all 0.3s;
         }
 
-        /* Profile Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
         }
 
-        .modal.show {
-            display: flex;
+        /* Loading */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
         }
 
-        .modal-content {
-            background: white;
-            border-radius: 16px;
-            padding: 30px;
-            max-width: 600px;
-            width: 90%;
-            max-height: 90vh;
-            overflow-y: auto;
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
-        .modal-header {
-            margin-bottom: 25px;
-        }
-
-        .modal-title {
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--text-dark);
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: var(--text-dark);
-            font-weight: 500;
-        }
-
-        .optional-tag {
-            font-size: 12px;
-            color: var(--text-light);
-            font-weight: normal;
-        }
-
-        /* Upgrade Banner */
-        .upgrade-banner {
-            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-            color: white;
+        /* Alert */
+        .alert {
             padding: 15px 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            text-align: center;
+            border-radius: 8px;
+            margin: 20px 30px;
+            display: none;
         }
 
-        .upgrade-banner h4 {
-            margin-bottom: 8px;
+        .alert.show {
+            display: block;
         }
 
-        .upgrade-banner p {
-            font-size: 14px;
-            margin-bottom: 10px;
+        .alert-success {
+            background: rgba(72, 187, 120, 0.1);
+            color: var(--success);
+            border: 1px solid rgba(72, 187, 120, 0.3);
         }
 
-        .btn-upgrade {
-            background: white;
-            color: #f59e0b;
-            padding: 8px 20px;
-            border: none;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
+        .alert-error {
+            background: rgba(245, 101, 101, 0.1);
+            color: var(--error);
+            border: 1px solid rgba(245, 101, 101, 0.3);
+        }
+
+        .alert-warning {
+            background: rgba(237, 137, 54, 0.1);
+            color: var(--warning);
+            border: 1px solid rgba(237, 137, 54, 0.3);
         }
 
         /* Responsive */
@@ -595,6 +461,11 @@
             .template-grid {
                 grid-template-columns: 1fr;
             }
+            
+            .prescription-header {
+                flex-direction: column;
+                text-align: center;
+            }
         }
     </style>
 </head>
@@ -603,6 +474,17 @@
     <script src="js/supabase-config.js"></script>
     
     <div class="container">
+        <!-- Alert Messages -->
+        <div class="alert alert-success" id="alertSuccess">
+            <span id="alertSuccessMessage"></span>
+        </div>
+        <div class="alert alert-error" id="alertError">
+            <span id="alertErrorMessage"></span>
+        </div>
+        <div class="alert alert-warning" id="alertWarning">
+            <span id="alertWarningMessage"></span>
+        </div>
+        
         <!-- Header -->
         <div class="header">
             <h1>
@@ -616,94 +498,71 @@
                 <div class="user-info">
                     <span id="userName">Carregando...</span>
                 </div>
-                <button class="btn btn-white" onclick="logout()">Sair</button>
+                <a href="profile.html" class="btn btn-white">
+                    <span>👤</span> Acessar Perfil
+                </a>
+                <button class="btn btn-white" onclick="logoutUser()">
+                    <span>🚪</span> Sair
+                </button>
             </div>
         </div>
 
         <div class="main-layout">
-            <!-- Sidebar -->
+            <!-- Sidebar Controls -->
             <div class="sidebar">
-                <!-- Profile Section -->
-                <div class="profile-section">
-                    <div class="profile-header">
-                        <h3>Meu Perfil</h3>
-                        <button class="edit-profile-btn" onclick="openProfileModal()">Editar</button>
-                    </div>
+                <!-- Patient Info -->
+                <div class="controls-section">
+                    <h3>Informações do Paciente</h3>
                     
-                    <div class="logo-upload" onclick="document.getElementById('logoInput').click()">
-                        <input type="file" id="logoInput" accept="image/*" style="display: none;" onchange="handleLogoUpload(event)">
-                        <img id="logoPreview" class="logo-preview" style="display: none;">
-                        <div id="logoPlaceholder">
-                            <p style="color: #a0aec0;">📷 Clique para adicionar logo</p>
-                            <small style="color: #cbd5e0;">PNG/JPG até 1MB</small>
-                        </div>
+                    <div class="form-group">
+                        <label for="patientName">Nome do Paciente</label>
+                        <input type="text" id="patientName" class="form-control" placeholder="Digite o nome do paciente">
                     </div>
-                    
-                    <div style="font-size: 14px; color: var(--text-dark);">
-                        <strong id="profileName">Dr. Nome</strong><br>
-                        <span id="profileCRM" style="color: var(--text-light);">CRM: 00000-UF</span>
-                    </div>
-                </div>
 
-                <!-- Upgrade Banner (for freemium users) -->
-                <div class="upgrade-banner" id="upgradeBanner" style="display: none;">
-                    <h4>🚀 Desbloqueie Templates Premium!</h4>
-                    <p>Acesse cores, layouts e personalização completa</p>
-                    <button class="btn-upgrade" onclick="upgradeNow()">Fazer Upgrade</button>
+                    <div class="form-group">
+                        <label for="prescriptionDate">Data</label>
+                        <input type="date" id="prescriptionDate" class="form-control">
+                    </div>
                 </div>
 
                 <!-- Template Selection -->
-                <div class="template-selector">
-                    <h3 style="margin-bottom: 15px; font-size: 16px;">Templates</h3>
+                <div class="controls-section">
+                    <h3>Tipo de Receituário</h3>
                     
-                    <!-- Template Type -->
-                    <div class="template-selector-buttons">
-                        <button class="template-btn active" onclick="selectTemplateType('medicacao')">💊 Medicação</button>
-                        <button class="template-btn" onclick="selectTemplateType('exames')">🔬 Exames</button>
-                        <button class="template-btn" onclick="selectTemplateType('procedimentos')">🏥 Procedimentos</button>
-                        <button class="template-btn" onclick="selectTemplateType('controle')">📋 Controle Especial</button>
-                    </div>
-                    
-                    <!-- Color Themes -->
-                    <h4 style="margin: 15px 0 10px; font-size: 14px;">Tema de Cores</h4>
                     <div class="template-grid">
-                        <div class="template-card active" onclick="selectColorTheme('default')">
-                            <div class="template-preview">Padrão</div>
-                            <small>Clássico</small>
-                        </div>
-                        <div class="template-card template-blue locked" onclick="selectColorTheme('blue')">
-                            <div class="template-preview">Azul</div>
-                            <small>Clínico</small>
-                        </div>
-                        <div class="template-card template-green locked" onclick="selectColorTheme('green')">
-                            <div class="template-preview">Verde</div>
-                            <small>Saúde</small>
-                        </div>
-                        <div class="template-card template-red locked" onclick="selectColorTheme('red')">
-                            <div class="template-preview">Vermelho</div>
-                            <small>Urgência</small>
-                        </div>
+                        <button class="template-btn active" data-template="medicacao">
+                            💊 Medicação
+                        </button>
+                        <button class="template-btn" data-template="exames">
+                            🔬 Exames
+                        </button>
+                        <button class="template-btn" data-template="procedimentos">
+                            🏥 Procedimentos
+                        </button>
+                        <button class="template-btn" data-template="livre">
+                            📝 Livre
+                        </button>
                     </div>
+                </div>
+
+                <!-- Paper Size -->
+                <div class="controls-section">
+                    <h3>Tamanho do Papel</h3>
                     
-                    <!-- Header Layout -->
-                    <h4 style="margin: 15px 0 10px; font-size: 14px;">Layout do Cabeçalho</h4>
-                    <select class="form-control" id="headerLayout" onchange="updateHeaderLayout()" disabled>
-                        <option value="default">Padrão</option>
-                        <option value="centered">Centralizado 🔒</option>
-                        <option value="lateral">Lateral 🔒</option>
-                        <option value="minimal">Minimalista 🔒</option>
-                    </select>
-                </div>
-
-                <!-- Patient Info -->
-                <div class="form-section">
-                    <label for="patientName">Nome do Paciente</label>
-                    <input type="text" id="patientName" class="form-control" placeholder="Digite o nome do paciente">
-                </div>
-
-                <div class="form-section">
-                    <label for="prescriptionDate">Data</label>
-                    <input type="date" id="prescriptionDate" class="form-control">
+                    <div class="paper-size-group">
+                        <label>
+                            <input type="radio" name="paperSize" value="a4" checked>
+                            A4
+                        </label>
+                        <label>
+                            <input type="radio" name="paperSize" value="a5">
+                            A5
+                        </label>
+                        <label>
+                            <input type="radio" name="paperSize" value="letter">
+                            Carta
+                        </label>
+                    </div>
                 </div>
             </div>
 
@@ -713,13 +572,15 @@
                     <!-- Header -->
                     <div class="prescription-header">
                         <div id="clinicLogoContainer">
-                            <div class="clinic-logo-placeholder">CLÍNICA</div>
+                            <div class="clinic-logo-placeholder" id="logoPlaceholder">CLÍNICA</div>
+                            <img id="clinicLogo" class="clinic-logo" style="display: none;" alt="Logo da Clínica">
                         </div>
                         <div class="doctor-info">
                             <h2 id="doctorName">Dr. Nome do Médico</h2>
                             <p id="doctorCRM">CRM: 00000-UF</p>
                             <p id="doctorSpecialty">Especialidade</p>
                             <p id="doctorPhone">Telefone: (00) 00000-0000</p>
+                            <p id="doctorAddress" style="display: none;">Endereço</p>
                         </div>
                     </div>
 
@@ -744,26 +605,13 @@ Para exames:
   • Exame 2"></textarea>
                     </div>
 
-                    <!-- Footer -->
-                    <div class="prescription-footer">
-                        <!-- QR Code Space -->
-                        <div class="qr-code-space" id="qrCodeSpace" style="display: none;">
-                            QR Code
-                        </div>
+                    <!-- Signature -->
+                    <div class="signature-section">
+                        <img id="signatureDisplay" class="signature-display" style="display: none;" alt="Assinatura">
                         
-                        <!-- Clinic Contact -->
-                        <div class="clinic-contact" id="clinicContact" style="display: none;">
-                            <p id="clinicAddress"></p>
-                            <p id="clinicCNPJ"></p>
-                        </div>
-                        
-                        <!-- Signature -->
-                        <div class="signature-section">
-                            <canvas id="signatureCanvas" class="signature-canvas" width="300" height="100"></canvas>
-                            <div style="border-top: 2px solid #333; width: 300px; margin: 10px auto;">
-                                <p id="signatureName" style="margin-top: 10px;">Dr. Nome do Médico</p>
-                                <p id="signatureCRM" style="color: var(--text-light); font-size: 13px;">CRM: 00000-UF</p>
-                            </div>
+                        <div class="signature-line">
+                            <p id="signatureName">Dr. Nome do Médico</p>
+                            <p id="signatureCRM" class="doctor-crm">CRM: 00000-UF</p>
                         </div>
                     </div>
                 </div>
@@ -772,69 +620,18 @@ Para exames:
 
         <!-- Action Buttons -->
         <div class="action-buttons">
-            <button class="btn btn-secondary" onclick="clearSignature()">Limpar Assinatura</button>
-            <button class="btn btn-primary" onclick="generatePDF()">📄 Gerar PDF</button>
-            <button class="btn btn-primary" onclick="generatePNG()">🖼️ Gerar PNG</button>
-            <button class="btn btn-primary" onclick="savePrescription()">💾 Salvar Histórico</button>
-        </div>
-    </div>
-
-    <!-- Profile Modal -->
-    <div class="modal" id="profileModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">Editar Perfil Profissional</h2>
-            </div>
-            
-            <form id="profileForm">
-                <div class="form-group">
-                    <label>Nome Completo</label>
-                    <input type="text" id="profileFormName" class="form-control" required>
-                </div>
-                
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label>Conselho</label>
-                        <select id="profileFormCouncil" class="form-control" required>
-                            <option value="CRM">CRM</option>
-                            <option value="CRO">CRO</option>
-                            <option value="COREN">COREN</option>
-                            <option value="CRF">CRF</option>
-                            <option value="CREFITO">CREFITO</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Número / UF</label>
-                        <input type="text" id="profileFormCRM" class="form-control" placeholder="12345-SP" required>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label>Especialidade</label>
-                    <input type="text" id="profileFormSpecialty" class="form-control" placeholder="Ex: Clínica Geral">
-                </div>
-                
-                <div class="form-group">
-                    <label>Telefone</label>
-                    <input type="tel" id="profileFormPhone" class="form-control" placeholder="(11) 98765-4321">
-                </div>
-                
-                <div class="form-group">
-                    <label>Endereço da Clínica <span class="optional-tag">(opcional)</span></label>
-                    <input type="text" id="profileFormAddress" class="form-control" placeholder="Rua Example, 123 - Cidade/UF">
-                </div>
-                
-                <div class="form-group">
-                    <label>CNPJ <span class="optional-tag">(opcional)</span></label>
-                    <input type="text" id="profileFormCNPJ" class="form-control" placeholder="00.000.000/0001-00">
-                </div>
-                
-                <div style="display: flex; gap: 10px; justify-content: flex-end;">
-                    <button type="button" class="btn btn-secondary" onclick="closeProfileModal()">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Salvar Perfil</button>
-                </div>
-            </form>
+            <button class="btn btn-primary" onclick="generatePDF()">
+                <span>📄</span> Gerar PDF
+            </button>
+            <button class="btn btn-primary" onclick="generatePNG()">
+                <span>🖼️</span> Gerar PNG
+            </button>
+            <button class="btn btn-primary" onclick="savePrescription()">
+                <span>💾</span> Salvar Histórico
+            </button>
+            <button class="btn btn-secondary" onclick="clearForm()">
+                <span>🗑️</span> Limpar
+            </button>
         </div>
     </div>
 
@@ -845,39 +642,485 @@ Para exames:
         let currentUser = null;
         let currentSubscription = null;
         let currentTemplate = 'medicacao';
-        let currentColorTheme = 'default';
-        let currentHeaderLayout = 'default';
-        let userLogo = null;
         let prescriptionCount = 0;
-        let isDrawing = false;
+
+        // Templates
+        const templates = {
+            medicacao: {
+                title: 'Receituário de Medicação',
+                content: `USO INTERNO
+
+1. ________________________________
+   Posologia: _____________________
+   Quantidade: ____________________
+
+2. ________________________________
+   Posologia: _____________________
+   Quantidade: ____________________
+
+3. ________________________________
+   Posologia: _____________________
+   Quantidade: ____________________
+
+Orientações:
+_________________________________
+_________________________________`,
+                placeholder: 'Digite as medicações e posologia...'
+            },
+            
+            exames: {
+                title: 'Solicitação de Exames',
+                content: `SOLICITO OS SEGUINTES EXAMES:
+
+□ Hemograma completo
+□ Glicemia de jejum
+□ Colesterol total e frações
+□ Triglicerídeos
+□ TGO/TGP
+□ TSH e T4 livre
+□ Urina tipo I
+□ Creatinina
+□ Ureia
+□ _______________________________
+□ _______________________________
+□ _______________________________
+
+Observações clínicas:
+_________________________________
+_________________________________
+
+Hipótese diagnóstica:
+_________________________________`,
+                placeholder: 'Marque ou adicione os exames necessários...'
+            },
+            
+            procedimentos: {
+                title: 'Encaminhamento / Procedimento',
+                content: `ENCAMINHAMENTO MÉDICO
+
+Prezado(a) Colega,
+
+Encaminho o(a) paciente para:
+_________________________________
+_________________________________
+
+Motivo do encaminhamento:
+_________________________________
+_________________________________
+_________________________________
+
+Diagnóstico / CID:
+_________________________________
+
+História clínica resumida:
+_________________________________
+_________________________________
+_________________________________
+
+Exames realizados:
+_________________________________
+_________________________________
+
+Medicações em uso:
+_________________________________
+_________________________________
+
+Atenciosamente,`,
+                placeholder: 'Descreva o encaminhamento ou procedimento...'
+            },
+            
+            livre: {
+                title: 'Receituário Livre',
+                content: '',
+                placeholder: 'Digite o conteúdo do receituário...'
+            }
+        };
 
         // ========================================
         // INITIALIZATION
         // ========================================
-        async function initializeApp() {
+        document.addEventListener('DOMContentLoaded', async () => {
             // Check authentication
-            const session = await checkSession();
-            if (!session) {
-                window.location.href = 'auth.html';
-                return;
-            }
+            const sessionData = await checkSessionOrRedirect();
+            if (!sessionData) return;
 
-            // Load user data
-            await loadUserData(session.user.id);
+            currentUser = sessionData.user;
             
-            // Load user subscription
-            await loadUserSubscription(session.user.id);
+            // Load user data and populate prescription
+            await loadUserData();
             
             // Initialize components
             initializeDate();
-            initializeSignature();
             setupEventListeners();
             
             // Load prescription count
             await updatePrescriptionCount();
+            
+            // Load template
+            loadTemplate('medicacao');
+        });
+
+        // ========================================
+        // LOAD USER DATA
+        // ========================================
+        async function loadUserData() {
+    try {
+        const userData = await getCurrentUserData();
+        if (!userData) return;
+
+        currentUser = userData;
+        currentSubscription = userData.subscriptions?.[0] || { plan: 'freemium' };
+
+        // Update header
+        document.getElementById('userName').textContent = userData.name;
+
+        // Populate doctor info
+        document.getElementById('doctorName').textContent = userData.name;
+        document.getElementById('doctorCRM').textContent = `${userData.council}-${userData.state} ${userData.registration_number}`;
+        document.getElementById('doctorSpecialty').textContent = userData.specialty || 'Especialista';
+        document.getElementById('doctorPhone').textContent = userData.phone ? `Tel: ${userData.phone}` : '';
+        
+        // Signature display names
+        document.getElementById('signatureName').textContent = userData.name;
+        document.getElementById('signatureCRM').textContent = `${userData.council}-${userData.state} ${userData.registration_number}`;
+
+        // Address (optional)
+        if (userData.address) {
+            document.getElementById('doctorAddress').textContent = userData.address;
+            document.getElementById('doctorAddress').style.display = 'block';
         }
 
-        // Load user data
-        async function loadUserData(userId) {
+        // Logo (only for Essential plan)
+        if (currentSubscription?.plan === 'essential' && userData.logo_url) {
+            const logoImg = document.getElementById('clinicLogo');
+            const logoPlaceholder = document.getElementById('logoPlaceholder');
+            
+            logoImg.src = userData.logo_url;
+            logoImg.style.display = 'block';
+            logoPlaceholder.style.display = 'none';
+        }
+
+        // Signature (all plans) - CORRIGIDO
+        if (userData.signature_url) {
+            const signatureImg = document.getElementById('signatureDisplay');
+            signatureImg.src = userData.signature_url;
+            signatureImg.style.display = 'block';
+        } else {
+            // Verificar localStorage como fallback
+            const localSignature = localStorage.getItem('user_signature');
+            if (localSignature) {
+                const signatureImg = document.getElementById('signatureDisplay');
+                signatureImg.src = localSignature;
+                signatureImg.style.display = 'block';
+            }
+        }
+
+        // Update prescription count with correct plan
+        await updatePrescriptionCount();
+
+    } catch (error) {
+        console.error('Error loading user data:', error);
+        showAlert('Erro ao carregar dados do usuário', 'error');
+    }
+}
+
+        // ========================================
+        // EVENT LISTENERS
+        // ========================================
+        function setupEventListeners() {
+            // Template selection
+            document.querySelectorAll('.template-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    // Update active state
+                    document.querySelectorAll('.template-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    
+                    // Load template
+                    const template = btn.dataset.template;
+                    loadTemplate(template);
+                });
+            });
+
+            // Patient name input
+            document.getElementById('patientName').addEventListener('input', (e) => {
+                const display = document.getElementById('patientDisplay');
+                const value = e.target.value.trim();
+                display.textContent = value || '_________________________';
+            });
+
+            // Date input
+            document.getElementById('prescriptionDate').addEventListener('change', updateDateDisplay);
+        }
+
+        // ========================================
+        // TEMPLATE MANAGEMENT
+        // ========================================
+        function loadTemplate(templateName) {
+            const template = templates[templateName];
+            if (!template) return;
+            
+            currentTemplate = templateName;
+            const textarea = document.getElementById('prescriptionText');
+            textarea.value = template.content;
+            textarea.placeholder = template.placeholder;
+        }
+
+        // ========================================
+        // DATE MANAGEMENT
+        // ========================================
+        function initializeDate() {
+            const dateInput = document.getElementById('prescriptionDate');
+            const today = new Date();
+            dateInput.valueAsDate = today;
+            updateDateDisplay();
+        }
+
+        function updateDateDisplay() {
+            const dateInput = document.getElementById('prescriptionDate');
+            const display = document.getElementById('dateDisplay');
+            
+            if (dateInput.value) {
+                const date = new Date(dateInput.value + 'T00:00:00');
+                const day = String(date.getDate()).padStart(2, '0');
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const year = date.getFullYear();
+                display.textContent = `${day}/${month}/${year}`;
+            } else {
+                display.textContent = '__/__/____';
+            }
+        }
+
+        async function updatePrescriptionCount() {
+    try {
+        if (!currentUser) return;
+
+        const result = await window.prescriptionFunctions.updatePrescriptionCount();
+        
+        prescriptionCount = result.count;
+        const limit = result.limit === Infinity ? '∞' : result.limit;
+        
+        // Update display
+        document.getElementById('countText').textContent = `${prescriptionCount}/${limit}`;
+        
+        // Update global variables
+        currentSubscription = { plan: result.plan };
+
+    } catch (error) {
+        console.error('Error updating prescription count:', error);
+        document.getElementById('countText').textContent = '0/30';
+    }
+}
+
+        // ========================================
+        // EXPORT FUNCTIONS
+        // ========================================
+        async function generatePDF() {
             try {
-                const { data: user
+                showAlert('Gerando PDF...', 'success');
+                
+                const element = document.getElementById('prescriptionPreview');
+                const paperSize = document.querySelector('input[name="paperSize"]:checked').value;
+                
+                // Prepare for export
+                const textarea = document.getElementById('prescriptionText');
+                const originalDisplay = textarea.style.display;
+                
+                // Create formatted content div
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = formatTextForExport(textarea.value);
+                tempDiv.style.padding = '20px';
+                tempDiv.style.minHeight = '400px';
+                tempDiv.style.fontSize = '14px';
+                tempDiv.style.lineHeight = '1.8';
+                tempDiv.style.whiteSpace = 'pre-wrap';
+                
+                // Replace textarea with formatted content
+                textarea.style.display = 'none';
+                textarea.parentNode.insertBefore(tempDiv, textarea);
+                
+                // Generate PDF
+                const canvas = await html2canvas(element, {
+                    scale: 2,
+                    useCORS: true,
+                    logging: false,
+                    backgroundColor: '#ffffff'
+                });
+                
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', paperSize);
+                
+                const paperDimensions = {
+                    a4: { width: 210, height: 297 },
+                    a5: { width: 148, height: 210 },
+                    letter: { width: 216, height: 279 }
+                };
+                
+                const imgData = canvas.toDataURL('image/png', 0.95);
+                const imgWidth = paperDimensions[paperSize].width - 20;
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                
+                pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
+                
+                // Generate filename
+                const patientName = document.getElementById('patientName').value || 'Paciente';
+                const date = document.getElementById('dateDisplay').textContent.replace(/\//g, '-');
+                const safeName = patientName.replace(/[^a-z0-9]/gi, '_');
+                const fileName = `Receituario_${safeName}_${date}.pdf`;
+                
+                pdf.save(fileName);
+                
+                // Restore textarea
+                tempDiv.remove();
+                textarea.style.display = originalDisplay;
+                
+                showAlert('PDF gerado com sucesso!', 'success');
+                
+            } catch (error) {
+                console.error('Error generating PDF:', error);
+                showAlert('Erro ao gerar PDF', 'error');
+            }
+        }
+
+        async function generatePNG() {
+            try {
+                showAlert('Gerando imagem...', 'success');
+                
+                const element = document.getElementById('prescriptionPreview');
+                
+                // Prepare for export
+                const textarea = document.getElementById('prescriptionText');
+                const originalDisplay = textarea.style.display;
+                
+                // Create formatted content div
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = formatTextForExport(textarea.value);
+                tempDiv.style.padding = '20px';
+                tempDiv.style.minHeight = '400px';
+                tempDiv.style.fontSize = '14px';
+                tempDiv.style.lineHeight = '1.8';
+                tempDiv.style.whiteSpace = 'pre-wrap';
+                
+                // Replace textarea with formatted content
+                textarea.style.display = 'none';
+                textarea.parentNode.insertBefore(tempDiv, textarea);
+                
+                // Generate PNG
+                const canvas = await html2canvas(element, {
+                    scale: 2,
+                    useCORS: true,
+                    logging: false,
+                    backgroundColor: '#ffffff'
+                });
+                
+                // Generate filename
+                const patientName = document.getElementById('patientName').value || 'Paciente';
+                const date = document.getElementById('dateDisplay').textContent.replace(/\//g, '-');
+                const safeName = patientName.replace(/[^a-z0-9]/gi, '_');
+                const fileName = `Receituario_${safeName}_${date}.png`;
+                
+                // Download
+                const link = document.createElement('a');
+                link.download = fileName;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                
+                // Restore textarea
+                tempDiv.remove();
+                textarea.style.display = originalDisplay;
+                
+                showAlert('Imagem gerada com sucesso!', 'success');
+                
+            } catch (error) {
+                console.error('Error generating PNG:', error);
+                showAlert('Erro ao gerar imagem', 'error');
+            }
+        }
+
+        function formatTextForExport(text) {
+            return text
+                .replace(/\n/g, '<br>')
+                .replace(/\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;')
+                .replace(/  /g, '&nbsp;&nbsp;');
+        }
+
+        // ========================================
+        // SAVE PRESCRIPTION
+        // ========================================
+        async function savePrescription() {
+            try {
+                const prescriptionData = {
+                    patientName: document.getElementById('patientName').value,
+                    content: document.getElementById('prescriptionText').value,
+                    template: currentTemplate,
+                    signature: currentUser.signature_url || null
+                };
+                
+                if (!prescriptionData.patientName) {
+                    showAlert('Por favor, preencha o nome do paciente', 'warning');
+                    return;
+                }
+                
+                if (!prescriptionData.content) {
+                    showAlert('Por favor, preencha o conteúdo do receituário', 'warning');
+                    return;
+                }
+                
+                showAlert('Salvando receituário...', 'success');
+                
+                const result = await savePrescription(prescriptionData);
+                
+                if (result.success) {
+                    showAlert('✅ Receituário salvo no histórico!', 'success');
+                    await updatePrescriptionCount();
+                } else {
+                    showAlert(result.error || 'Erro ao salvar receituário', 'error');
+                }
+                
+            } catch (error) {
+                console.error('Error saving prescription:', error);
+                showAlert('Erro ao salvar receituário', 'error');
+            }
+        }
+
+        // ========================================
+        // UTILITY FUNCTIONS
+        // ========================================
+        function clearForm() {
+            if (!confirm('Deseja limpar todos os campos?')) return;
+            
+            document.getElementById('patientName').value = '';
+            document.getElementById('patientDisplay').textContent = '_________________________';
+            
+            initializeDate();
+            
+            loadTemplate(currentTemplate);
+            
+            showAlert('Formulário limpo', 'success');
+        }
+
+        function showAlert(message, type = 'success') {
+            hideAllAlerts();
+            
+            const alertElement = document.getElementById(`alert${type.charAt(0).toUpperCase() + type.slice(1)}`);
+            const messageElement = document.getElementById(`alert${type.charAt(0).toUpperCase() + type.slice(1)}Message`);
+            
+            if (alertElement && messageElement) {
+                messageElement.textContent = message;
+                alertElement.classList.add('show');
+                
+                // Auto-hide after 5 seconds
+                setTimeout(() => {
+                    alertElement.classList.remove('show');
+                }, 5000);
+            }
+        }
+
+        function hideAllAlerts() {
+            document.querySelectorAll('.alert').forEach(alert => {
+                alert.classList.remove('show');
+            });
+        }
+        
+    </script>
+</body>
+</html>

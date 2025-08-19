@@ -26,28 +26,98 @@ const STRIPE_LINKS = {
 };
 
 // ========================================
+// VERIFICAÇÃO DE SESSÃO GLOBAL
+// ========================================
+
+/**
+ * Verificar sessão ativa e redirecionar se necessário
+ */
+async function checkSessionOrRedirect() {
+    try {
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (!session) {
+            window.location.href = 'index.html';
+            return null;
+        }
+        
+        // Verificar se usuário ainda existe e está ativo
+        const { data: user, error } = await supabase
+            .from('users')
+            .select('*')
+            .eq('id', session.user.id)
+            .single();
+            
+        if (error || !user) {
+            await supabase.auth.signOut();
+            window.location.href = 'index.html';
+            return null;
+        }
+        
+        if (user.status !== 'active') {
+            await supabase.auth.signOut();
+            alert('Sua conta não está ativa. Entre em contato com o suporte.');
+            window.location.href = 'index.html';
+            return null;
+        }
+        
+        return { session, user };
+    } catch (error) {
+        console.error('Erro ao verificar sessão:', error);
+        window.location.href = 'index.html';
+        return null;
+    }
+}
+
+// ========================================
 // FUNÇÕES DE AUTENTICAÇÃO
 // ========================================
 
 /**
- * Registrar novo profissional
+ * Registrar novo profissional - VERSÃO MELHORADA
  */
 async function registerProfessional(userData) {
     try {
-        // 1. Criar auth user
+        console.log('1. Iniciando registro:', userData.email);
+        
+        // 1. Verificar se email já existe
+        const { data: existingUser } = await supabase
+            .from('users')
+            .select('email')
+            .eq('email', userData.email)
+            .single();
+            
+        if (existingUser) {
+            return { success: false, error: 'Este e-mail já está cadastrado no sistema.' };
+        }
+
+        // 2. Criar auth user
         const { data: authData, error: authError } = await supabase.auth.signUp({
             email: userData.email,
             password: userData.password,
             options: {
-                data: {
-                    name: userData.name
-                }
+                data: { name: userData.name }
             }
         });
 
-        if (authError) throw authError;
+        if (authError) {
+            console.error('Auth error:', authError);
+            let errorMessage = 'Erro ao criar conta.';
+            
+            if (authError.message.includes('already registered')) {
+                errorMessage = 'Este e-mail já está cadastrado.';
+            } else if (authError.message.includes('invalid email')) {
+                errorMessage = 'E-mail inválido.';
+            } else if (authError.message.includes('password')) {
+                errorMessage = 'Senha deve ter pelo menos 8 caracteres.';
+            }
+            
+            return { success: false, error: errorMessage };
+        }
 
-        // 2. Criar registro na tabela users
+        console.log('2. Auth user criado:', authData.user.id);
+
+        // 3. Criar registro na tabela users
         const { data: user, error: userError } = await supabase
             .from('users')
             .insert({
@@ -64,9 +134,27 @@ async function registerProfessional(userData) {
             .select()
             .single();
 
-        if (userError) throw userError;
+        if (userError) {
+            console.error('User creation error:', userError);
+            
+            // Tentar deletar o auth user se falhou
+            try {
+                await supabase.auth.admin.deleteUser(authData.user.id);
+            } catch (cleanupError) {
+                console.error('Cleanup error:', cleanupError);
+            }
+            
+            let errorMessage = 'Erro ao criar perfil profissional.';
+            if (userError.code === '23505') { // Unique constraint
+                errorMessage = 'Este e-mail já está cadastrado.';
+            }
+            
+            return { success: false, error: errorMessage };
+        }
 
-        // 3. Criar registro de consentimento LGPD
+        console.log('3. Public user criado:', user);
+
+        // 4. Criar registro de consentimento LGPD
         const { error: consentError } = await supabase
             .from('consent_records')
             .insert({
@@ -77,9 +165,11 @@ async function registerProfessional(userData) {
                 ip_address: await getUserIP()
             });
 
-        if (consentError) throw consentError;
+        if (consentError) {
+            console.warn('Consent error (não crítico):', consentError);
+        }
 
-        // 4. Criar assinatura freemium
+        // 5. Criar assinatura freemium
         const { error: subError } = await supabase
             .from('subscriptions')
             .insert({
@@ -88,16 +178,200 @@ async function registerProfessional(userData) {
                 status: 'active'
             });
 
-        if (subError) throw subError;
-
-        // 5. Enviar email para admin (você implementará)
-        await notifyAdminNewRegistration(user);
+        if (subError) {
+            console.error('Subscription error:', subError);
+            // Não falhar por causa disso, admin pode criar manualmente
+        }
 
         return { success: true, user };
 
     } catch (error) {
         console.error('Registration error:', error);
-        return { success: false, error: error.message };
+        return { success: false, error: 'Erro interno. Tente novamente.' };
+    }
+}
+
+/**
+ * Login de usuário - VERSÃO MELHORADA
+ */
+async function loginUser(email, password) {
+    try {
+        // 1. Fazer login
+        const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+            email,
+            password
+        });
+
+        if (authError) {
+            console.error('Auth error:', authError);
+            let errorMessage = 'Erro ao fazer login.';
+            
+            if (authError.message.includes('Invalid login credentials')) {
+                errorMessage = 'E-mail ou senha incorretos.';
+            } else if (authError.message.includes('Email not confirmed')) {
+                errorMessage = 'Confirme seu e-mail antes de fazer login.';
+            } else if (authError.message.includes('Too many requests')) {
+                errorMessage = 'Muitas tentativas. Aguarde alguns minutos.';
+            } else if (authError.message.includes('Email logins are disabled')) {
+                errorMessage = 'Login temporariamente indisponível.';
+            }
+            
+            return { success: false, error: errorMessage };
+        }
+
+        // 2. Buscar dados do usuário
+        const { data: user, error: userError } = await supabase
+            .from('users')
+            .select('*')
+            .eq('id', authData.user.id)
+            .single();
+
+        if (userError) {
+            console.error('User fetch error:', userError);
+            await supabase.auth.signOut();
+            return { 
+                success: false, 
+                error: 'Perfil não encontrado. Entre em contato com o suporte.' 
+            };
+        }
+
+        // 3. Verificar status
+        if (user.status === 'pending') {
+            await supabase.auth.signOut();
+            return { 
+                success: false, 
+                error: 'Sua conta ainda está em validação. Aguarde até 24h para aprovação.' 
+            };
+        }
+
+        if (user.status === 'rejected') {
+            await supabase.auth.signOut();
+            return { 
+                success: false, 
+                error: 'Seu cadastro foi rejeitado. Entre em contato com o suporte.' 
+            };
+        }
+
+        if (user.status === 'suspended') {
+            await supabase.auth.signOut();
+            return { 
+                success: false, 
+                error: 'Sua conta está suspensa. Entre em contato com o suporte.' 
+            };
+        }
+
+        return { success: true, user };
+
+    } catch (error) {
+        console.error('Login error:', error);
+        return { success: false, error: 'Erro interno. Tente novamente.' };
+    }
+}
+
+/**
+ * Salvar assinatura desenhada (canvas) - VERSÃO MELHORADA
+ */
+async function saveCanvasSignature(dataURL) {
+    try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) throw new Error('Usuário não autenticado');
+
+        // Converter dataURL para blob
+        const response = await fetch(dataURL);
+        const blob = await response.blob();
+
+        // Criar arquivo
+        const file = new File([blob], 'signature.png', { type: 'image/png' });
+
+        // Usar a função de upload existente
+        const result = await uploadSignature(file);
+        
+        if (result.success) {
+            // Também salvar no localStorage para fallback
+            localStorage.setItem('user_signature', dataURL);
+        }
+        
+        return result;
+    } catch (error) {
+        console.error('Erro ao salvar assinatura:', error);
+        return { success: false, error: 'Erro ao salvar assinatura.' };
+    }
+}
+
+/**
+ * Remover assinatura - VERSÃO MELHORADA  
+ */
+async function removeSignature() {
+    try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) throw new Error('Usuário não autenticado');
+
+        // 1. Remover do storage
+        const fileName = `${session.user.id}/signature.png`;
+        const { error: storageError } = await supabase.storage
+            .from('signatures')
+            .remove([fileName]);
+
+        if (storageError) {
+            console.warn('Storage removal warning:', storageError);
+        }
+
+        // 2. Remover da tabela users
+        const { error: updateError } = await supabase
+            .from('users')
+            .update({ signature_url: null })
+            .eq('id', session.user.id);
+
+        if (updateError) throw updateError;
+
+        // 3. Remover do localStorage
+        localStorage.removeItem('user_signature');
+
+        return { success: true };
+    } catch (error) {
+        console.error('Erro ao remover assinatura:', error);
+        return { success: false, error: 'Erro ao remover assinatura.' };
+    }
+}
+
+/**
+ * Atualizar contador de receituários - CORRIGIDO
+ */
+async function updatePrescriptionCount() {
+    try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) return { count: 0, limit: 0 };
+
+        const startOfMonth = new Date();
+        startOfMonth.setDate(1);
+        startOfMonth.setHours(0, 0, 0, 0);
+
+        const { count } = await supabase
+            .from('prescriptions')
+            .select('*', { count: 'exact', head: true })
+            .eq('user_id', session.user.id)
+            .gte('created_at', startOfMonth.toISOString());
+
+        // Buscar plano atual
+        const { data: subscription } = await supabase
+            .from('subscriptions')
+            .select('plan')
+            .eq('user_id', session.user.id)
+            .single();
+
+        const plan = subscription?.plan || 'freemium';
+        const limit = plan === 'freemium' ? 30 : Infinity;
+
+        // Atualizar contador na tabela subscriptions
+        await supabase
+            .from('subscriptions')
+            .update({ prescriptions_count: count })
+            .eq('user_id', session.user.id);
+
+        return { count: count || 0, limit, plan };
+    } catch (error) {
+        console.error('Error updating prescription count:', error);
+        return { count: 0, limit: 30, plan: 'freemium' };
     }
 }
 
@@ -165,6 +439,7 @@ async function logoutUser() {
         console.error('Logout error:', error);
         return false;
     }
+    window.location.href = 'index.html';
     return true;
 }
 
@@ -187,6 +462,200 @@ async function resetPassword(email) {
 }
 
 // ========================================
+// FUNÇÕES DE PERFIL E UPLOAD
+// ========================================
+
+/**
+ * Buscar dados completos do usuário logado
+ */
+async function getCurrentUserData() {
+    try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) return null;
+
+        const { data: user, error } = await supabase
+            .from('users')
+            .select(`
+                *,
+                subscriptions(plan, status)
+            `)
+            .eq('id', session.user.id)
+            .single();
+
+        if (error) throw error;
+        return user;
+    } catch (error) {
+        console.error('Erro ao buscar dados do usuário:', error);
+        return null;
+    }
+}
+
+/**
+ * Atualizar dados do perfil
+ */
+async function updateProfile(profileData) {
+    try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) throw new Error('Usuário não autenticado');
+
+        const { data, error } = await supabase
+            .from('users')
+            .update({
+                name: profileData.name,
+                council: profileData.council,
+                state: profileData.state,
+                registration_number: profileData.registrationNumber,
+                specialty: profileData.specialty,
+                phone: profileData.phone,
+                address: profileData.address,
+                cnpj: profileData.cnpj,
+                updated_at: new Date().toISOString()
+            })
+            .eq('id', session.user.id)
+            .select()
+            .single();
+
+        if (error) throw error;
+        return { success: true, data };
+    } catch (error) {
+        console.error('Erro ao atualizar perfil:', error);
+        return { success: false, error: error.message };
+    }
+}
+
+/**
+ * Upload de logo da clínica
+ */
+async function uploadLogo(file) {
+    try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) throw new Error('Usuário não autenticado');
+
+        // Verificar se é plano essencial
+        const { data: subscription } = await supabase
+            .from('subscriptions')
+            .select('plan')
+            .eq('user_id', session.user.id)
+            .single();
+
+        if (!subscription || subscription.plan === 'freemium') {
+            throw new Error('Upload de logo disponível apenas no plano Essencial');
+        }
+
+        // Validar arquivo
+        if (file.size > 1024 * 1024) { // 1MB
+            throw new Error('Arquivo muito grande. Máximo 1MB');
+        }
+
+        if (!file.type.startsWith('image/')) {
+            throw new Error('Apenas imagens são permitidas');
+        }
+
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${session.user.id}/logo.${fileExt}`;
+
+        // Upload para o Supabase Storage
+        const { data: uploadData, error: uploadError } = await supabase.storage
+            .from('logos')
+            .upload(fileName, file, {
+                upsert: true
+            });
+
+        if (uploadError) throw uploadError;
+
+        // Obter URL pública
+        const { data: { publicUrl } } = supabase.storage
+            .from('logos')
+            .getPublicUrl(fileName);
+
+        // Atualizar na tabela users
+        const { error: updateError } = await supabase
+            .from('users')
+            .update({ logo_url: publicUrl })
+            .eq('id', session.user.id);
+
+        if (updateError) throw updateError;
+
+        return { success: true, url: publicUrl };
+    } catch (error) {
+        console.error('Erro no upload do logo:', error);
+        return { success: false, error: error.message };
+    }
+}
+
+/**
+ * Upload de assinatura
+ */
+async function uploadSignature(file) {
+    try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) throw new Error('Usuário não autenticado');
+
+        // Validar arquivo
+        if (file.size > 500 * 1024) { // 500KB
+            throw new Error('Arquivo muito grande. Máximo 500KB');
+        }
+
+        if (!file.type.startsWith('image/')) {
+            throw new Error('Apenas imagens são permitidas');
+        }
+
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${session.user.id}/signature.${fileExt}`;
+
+        // Upload para o Supabase Storage
+        const { data: uploadData, error: uploadError } = await supabase.storage
+            .from('signatures')
+            .upload(fileName, file, {
+                upsert: true
+            });
+
+        if (uploadError) throw uploadError;
+
+        // Obter URL pública
+        const { data: { publicUrl } } = supabase.storage
+            .from('signatures')
+            .getPublicUrl(fileName);
+
+        // Atualizar na tabela users
+        const { error: updateError } = await supabase
+            .from('users')
+            .update({ signature_url: publicUrl })
+            .eq('id', session.user.id);
+
+        if (updateError) throw updateError;
+
+        return { success: true, url: publicUrl };
+    } catch (error) {
+        console.error('Erro no upload da assinatura:', error);
+        return { success: false, error: error.message };
+    }
+}
+
+/**
+ * Salvar assinatura desenhada (canvas)
+ */
+async function saveCanvasSignature(dataURL) {
+    try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) throw new Error('Usuário não autenticado');
+
+        // Converter dataURL para blob
+        const response = await fetch(dataURL);
+        const blob = await response.blob();
+
+        // Criar arquivo
+        const file = new File([blob], 'signature.png', { type: 'image/png' });
+
+        // Usar a função de upload existente
+        return await uploadSignature(file);
+    } catch (error) {
+        console.error('Erro ao salvar assinatura:', error);
+        return { success: false, error: error.message };
+    }
+}
+
+// ========================================
 // FUNÇÕES DE RECEITUÁRIOS
 // ========================================
 
@@ -195,12 +664,11 @@ async function resetPassword(email) {
  */
 async function savePrescription(prescriptionData) {
     try {
-        // 1. Verificar se usuário está logado
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) throw new Error('Usuário não autenticado');
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) throw new Error('Usuário não autenticado');
 
-        // 2. Verificar limite do plano
-        const canCreate = await checkPrescriptionLimit(user.id);
+        // Verificar limite do plano
+        const canCreate = await checkPrescriptionLimit(session.user.id);
         if (!canCreate) {
             return { 
                 success: false, 
@@ -208,11 +676,11 @@ async function savePrescription(prescriptionData) {
             };
         }
 
-        // 3. Salvar receituário
+        // Salvar receituário
         const { data, error } = await supabase
             .from('prescriptions')
             .insert({
-                user_id: user.id,
+                user_id: session.user.id,
                 patient_name: prescriptionData.patientName,
                 content: prescriptionData.content,
                 template_type: prescriptionData.template,
@@ -223,8 +691,8 @@ async function savePrescription(prescriptionData) {
 
         if (error) throw error;
 
-        // 4. Atualizar contador
-        await updatePrescriptionCount(user.id);
+        // Atualizar contador
+        await updatePrescriptionCount(session.user.id);
 
         return { success: true, data };
 
@@ -239,7 +707,7 @@ async function savePrescription(prescriptionData) {
  */
 async function checkPrescriptionLimit(userId) {
     try {
-        // 1. Buscar assinatura do usuário
+        // Buscar assinatura do usuário
         const { data: subscription } = await supabase
             .from('subscriptions')
             .select('*')
@@ -248,14 +716,13 @@ async function checkPrescriptionLimit(userId) {
 
         if (!subscription) return false;
 
-        // 2. Se for plano essencial, sem limite
+        // Se for plano essencial, sem limite
         if (subscription.plan === 'essential' || subscription.plan === 'professional') {
             return true;
         }
 
-        // 3. Se for freemium, verificar limite mensal (30)
+        // Se for freemium, verificar limite mensal (30)
         if (subscription.plan === 'freemium') {
-            // Contar receituários do mês atual
             const startOfMonth = new Date();
             startOfMonth.setDate(1);
             startOfMonth.setHours(0, 0, 0, 0);
@@ -270,7 +737,6 @@ async function checkPrescriptionLimit(userId) {
         }
 
         return false;
-
     } catch (error) {
         console.error('Check limit error:', error);
         return false;
@@ -302,13 +768,13 @@ async function updatePrescriptionCount(userId) {
  */
 async function getPrescriptionHistory() {
     try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) throw new Error('Usuário não autenticado');
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) throw new Error('Usuário não autenticado');
 
         const { data, error } = await supabase
             .from('prescriptions')
             .select('*')
-            .eq('user_id', user.id)
+            .eq('user_id', session.user.id)
             .order('created_at', { ascending: false })
             .limit(100);
 
@@ -330,18 +796,15 @@ async function getPrescriptionHistory() {
  */
 async function loginAdmin(email, password) {
     try {
-        // 1. Fazer login normal
         const loginResult = await loginUser(email, password);
         if (!loginResult.success) return loginResult;
 
-        // 2. Verificar se é admin
         if (!loginResult.user.is_admin) {
             await supabase.auth.signOut();
             return { success: false, error: 'Acesso negado' };
         }
 
         return { success: true, user: loginResult.user };
-
     } catch (error) {
         console.error('Admin login error:', error);
         return { success: false, error: error.message };
@@ -361,7 +824,6 @@ async function getPendingProfessionals() {
 
         if (error) throw error;
         return { success: true, data };
-
     } catch (error) {
         console.error('Get pending error:', error);
         return { success: false, error: error.message };
@@ -373,18 +835,20 @@ async function getPendingProfessionals() {
  */
 async function approveProfessional(userId) {
     try {
-        const { error } = await supabase.rpc('validate_professional', {
-            target_user_id: userId,
-            approved: true
-        });
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) throw new Error('Não autenticado');
+
+        const { error } = await supabase
+            .from('users')
+            .update({
+                status: 'active',
+                validated_at: new Date().toISOString(),
+                validated_by: session.user.id
+            })
+            .eq('id', userId);
 
         if (error) throw error;
-
-        // Enviar email de aprovação (implementar)
-        // await sendApprovalEmail(userId);
-
         return { success: true };
-
     } catch (error) {
         console.error('Approve error:', error);
         return { success: false, error: error.message };
@@ -396,19 +860,20 @@ async function approveProfessional(userId) {
  */
 async function rejectProfessional(userId, reason) {
     try {
-        const { error } = await supabase.rpc('validate_professional', {
-            target_user_id: userId,
-            approved: false,
-            reason: reason
-        });
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) throw new Error('Não autenticado');
+
+        const { error } = await supabase
+            .from('users')
+            .update({
+                status: 'rejected',
+                validated_at: new Date().toISOString(),
+                validated_by: session.user.id
+            })
+            .eq('id', userId);
 
         if (error) throw error;
-
-        // Enviar email de rejeição (implementar)
-        // await sendRejectionEmail(userId, reason);
-
         return { success: true };
-
     } catch (error) {
         console.error('Reject error:', error);
         return { success: false, error: error.message };
@@ -447,7 +912,6 @@ async function getDashboardStats() {
             .eq('plan', 'essential')
             .eq('status', 'active');
 
-        // Receita mensal (R$ 29 * assinaturas)
         const monthlyRevenue = activeSubscriptions * 29;
 
         return {
@@ -460,7 +924,6 @@ async function getDashboardStats() {
                 monthlyRevenue
             }
         };
-
     } catch (error) {
         console.error('Dashboard stats error:', error);
         return { success: false, error: error.message };
@@ -475,18 +938,16 @@ async function getDashboardStats() {
  * Redirecionar para checkout do Stripe
  */
 function redirectToCheckout(plan) {
-    const { data: { user } } = supabase.auth.getUser();
-    if (!user) {
-        alert('Faça login primeiro');
-        return;
-    }
+    const urlParams = new URLSearchParams(window.location.search);
+    const userEmail = urlParams.get('email') || '';
 
     const link = plan === 'yearly' 
         ? STRIPE_LINKS.essential_yearly 
         : STRIPE_LINKS.essential_monthly;
 
-    // Adicionar email do usuário como parâmetro
-    const checkoutUrl = `${link}?prefilled_email=${encodeURIComponent(user.email)}`;
+    const checkoutUrl = userEmail 
+        ? `${link}?prefilled_email=${encodeURIComponent(userEmail)}`
+        : link;
     
     window.location.href = checkoutUrl;
 }
@@ -509,17 +970,6 @@ async function getUserIP() {
 }
 
 /**
- * Notificar admin sobre novo cadastro
- */
-async function notifyAdminNewRegistration(user) {
-    // Implementar envio de email
-    console.log('Novo cadastro para validação:', user);
-    
-    // Por enquanto, apenas log
-    // Em produção, usar SendGrid, Resend ou similar
-}
-
-/**
  * Verificar sessão atual
  */
 async function checkSession() {
@@ -527,30 +977,38 @@ async function checkSession() {
     return session;
 }
 
-/**
- * Listener de mudanças de autenticação
- */
+// ========================================
+// LISTENER DE MUDANÇAS DE AUTENTICAÇÃO
+// ========================================
+
 supabase.auth.onAuthStateChange((event, session) => {
     console.log('Auth event:', event);
     
-    if (event === 'SIGNED_IN') {
-        console.log('User signed in:', session.user);
-    }
-    
     if (event === 'SIGNED_OUT') {
         console.log('User signed out');
-        window.location.href = '/auth.html';
+        window.location.href = 'index.html';
     }
 });
 
-// Exportar para uso global
+// ========================================
+// EXPORTAR PARA USO GLOBAL
+// ========================================
+
 window.supabaseClient = supabase;
 window.authFunctions = {
     registerProfessional,
     loginUser,
     logoutUser,
     resetPassword,
-    loginAdmin
+    loginAdmin,
+    checkSessionOrRedirect
+};
+window.profileFunctions = {
+    getCurrentUserData,
+    updateProfile,
+    uploadLogo,
+    uploadSignature,
+    saveCanvasSignature
 };
 window.prescriptionFunctions = {
     savePrescription,

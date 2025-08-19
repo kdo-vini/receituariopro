@@ -1154,26 +1154,34 @@
         // Carregar ao iniciar
         checkAdminAccess();
         
-        // Login form handler REAL
-        document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const email = document.getElementById('adminEmail').value;
-            const password = document.getElementById('adminPassword').value;
-            
-            try {
-                const result = await loginAdmin(email, password);
-                
-                if (result.success) {
-                    showDashboard();
-                    loadDashboardData();
-                } else {
-                    alert(result.error || 'Credenciais inválidas');
-                }
-            } catch (error) {
-                alert('Erro ao fazer login');
-            }
-        });
+        // Login form handler CORRETO para admin
+document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const email = document.getElementById('adminEmail').value;
+    const password = document.getElementById('adminPassword').value;
+    const button = e.target.querySelector('button[type="submit"]');
+    
+    button.disabled = true;
+    button.textContent = 'Entrando...';
+    
+    try {
+        const result = await loginUser(email, password);
+        
+        if (result.success && result.user.is_admin) {
+            showDashboard();
+            loadDashboardData();
+        } else {
+            alert(result.error || 'Acesso negado');
+            button.disabled = false;
+            button.textContent = 'Entrar';
+        }
+    } catch (error) {
+        alert('Erro ao fazer login');
+        button.disabled = false;
+        button.textContent = 'Entrar';
+    }
+});
         
         // Show dashboard
         function showDashboard() {
@@ -1386,6 +1394,81 @@
                 e.target.classList.remove('show');
             }
         });
+                // ========================================
+        // INTEGRAÇÃO REAL COM SUPABASE
+        // ========================================
+        
+        // Verificar se já está logado
+        document.addEventListener('DOMContentLoaded', async () => {
+            await checkExistingSession();
+        });
+        
+        async function checkExistingSession() {
+            const sessionData = await checkSessionOrRedirect();
+            if (sessionData) {
+                const { user } = sessionData;
+                
+                if (user.is_admin) {
+                    window.location.href = 'admin.html';
+                } else if (user.status === 'active') {
+                    window.location.href = 'app.html';
+                }
+            }
+        }
+         // ========================================
+        // INTEGRAÇÃO COM SUPABASE
+        // ========================================
+        
+        document.addEventListener('DOMContentLoaded', async () => {
+    await checkAdminAccess();
+});
+
+async function checkAdminAccess() {
+    try {
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (!session) {
+            // Mostrar tela de login admin
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('dashboard').style.display = 'none';
+            return;
+        }
+        
+        // Verificar se usuário existe e é admin
+        const { data: user, error } = await supabase
+            .from('users')
+            .select('*')
+            .eq('id', session.user.id)
+            .single();
+            
+        if (error || !user) {
+            await supabase.auth.signOut();
+            window.location.href = 'index.html';
+            return;
+        }
+        
+        if (!user.is_admin) {
+            await supabase.auth.signOut();
+            alert('Acesso negado. Área administrativa.');
+            window.location.href = 'index.html';
+            return;
+        }
+        
+        // Se chegou aqui, é admin válido
+        showDashboard();
+        loadDashboardData();
+        
+    } catch (error) {
+        console.error('Erro na verificação admin:', error);
+        document.getElementById('loginScreen').style.display = 'flex';
+        document.getElementById('dashboard').style.display = 'none';
+    }
+}
+
+function showDashboard() {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+}
     </script>
 </body>
 </html>

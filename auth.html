@@ -952,41 +952,72 @@
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             hideAlert();
-            
+
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
             const button = e.target.querySelector('button[type="submit"]');
             const btnText = document.getElementById('loginBtnText');
-            
+
             // Validate
             if (!validateEmail(email)) {
                 showAlert('Por favor, insira um e-mail válido', 'error');
                 return;
             }
-            
+
             if (!password) {
                 showAlert('Por favor, insira sua senha', 'error');
                 return;
             }
-            
+
             // Show loading
             button.disabled = true;
             btnText.innerHTML = '<span class="loading-spinner"></span> Entrando...';
-            
-            // Simulate API call
-            setTimeout(() => {
-                // Check if user is validated (mock check)
-                if (email === 'demo@receituariopro.com') {
-                    showAlert('Sua conta ainda está em processo de validação', 'warning');
-                    button.disabled = false;
-                    btnText.textContent = 'Entrar';
+
+            try {
+                const result = await loginUser(email, password);
+
+                if (result.success) {
+                            // Após o login success, adicione:
+console.log('Login result:', result);
+console.log('User data:', result.user);
+console.log('Auth session:', await supabase.auth.getSession());
+                    // Redirecionar baseado no tipo de usuário
+                    if (result.user.is_admin) {
+                        window.location.href = 'admin.html';
+                    } else {
+                        window.location.href = 'app.html';
+                    }
                 } else {
-                    // Success - redirect to app
-                    window.location.href = 'app.html';
+                    // Melhorar mensagens de erro
+                            // Após o login success, adicione:
+console.log('Login result:', result);
+console.log('User data:', result.user);
+console.log('Auth session:', await supabase.auth.getSession());
+                    let errorMessage = result.error;
+
+                    if (errorMessage.includes('Email logins are disabled')) {
+                        errorMessage = 'Sistema temporariamente indisponível. Tente novamente.';
+                    } else if (errorMessage.includes('Invalid login credentials')) {
+                        errorMessage = 'E-mail ou senha incorretos.';
+                    } else if (errorMessage.includes('Email not confirmed')) {
+                        errorMessage = 'Verifique seu e-mail para confirmar a conta.';
+                    } else if (errorMessage.includes('Too many requests')) {
+                        errorMessage = 'Muitas tentativas. Aguarde alguns minutos.';
+                    } else if (errorMessage.includes('User not found')) {
+                        errorMessage = 'E-mail não cadastrado no sistema.';
+                    }
+
+                    showAlert(errorMessage, 'error');
                 }
-            }, 1500);
+            } catch (err) {
+                showAlert('Erro inesperado. Tente novamente mais tarde.', 'error');
+                console.error(err);
+            } finally {
+                button.disabled = false;
+                btnText.innerHTML = 'Entrar';
+            }
         });
-        
+
         // Register form handler
         document.getElementById('registerForm').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -1024,7 +1055,7 @@
                 return;
             }
             
-            if (!validateRegistrationNumber(formData.registrationNumber, formData.council)) {
+            if (!validateRegistrationNumber(formData.registrationNumber)) {
                 showAlert('Número de registro inválido. Use apenas números', 'error');
                 return;
             }
@@ -1048,32 +1079,27 @@
             button.disabled = true;
             btnText.innerHTML = '<span class="loading-spinner"></span> Criando conta...';
             
-            // Simulate API call
-            setTimeout(() => {
-                // Show validation modal
-                showValidationModal();
+            try {
+                const result = await registerProfessional(formData);
                 
-                // Reset form
-                e.target.reset();
+                if (result.success) {
+                    // Show validation modal
+                    showValidationModal();
+                    
+                    // Reset form
+                    e.target.reset();
+                    button.disabled = false;
+                    btnText.textContent = 'Criar Conta';
+                } else {
+                    showAlert(result.error || 'Erro ao criar conta', 'error');
+                    button.disabled = false;
+                    btnText.textContent = 'Criar Conta';
+                }
+            } catch (error) {
+                showAlert('Erro ao criar conta. Tente novamente.', 'error');
                 button.disabled = false;
                 btnText.textContent = 'Criar Conta';
-                
-                // In production, this would:
-                // 1. Send data to Supabase
-                // 2. Send validation email to admin
-                // 3. Create pending user record
-                console.log('Registration data:', formData);
-                
-                // Mock email to admin
-                console.log(`
-                    ADMIN EMAIL:
-                    New professional registration pending validation:
-                    Name: ${formData.name}
-                    Email: ${formData.email}
-                    Council: ${formData.council}-${formData.state} ${formData.registrationNumber}
-                    Specialty: ${formData.specialty || 'Not specified'}
-                `);
-            }, 1500);
+            }
         });
         
         // Recover form handler
@@ -1094,15 +1120,21 @@
             button.disabled = true;
             btnText.innerHTML = '<span class="loading-spinner"></span> Enviando...';
             
-            // Simulate API call
-            setTimeout(() => {
-                showAlert('Se este e-mail estiver cadastrado, você receberá as instruções de recuperação em instantes', 'success');
+            try {
+                const result = await resetPassword(email);
+                
+                if (result.success) {
+                    showAlert('Se este e-mail estiver cadastrado, você receberá as instruções de recuperação em instantes', 'success');
+                    e.target.reset();
+                } else {
+                    showAlert('Erro ao enviar email de recuperação', 'error');
+                }
+            } catch (error) {
+                showAlert('Erro ao processar solicitação', 'error');
+            } finally {
                 button.disabled = false;
                 btnText.textContent = 'Enviar Link de Recuperação';
-                
-                // Clear form
-                e.target.reset();
-            }, 1500);
+            }
         });
         
         // Phone mask
@@ -1115,6 +1147,7 @@
                 e.target.value = value;
             }
         });
+
     </script>
 </body>
 </html>

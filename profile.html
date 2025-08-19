@@ -1,0 +1,1308 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Perfil | Receituário Pro</title>
+    <meta name="robots" content="noindex, nofollow">
+    
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #667eea;
+            --primary-dark: #5a67d8;
+            --secondary: #764ba2;
+            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --text-dark: #1a202c;
+            --text-light: #718096;
+            --white: #ffffff;
+            --gray-light: #f7fafc;
+            --gray-lighter: #edf2f7;
+            --success: #48bb78;
+            --error: #f56565;
+            --warning: #ed8936;
+            --info: #4299e1;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--gray-light);
+            min-height: 100vh;
+        }
+        
+        /* Header */
+        .header {
+            background: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+        }
+        
+        .logo img {
+            height: 32px;
+        }
+        
+        .logo span {
+            font-weight: 700;
+            font-size: 1.25rem;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: var(--gradient);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-secondary {
+            background: var(--gray-lighter);
+            color: var(--text-dark);
+        }
+        
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+        
+        /* Main Content */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+        
+        .profile-grid {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 2rem;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            height: fit-content;
+        }
+        
+        .user-avatar {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .avatar-circle {
+            width: 80px;
+            height: 80px;
+            background: var(--gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            color: white;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+        
+        .user-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.25rem;
+        }
+        
+        .user-council {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+        
+        .plan-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }
+        
+        .plan-badge.freemium {
+            background: rgba(237, 137, 54, 0.1);
+            color: var(--warning);
+        }
+        
+        .plan-badge.essential {
+            background: rgba(72, 187, 120, 0.1);
+            color: var(--success);
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+        }
+        
+        .sidebar-item {
+            margin-bottom: 0.5rem;
+        }
+        
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            color: var(--text-dark);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        
+        .sidebar-link:hover {
+            background: var(--gray-light);
+        }
+        
+        .sidebar-link.active {
+            background: var(--gradient);
+            color: white;
+        }
+        
+        .sidebar-icon {
+            font-size: 1.25rem;
+            width: 20px;
+            text-align: center;
+        }
+        
+        /* Main Panel */
+        .main-panel {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .panel-header {
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--gray-lighter);
+        }
+        
+        .panel-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+        
+        .panel-subtitle {
+            color: var(--text-light);
+        }
+        
+        .section {
+            display: none;
+        }
+        
+        .section.active {
+            display: block;
+        }
+        
+        /* Form Styles */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+            font-weight: 500;
+        }
+        
+        .required {
+            color: var(--error);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--gray-lighter);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .form-helper {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-top: 0.25rem;
+        }
+        
+        /* Upload Areas */
+        .upload-area {
+            border: 2px dashed var(--gray-lighter);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 1rem;
+        }
+        
+        .upload-area:hover {
+            border-color: var(--primary);
+            background: rgba(102, 126, 234, 0.05);
+        }
+        
+        .upload-area.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .upload-icon {
+            font-size: 3rem;
+            color: var(--text-light);
+            margin-bottom: 1rem;
+        }
+        
+        .upload-text {
+            color: var(--text-dark);
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+        
+        .upload-hint {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+        
+        .preview-container {
+            margin-top: 1rem;
+            text-align: center;
+        }
+        
+        .logo-preview {
+            max-width: 200px;
+            max-height: 80px;
+            object-fit: contain;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .signature-preview {
+            max-width: 300px;
+            max-height: 100px;
+            object-fit: contain;
+            border: 1px solid var(--gray-lighter);
+            border-radius: 8px;
+            background: white;
+        }
+        
+        /* Signature Canvas */
+        .signature-canvas-container {
+            border: 2px solid var(--gray-lighter);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+            background: white;
+        }
+        
+        .signature-canvas {
+            border: 1px dashed var(--gray-lighter);
+            border-radius: 4px;
+            cursor: crosshair;
+            display: block;
+            margin: 0 auto;
+        }
+        
+        .canvas-controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+        
+        /* Upgrade Banner */
+        .upgrade-banner {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        .upgrade-banner h3 {
+            margin-bottom: 0.5rem;
+        }
+        
+        .upgrade-banner p {
+            margin-bottom: 1rem;
+            opacity: 0.9;
+        }
+        
+        .btn-upgrade {
+            background: white;
+            color: #f59e0b;
+            font-weight: 600;
+        }
+        
+        /* Alert Messages */
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            display: none;
+        }
+        
+        .alert.show {
+            display: block;
+        }
+        
+        .alert-success {
+            background: rgba(72, 187, 120, 0.1);
+            color: var(--success);
+            border: 1px solid rgba(72, 187, 120, 0.3);
+        }
+        
+        .alert-error {
+            background: rgba(245, 101, 101, 0.1);
+            color: var(--error);
+            border: 1px solid rgba(245, 101, 101, 0.3);
+        }
+        
+        .alert-warning {
+            background: rgba(237, 137, 54, 0.1);
+            color: var(--warning);
+            border: 1px solid rgba(237, 137, 54, 0.3);
+        }
+        
+        /* Loading */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1rem;
+            }
+            
+            .profile-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Incluir configuração do Supabase -->
+    <script src="js/supabase-config.js"></script>
+    
+    <!-- Header -->
+    <div class="header">
+        <a href="app.html" class="logo">
+            <img src="img/saas-logo.png" alt="Logo">
+            <span>Receituário Pro</span>
+        </a>
+        
+        <div class="header-actions">
+            <a href="app.html" class="btn btn-secondary">
+                <span>📝</span> Receituários
+            </a>
+            <button class="btn btn-primary" onclick="logoutUser()">
+                <span>🚪</span> Sair
+            </button>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="profile-grid">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <div class="user-avatar">
+                    <div class="avatar-circle" id="userAvatar">
+                        <span id="userInitials">U</span>
+                    </div>
+                    <div class="user-name" id="userName">Carregando...</div>
+                    <div class="user-council" id="userCouncil">-</div>
+                    <div class="plan-badge" id="planBadge">Freemium</div>
+                </div>
+                
+                <ul class="sidebar-menu">
+                    <li class="sidebar-item">
+                        <a href="#" class="sidebar-link active" data-section="profile">
+                            <span class="sidebar-icon">👤</span>
+                            <span>Dados Pessoais</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="#" class="sidebar-link" data-section="logo">
+                            <span class="sidebar-icon">🏥</span>
+                            <span>Logo da Clínica</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="#" class="sidebar-link" data-section="signature">
+                            <span class="sidebar-icon">✍️</span>
+                            <span>Assinatura Digital</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="#" class="sidebar-link" data-section="plan">
+                            <span class="sidebar-icon">💳</span>
+                            <span>Meu Plano</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            <!-- Main Panel -->
+            <div class="main-panel">
+                <!-- Alert Messages -->
+                <div class="alert alert-success" id="alertSuccess">
+                    <span id="alertSuccessMessage"></span>
+                </div>
+                <div class="alert alert-error" id="alertError">
+                    <span id="alertErrorMessage"></span>
+                </div>
+                <div class="alert alert-warning" id="alertWarning">
+                    <span id="alertWarningMessage"></span>
+                </div>
+                
+                <!-- Dados Pessoais -->
+                <div class="section active" id="profileSection">
+                    <div class="panel-header">
+                        <h1 class="panel-title">Dados Pessoais</h1>
+                        <p class="panel-subtitle">Mantenha suas informações profissionais sempre atualizadas</p>
+                    </div>
+                    
+                    <form id="profileForm">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">Nome Completo <span class="required">*</span></label>
+                                <input type="text" id="profileName" class="form-control" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">E-mail</label>
+                                <input type="email" id="profileEmail" class="form-control" disabled>
+                                <span class="form-helper">O e-mail não pode ser alterado</span>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Conselho <span class="required">*</span></label>
+                                <select id="profileCouncil" class="form-control" required>
+                                    <option value="CRM">CRM - Medicina</option>
+                                    <option value="CRO">CRO - Odontologia</option>
+                                    <option value="COREN">COREN - Enfermagem</option>
+                                    <option value="CRF">CRF - Farmácia</option>
+                                    <option value="CREFITO">CREFITO - Fisioterapia</option>
+                                    <option value="CRN">CRN - Nutrição</option>
+                                    <option value="CRFA">CRFa - Fonoaudiologia</option>
+                                    <option value="CRP">CRP - Psicologia</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Estado <span class="required">*</span></label>
+                                <select id="profileState" class="form-control" required>
+                                    <option value="AC">AC</option>
+                                    <option value="AL">AL</option>
+                                    <option value="AP">AP</option>
+                                    <option value="AM">AM</option>
+                                    <option value="BA">BA</option>
+                                    <option value="CE">CE</option>
+                                    <option value="DF">DF</option>
+                                    <option value="ES">ES</option>
+                                    <option value="GO">GO</option>
+                                    <option value="MA">MA</option>
+                                    <option value="MT">MT</option>
+                                    <option value="MS">MS</option>
+                                    <option value="MG">MG</option>
+                                    <option value="PA">PA</option>
+                                    <option value="PB">PB</option>
+                                    <option value="PR">PR</option>
+                                    <option value="PE">PE</option>
+                                    <option value="PI">PI</option>
+                                    <option value="RJ">RJ</option>
+                                    <option value="RN">RN</option>
+                                    <option value="RS">RS</option>
+                                    <option value="RO">RO</option>
+                                    <option value="RR">RR</option>
+                                    <option value="SC">SC</option>
+                                    <option value="SP">SP</option>
+                                    <option value="SE">SE</option>
+                                    <option value="TO">TO</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Número do Registro <span class="required">*</span></label>
+                                <input type="text" id="profileRegistration" class="form-control" required>
+                                <span class="form-helper">Apenas números, sem pontos ou traços</span>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Especialidade</label>
+                                <input type="text" id="profileSpecialty" class="form-control">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">WhatsApp</label>
+                                <input type="tel" id="profilePhone" class="form-control">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">CNPJ</label>
+                                <input type="text" id="profileCNPJ" class="form-control">
+                            </div>
+                            
+                            <div class="form-group full-width">
+                                <label class="form-label">Endereço da Clínica</label>
+                                <input type="text" id="profileAddress" class="form-control" placeholder="Rua Example, 123 - Cidade/UF - CEP 00000-000">
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">
+                            <span id="profileBtnText">Salvar Alterações</span>
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Logo da Clínica -->
+                <div class="section" id="logoSection">
+                    <div class="panel-header">
+                        <h1 class="panel-title">Logo da Clínica</h1>
+                        <p class="panel-subtitle">Adicione o logo da sua clínica aos receituários</p>
+                    </div>
+                    
+                    <div id="logoUpgradeNotice" class="upgrade-banner" style="display: none;">
+                        <h3>🚀 Funcionalidade Premium</h3>
+                        <p>O upload de logo está disponível apenas no plano Essencial</p>
+                        <button class="btn btn-upgrade" onclick="upgradeToEssential()">Fazer Upgrade</button>
+                    </div>
+                    
+                    <div id="logoUploadArea">
+                        <div class="upload-area" onclick="document.getElementById('logoInput').click()">
+                            <input type="file" id="logoInput" accept="image/*" style="display: none;">
+                            <div class="upload-icon">📷</div>
+                            <div class="upload-text">Clique para enviar logo</div>
+                            <div class="upload-hint">PNG, JPG até 1MB</div>
+                        </div>
+                        
+                        <div class="preview-container" id="logoPreviewContainer" style="display: none;">
+                            <img id="logoPreview" class="logo-preview" alt="Logo Preview">
+                            <div style="margin-top: 1rem;">
+                                <button class="btn btn-secondary" onclick="removeLogo()">
+                                    <span>🗑️</span> Remover Logo
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Assinatura Digital -->
+                <div class="section" id="signatureSection">
+                    <div class="panel-header">
+                        <h1 class="panel-title">Assinatura Digital</h1>
+                        <p class="panel-subtitle">Configure sua assinatura para os receituários</p>
+                    </div>
+                    
+                    <div style="margin-bottom: 2rem;">
+                        <h3 style="margin-bottom: 1rem; color: var(--text-dark);">Opção 1: Desenhar Assinatura</h3>
+                        <div class="signature-canvas-container">
+                            <canvas id="signatureCanvas" class="signature-canvas" width="400" height="150"></canvas>
+                            <div class="canvas-controls">
+                                <button class="btn btn-secondary" onclick="clearSignature()">
+                                    <span>🗑️</span> Limpar
+                                </button>
+                                <button class="btn btn-primary" onclick="saveSignature()">
+                                    <span>💾</span> Salvar Assinatura
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom: 2rem;">
+                        <h3 style="margin-bottom: 1rem; color: var(--text-dark);">Opção 2: Upload de Imagem</h3>
+                        <div class="upload-area" onclick="document.getElementById('signatureInput').click()">
+                            <input type="file" id="signatureInput" accept="image/*" style="display: none;">
+                            <div class="upload-icon">✍️</div>
+                            <div class="upload-text">Clique para enviar assinatura</div>
+                            <div class="upload-hint">PNG, JPG até 500KB</div>
+                        </div>
+                    </div>
+                    
+                    <div class="preview-container" id="signaturePreviewContainer" style="display: none;">
+                        <h3 style="margin-bottom: 1rem; color: var(--text-dark);">Assinatura Atual:</h3>
+                        <img id="signaturePreview" class="signature-preview" alt="Signature Preview">
+                        <div style="margin-top: 1rem;">
+                            <button class="btn btn-secondary" onclick="removeSignature()">
+                                <span>🗑️</span> Remover Assinatura
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Meu Plano -->
+                <div class="section" id="planSection">
+                    <div class="panel-header">
+                        <h1 class="panel-title">Meu Plano</h1>
+                        <p class="panel-subtitle">Gerencie sua assinatura e benefícios</p>
+                    </div>
+                    
+                    <div id="planDetails">
+                        <div style="padding: 2rem; background: var(--gray-light); border-radius: 12px; margin-bottom: 2rem;">
+                            <h3 style="margin-bottom: 1rem; color: var(--text-dark);">Plano Atual: <span id="currentPlan">Freemium</span></h3>
+                            <div id="planFeatures"></div>
+                        </div>
+                        
+                        <div id="upgradeSection" style="display: none;">
+                            <h3 style="margin-bottom: 1rem; color: var(--text-dark);">Upgrade para Essencial</h3>
+                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
+                                <button class="btn btn-primary" onclick="upgradeMonthly()">
+                                    <span>💳</span> R$ 39/mês
+                                </button>
+                                <button class="btn btn-primary" onclick="upgradeYearly()">
+                                    <span>💰</span> R$ 29/mês (anual)
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // ========================================
+        // VARIÁVEIS GLOBAIS
+        // ========================================
+        let currentUser = null;
+        let userPlan = null;
+        let signatureCanvas = null;
+        let signatureCtx = null;
+        let isDrawing = false;
+        
+        // ========================================
+        // INICIALIZAÇÃO
+        // ========================================
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Verificar sessão
+            const sessionData = await checkSessionOrRedirect();
+            if (!sessionData) return;
+            
+            currentUser = sessionData.user;
+            
+            // Inicializar componentes
+            initializeSignatureCanvas();
+            await loadUserData();
+            setupEventListeners();
+        });
+        
+        // ========================================
+        // NAVEGAÇÃO
+        // ========================================
+        function setupEventListeners() {
+            // Sidebar navigation
+            document.querySelectorAll('.sidebar-link').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    switchSection(link.dataset.section);
+                });
+            });
+            
+            // Forms
+            document.getElementById('profileForm').addEventListener('submit', handleProfileSubmit);
+            document.getElementById('logoInput').addEventListener('change', handleLogoUpload);
+            document.getElementById('signatureInput').addEventListener('change', handleSignatureUpload);
+        }
+        
+        function switchSection(sectionName) {
+            // Update sidebar
+            document.querySelectorAll('.sidebar-link').forEach(link => {
+                link.classList.remove('active');
+                if (link.dataset.section === sectionName) {
+                    link.classList.add('active');
+                }
+            });
+            
+            // Update sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            document.getElementById(sectionName + 'Section').classList.add('active');
+        }
+        
+        // ========================================
+        // CARREGAR DADOS DO USUÁRIO
+        // ========================================
+        async function loadUserData() {
+            try {
+                const userData = await getCurrentUserData();
+                if (!userData) return;
+                
+                currentUser = userData;
+                userPlan = userData.subscriptions?.[0]?.plan || 'freemium';
+                
+                // Update UI
+                updateUserDisplay(userData);
+                populateProfileForm(userData);
+                updatePlanDisplay(userData);
+                
+                // Check logo permissions
+                if (userPlan === 'freemium') {
+                    showLogoUpgradeNotice();
+                } else {
+                    hideLogoUpgradeNotice();
+                    if (userData.logo_url) {
+                        showLogoPreview(userData.logo_url);
+                    }
+                }
+                
+                // Show signature if exists
+                if (userData.signature_url) {
+                    showSignaturePreview(userData.signature_url);
+                }
+                
+            } catch (error) {
+                console.error('Erro ao carregar dados:', error);
+                showAlert('Erro ao carregar dados do usuário', 'error');
+            }
+        }
+        
+        function updateUserDisplay(userData) {
+            const initials = userData.name.split(' ').map(n => n[0]).join('').slice(0, 2);
+            document.getElementById('userInitials').textContent = initials;
+            document.getElementById('userName').textContent = userData.name;
+            document.getElementById('userCouncil').textContent = `${userData.council}-${userData.state} ${userData.registration_number}`;
+            
+            const planBadge = document.getElementById('planBadge');
+            planBadge.textContent = userPlan === 'freemium' ? 'Freemium' : 'Essencial';
+            planBadge.className = `plan-badge ${userPlan}`;
+        }
+        
+        function populateProfileForm(userData) {
+            document.getElementById('profileName').value = userData.name || '';
+            document.getElementById('profileEmail').value = userData.email || '';
+            document.getElementById('profileCouncil').value = userData.council || '';
+            document.getElementById('profileState').value = userData.state || '';
+            document.getElementById('profileRegistration').value = userData.registration_number || '';
+            document.getElementById('profileSpecialty').value = userData.specialty || '';
+            document.getElementById('profilePhone').value = userData.phone || '';
+            document.getElementById('profileCNPJ').value = userData.cnpj || '';
+            document.getElementById('profileAddress').value = userData.address || '';
+        }
+        
+        function updatePlanDisplay(userData) {
+            document.getElementById('currentPlan').textContent = userPlan === 'freemium' ? 'Freemium' : 'Essencial';
+            
+            const featuresDiv = document.getElementById('planFeatures');
+            const upgradeSection = document.getElementById('upgradeSection');
+            
+            if (userPlan === 'freemium') {
+                featuresDiv.innerHTML = `
+                    <ul style="list-style: none; margin: 0; padding: 0;">
+                        <li style="margin-bottom: 0.5rem;">✅ Até 30 receituários/mês</li>
+                        <li style="margin-bottom: 0.5rem;">✅ Templates básicos</li>
+                        <li style="margin-bottom: 0.5rem;">✅ Assinatura digital</li>
+                        <li style="margin-bottom: 0.5rem;">❌ Logo personalizado</li>
+                        <li style="margin-bottom: 0.5rem;">❌ Receituários ilimitados</li>
+                    </ul>
+                `;
+                upgradeSection.style.display = 'block';
+            } else {
+                featuresDiv.innerHTML = `
+                    <ul style="list-style: none; margin: 0; padding: 0;">
+                        <li style="margin-bottom: 0.5rem;">✅ Receituários ilimitados</li>
+                        <li style="margin-bottom: 0.5rem;">✅ Todos os templates</li>
+                        <li style="margin-bottom: 0.5rem;">✅ Assinatura digital</li>
+                        <li style="margin-bottom: 0.5rem;">✅ Logo personalizado</li>
+                        <li style="margin-bottom: 0.5rem;">✅ Suporte prioritário</li>
+                    </ul>
+                `;
+                upgradeSection.style.display = 'none';
+            }
+        }
+        
+        // ========================================
+        // FORMULÁRIO DE PERFIL
+        // ========================================
+        async function handleProfileSubmit(e) {
+            e.preventDefault();
+            
+            const formData = {
+                name: document.getElementById('profileName').value,
+                council: document.getElementById('profileCouncil').value,
+                state: document.getElementById('profileState').value,
+                registrationNumber: document.getElementById('profileRegistration').value,
+                specialty: document.getElementById('profileSpecialty').value,
+                phone: document.getElementById('profilePhone').value,
+                cnpj: document.getElementById('profileCNPJ').value,
+                address: document.getElementById('profileAddress').value
+            };
+            
+            const button = e.target.querySelector('button[type="submit"]');
+            const btnText = document.getElementById('profileBtnText');
+            
+            // Validations
+            if (!formData.name || formData.name.length < 3) {
+                showAlert('Nome deve ter pelo menos 3 caracteres', 'error');
+                return;
+            }
+            
+            if (!formData.registrationNumber || !/^\d+$/.test(formData.registrationNumber)) {
+                showAlert('Número de registro deve conter apenas números', 'error');
+                return;
+            }
+            
+            // Show loading
+            button.disabled = true;
+            btnText.innerHTML = '<span class="loading"></span> Salvando...';
+            
+            try {
+                const result = await updateProfile(formData);
+                
+                if (result.success) {
+                    showAlert('Perfil atualizado com sucesso!', 'success');
+                    currentUser = result.data;
+                    updateUserDisplay(result.data);
+                } else {
+                    showAlert(result.error || 'Erro ao atualizar perfil', 'error');
+                }
+            } catch (error) {
+                showAlert('Erro ao salvar alterações', 'error');
+            } finally {
+                button.disabled = false;
+                btnText.textContent = 'Salvar Alterações';
+            }
+        }
+        
+        // ========================================
+        // UPLOAD DE LOGO
+        // ========================================
+        function showLogoUpgradeNotice() {
+            document.getElementById('logoUpgradeNotice').style.display = 'block';
+            document.getElementById('logoUploadArea').style.display = 'none';
+        }
+        
+        function hideLogoUpgradeNotice() {
+            document.getElementById('logoUpgradeNotice').style.display = 'none';
+            document.getElementById('logoUploadArea').style.display = 'block';
+        }
+        
+        async function handleLogoUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            showAlert('Fazendo upload do logo...', 'success');
+            
+            try {
+                const result = await uploadLogo(file);
+                
+                if (result.success) {
+                    showAlert('Logo enviado com sucesso!', 'success');
+                    showLogoPreview(result.url);
+                    currentUser.logo_url = result.url;
+                } else {
+                    showAlert(result.error || 'Erro no upload do logo', 'error');
+                }
+            } catch (error) {
+                showAlert('Erro no upload do logo', 'error');
+            }
+            
+            // Clear input
+            e.target.value = '';
+        }
+        
+        function showLogoPreview(url) {
+            const preview = document.getElementById('logoPreview');
+            const container = document.getElementById('logoPreviewContainer');
+            
+            preview.src = url;
+            container.style.display = 'block';
+        }
+        
+        async function removeLogo() {
+            if (!confirm('Remover logo da clínica?')) return;
+            
+            try {
+                const result = await updateProfile({ ...currentUser, logo_url: null });
+                
+                if (result.success) {
+                    document.getElementById('logoPreviewContainer').style.display = 'none';
+                    showAlert('Logo removido com sucesso', 'success');
+                    currentUser.logo_url = null;
+                } else {
+                    showAlert('Erro ao remover logo', 'error');
+                }
+            } catch (error) {
+                showAlert('Erro ao remover logo', 'error');
+            }
+        }
+        
+        // ========================================
+        // ASSINATURA DIGITAL
+        // ========================================
+        function initializeSignatureCanvas() {
+            signatureCanvas = document.getElementById('signatureCanvas');
+            signatureCtx = signatureCanvas.getContext('2d');
+            
+            // Configure canvas
+            signatureCtx.lineCap = 'round';
+            signatureCtx.lineJoin = 'round';
+            signatureCtx.lineWidth = 2;
+            signatureCtx.strokeStyle = '#000000';
+            
+            // Mouse events
+            signatureCanvas.addEventListener('mousedown', startDrawing);
+            signatureCanvas.addEventListener('mousemove', draw);
+            signatureCanvas.addEventListener('mouseup', stopDrawing);
+            signatureCanvas.addEventListener('mouseout', stopDrawing);
+            
+            // Touch events
+            signatureCanvas.addEventListener('touchstart', handleTouch);
+            signatureCanvas.addEventListener('touchmove', handleTouch);
+            signatureCanvas.addEventListener('touchend', stopDrawing);
+        }
+        
+        function startDrawing(e) {
+            isDrawing = true;
+            const rect = signatureCanvas.getBoundingClientRect();
+            signatureCtx.beginPath();
+            signatureCtx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+        }
+        
+        function draw(e) {
+            if (!isDrawing) return;
+            
+            const rect = signatureCanvas.getBoundingClientRect();
+            signatureCtx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+            signatureCtx.stroke();
+        }
+        
+        function stopDrawing() {
+            isDrawing = false;
+        }
+        
+        function handleTouch(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const mouseEvent = new MouseEvent(
+                e.type === 'touchstart' ? 'mousedown' : 
+                e.type === 'touchmove' ? 'mousemove' : 'mouseup',
+                {
+                    clientX: touch.clientX,
+                    clientY: touch.clientY
+                }
+            );
+            signatureCanvas.dispatchEvent(mouseEvent);
+        }
+        
+        function clearSignature() {
+            signatureCtx.clearRect(0, 0, signatureCanvas.width, signatureCanvas.height);
+        }
+        
+        async function saveSignature() {
+            const dataURL = signatureCanvas.toDataURL('image/png');
+            
+            // Check if canvas is empty
+            const emptyCanvas = document.createElement('canvas');
+            emptyCanvas.width = signatureCanvas.width;
+            emptyCanvas.height = signatureCanvas.height;
+            
+            if (dataURL === emptyCanvas.toDataURL('image/png')) {
+                showAlert('Por favor, desenhe sua assinatura primeiro', 'warning');
+                return;
+            }
+            
+            showAlert('Salvando assinatura...', 'success');
+            
+            try {
+                const result = await saveCanvasSignature(dataURL);
+                
+                if (result.success) {
+                    showAlert('Assinatura salva com sucesso!', 'success');
+                    showSignaturePreview(result.url);
+                    currentUser.signature_url = result.url;
+                } else {
+                    showAlert(result.error || 'Erro ao salvar assinatura', 'error');
+                }
+            } catch (error) {
+                showAlert('Erro ao salvar assinatura', 'error');
+            }
+        }
+        
+        async function handleSignatureUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            showAlert('Fazendo upload da assinatura...', 'success');
+            
+            try {
+                const result = await uploadSignature(file);
+                
+                if (result.success) {
+                    showAlert('Assinatura enviada com sucesso!', 'success');
+                    showSignaturePreview(result.url);
+                    currentUser.signature_url = result.url;
+                    clearSignature(); // Clear canvas when uploading image
+                } else {
+                    showAlert(result.error || 'Erro no upload da assinatura', 'error');
+                }
+            } catch (error) {
+                showAlert('Erro no upload da assinatura', 'error');
+            }
+            
+            // Clear input
+            e.target.value = '';
+        }
+        
+        function showSignaturePreview(url) {
+            const preview = document.getElementById('signaturePreview');
+            const container = document.getElementById('signaturePreviewContainer');
+            
+            preview.src = url;
+            container.style.display = 'block';
+        }
+        
+        async function removeSignature() {
+            if (!confirm('Remover assinatura digital?')) return;
+            
+            try {
+                const result = await updateProfile({ ...currentUser, signature_url: null });
+                
+                if (result.success) {
+                    document.getElementById('signaturePreviewContainer').style.display = 'none';
+                    clearSignature();
+                    showAlert('Assinatura removida com sucesso', 'success');
+                    currentUser.signature_url = null;
+                } else {
+                    showAlert('Erro ao remover assinatura', 'error');
+                }
+            } catch (error) {
+                showAlert('Erro ao remover assinatura', 'error');
+            }
+        }
+        
+        // ========================================
+        // UPGRADE DE PLANOS
+        // ========================================
+        function upgradeToEssential() {
+            if (confirm('Fazer upgrade para o plano Essencial?')) {
+                upgradeMonthly();
+            }
+        }
+        
+        function upgradeMonthly() {
+            window.location.href = `${STRIPE_LINKS.essential_monthly}?prefilled_email=${encodeURIComponent(currentUser.email)}`;
+        }
+        
+        function upgradeYearly() {
+            window.location.href = `${STRIPE_LINKS.essential_yearly}?prefilled_email=${encodeURIComponent(currentUser.email)}`;
+        }
+        
+        // ========================================
+        // UTILITY FUNCTIONS
+        // ========================================
+        function showAlert(message, type = 'success') {
+            hideAllAlerts();
+            
+            const alertElement = document.getElementById(`alert${type.charAt(0).toUpperCase() + type.slice(1)}`);
+            const messageElement = document.getElementById(`alert${type.charAt(0).toUpperCase() + type.slice(1)}Message`);
+            
+            if (alertElement && messageElement) {
+                messageElement.textContent = message;
+                alertElement.classList.add('show');
+                
+                // Auto-hide after 5 seconds
+                setTimeout(() => {
+                    alertElement.classList.remove('show');
+                }, 5000);
+            }
+        }
+        
+        function hideAllAlerts() {
+            document.querySelectorAll('.alert').forEach(alert => {
+                alert.classList.remove('show');
+            });
+        }
+        
+        // Phone mask
+        document.getElementById('profilePhone').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 0) {
+                if (value.length <= 11) {
+                    value = value.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+                }
+                e.target.value = value;
+            }
+        });
+        
+        // CNPJ mask
+        document.getElementById('profileCNPJ').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 0) {
+                value = value.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
+                e.target.value = value;
+            }
+        });
+    </script>
+    <!-- Adicione este modal no profile.html, antes do </body> -->
+
+<!-- Modal de Confirmação Customizado -->
+<div class="modal" id="confirmModal" style="display: none;">
+    <div class="modal-content" style="max-width: 400px;">
+        <div class="modal-header">
+            <h3 class="modal-title" id="confirmTitle">Confirmar Ação</h3>
+        </div>
+        <div class="modal-body">
+            <p id="confirmMessage">Tem certeza que deseja realizar esta ação?</p>
+        </div>
+        <div class="modal-footer" style="display: flex; gap: 1rem; justify-content: flex-end;">
+            <button class="btn btn-secondary" onclick="closeConfirmModal()">Cancelar</button>
+            <button class="btn btn-primary" id="confirmButton" onclick="confirmAction()">Confirmar</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// Variável global para callback
+let confirmCallback = null;
+
+// Função para mostrar modal de confirmação
+function showConfirmModal(title, message, onConfirm) {
+    document.getElementById('confirmTitle').textContent = title;
+    document.getElementById('confirmMessage').textContent = message;
+    confirmCallback = onConfirm;
+    document.getElementById('confirmModal').style.display = 'flex';
+}
+
+// Função para fechar modal
+function closeConfirmModal() {
+    document.getElementById('confirmModal').style.display = 'none';
+    confirmCallback = null;
+}
+
+// Função para confirmar ação
+function confirmAction() {
+    if (confirmCallback) {
+        confirmCallback();
+    }
+    closeConfirmModal();
+}
+
+// SUBSTITUIR a função removeSignature por:
+async function removeSignature() {
+    showConfirmModal(
+        'Remover Assinatura',
+        'Tem certeza que deseja remover sua assinatura digital?',
+        async () => {
+            try {
+                showAlert('Removendo assinatura...', 'success');
+                
+                const result = await window.profileFunctions.removeSignature();
+                
+                if (result.success) {
+                    document.getElementById('signaturePreviewContainer').style.display = 'none';
+                    clearSignature();
+                    showAlert('Assinatura removida com sucesso', 'success');
+                    
+                    // Atualizar dados do usuário atual
+                    if (currentUser) {
+                        currentUser.signature_url = null;
+                    }
+                    
+                    // Forçar reload da página do app se estiver aberta
+                    if (window.opener) {
+                        window.opener.location.reload();
+                    }
+                } else {
+                    showAlert('Erro ao remover assinatura', 'error');
+                }
+            } catch (error) {
+                showAlert('Erro ao remover assinatura', 'error');
+            }
+        }
+    );
+}
+</script>
+</body>
+</html>
