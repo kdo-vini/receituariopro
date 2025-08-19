@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Receituário Pro - Acesso Exclusivo para Profissionais da Saúde</title>
+    <meta name="description" content="Acesse o Receituário Pro - Sistema exclusivo para profissionais da saúde com validação CRM/CRO/CREFITO">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #667eea;
+            --primary-dark: #5a67d8;
+            --secondary: #764ba2;
+            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --text-dark: #1a202c;
+            --text-light: #718096;
+            --white: #ffffff;
+            --gray-light: #f7fafc;
+            --success: #48bb78;
+            --error: #f56565;
+            --warning: #ed8936;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--gradient);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        
+        .auth-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 1000px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            overflow: hidden;
+            min-height: 600px;
+        }
+        
+        .auth-sidebar {
+            background: var(--gradient);
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .auth-sidebar::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: rotate 30s linear infinite;
+        }
+        
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .sidebar-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .logo-section {
+            margin-bottom: 2rem;
+        }
+        
+        .logo-section img {
+            height: 48px;
+            margin-bottom: 1rem;
+            filter: brightness(0) invert(1);
+        }
+        
+        .logo-section h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+        
+        .sidebar-content h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            opacity: 0.95;
+        }
+        
+        .sidebar-content p {
+            line-height: 1.8;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+        
+        .benefits-list {
+            list-style: none;
+        }
+        
+        .benefits-list li {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            opacity: 0.95;
+        }
+        
+        .benefits-list li::before {
+            content: '✓';
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            text-align: center;
+            line-height: 24px;
+            flex-shrink: 0;
+        }
+        
+        .auth-form-container {
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .form-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--gray-light);
+        }
+        
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 1rem 0;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-light);
+            cursor: pointer;
+            position: relative;
+            transition: color 0.3s;
+        }
+        
+        .tab-btn.active {
+            color: var(--primary);
+        }
+        
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--primary);
+        }
+        
+        .form-panel {
+            display: none;
+        }
+        
+        .form-panel.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .form-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-subtitle {
+            color: var(--text-light);
+            margin-bottom: 2rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        
+        .required {
+            color: var(--error);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--gray-light);
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .form-control.error {
+            border-color: var(--error);
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .input-group .form-group {
+            flex: 1;
+        }
+        
+        .select-wrapper {
+            position: relative;
+        }
+        
+        .select-wrapper::after {
+            content: '▼';
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+            color: var(--text-light);
+            font-size: 0.8rem;
+        }
+        
+        .form-control select {
+            appearance: none;
+            padding-right: 2.5rem;
+        }
+        
+        .error-message {
+            color: var(--error);
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+        
+        .error-message.show {
+            display: block;
+        }
+        
+        .form-helper {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-top: 0.25rem;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        
+        .checkbox-group label {
+            margin: 0;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        
+        .checkbox-group a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+        
+        .checkbox-group a:hover {
+            text-decoration: underline;
+        }
+        
+        .btn {
+            padding: 0.875rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+        
+        .btn-primary {
+            background: var(--gradient);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .divider {
+            text-align: center;
+            margin: 1.5rem 0;
+            position: relative;
+        }
+        
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: var(--gray-light);
+        }
+        
+        .divider span {
+            background: white;
+            padding: 0 1rem;
+            position: relative;
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+        
+        .social-login {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .social-btn {
+            flex: 1;
+            padding: 0.75rem;
+            border: 2px solid var(--gray-light);
+            background: white;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+        
+        .social-btn:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+        
+        .forgot-link {
+            text-align: center;
+            margin-top: 1rem;
+        }
+        
+        .forgot-link a {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        
+        .forgot-link a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s;
+        }
+        
+        .modal.show {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            position: relative;
+            animation: slideUp 0.3s;
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .modal-header {
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        
+        .modal-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1rem;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+        }
+        
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+        
+        .modal-message {
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+        
+        .modal-footer {
+            margin-top: 2rem;
+        }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 0.5rem;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .alert {
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+            display: none;
+        }
+        
+        .alert.show {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .alert-success {
+            background: rgba(72, 187, 120, 0.1);
+            color: var(--success);
+            border: 1px solid rgba(72, 187, 120, 0.3);
+        }
+        
+        .alert-error {
+            background: rgba(245, 101, 101, 0.1);
+            color: var(--error);
+            border: 1px solid rgba(245, 101, 101, 0.3);
+        }
+        
+        .alert-warning {
+            background: rgba(237, 137, 54, 0.1);
+            color: var(--warning);
+            border: 1px solid rgba(237, 137, 54, 0.3);
+        }
+        
+        @media (max-width: 768px) {
+            .auth-container {
+                grid-template-columns: 1fr;
+                max-width: 500px;
+            }
+            
+            .auth-sidebar {
+                display: none;
+            }
+            
+            .auth-form-container {
+                padding: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <!-- Sidebar -->
+        <div class="auth-sidebar">
+            <div class="sidebar-content">
+                <div class="logo-section">
+                    <img src="img/saas-logo.png" alt="Receituário Pro">
+                    <h1>Receituário Pro</h1>
+                </div>
+                <h2>Sistema Exclusivo para Profissionais da Saúde</h2>
+                <p>Modernize suas prescrições com segurança e praticidade. Nosso sistema é validado e exclusivo para médicos, dentistas e profissionais registrados.</p>
+                
+                <ul class="benefits-list">
+                    <li>Validação profissional CRM/CRO/CREFITO</li>
+                    <li>Assinatura digital com validade jurídica</li>
+                    <li>Conformidade total com LGPD</li>
+                    <li>Suporte especializado 24/7</li>
+                    <li>Histórico completo de prescrições</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Form Container -->
+        <div class="auth-form-container">
+            <!-- Tabs -->
+            <div class="form-tabs">
+                <button class="tab-btn active" data-tab="login">Entrar</button>
+                <button class="tab-btn" data-tab="register">Cadastrar</button>
+                <button class="tab-btn" data-tab="recover">Recuperar Senha</button>
+            </div>
+            
+            <!-- Alert Messages -->
+            <div class="alert alert-warning" id="alertBox">
+                <span>⚠️</span>
+                <span id="alertMessage"></span>
+            </div>
+            
+            <!-- Login Panel -->
+            <div class="form-panel active" id="loginPanel">
+                <h2 class="form-title">Bem-vindo de volta!</h2>
+                <p class="form-subtitle">Entre com suas credenciais para acessar o sistema</p>
+                
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="loginEmail">E-mail <span class="required">*</span></label>
+                        <input type="email" id="loginEmail" class="form-control" required>
+                        <span class="error-message">E-mail inválido</span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="loginPassword">Senha <span class="required">*</span></label>
+                        <input type="password" id="loginPassword" class="form-control" required>
+                        <span class="error-message">Senha é obrigatória</span>
+                    </div>
+                    
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="rememberMe">
+                        <label for="rememberMe">Lembrar de mim</label>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <span id="loginBtnText">Entrar</span>
+                    </button>
+                </form>
+                
+                <div class="forgot-link">
+                    <a href="#" onclick="switchTab('recover')">Esqueceu sua senha?</a>
+                </div>
+            </div>
+            
+            <!-- Register Panel -->
+            <div class="form-panel" id="registerPanel">
+                <h2 class="form-title">Crie sua conta</h2>
+                <p class="form-subtitle">Exclusivo para profissionais da saúde com registro ativo</p>
+                
+                <form id="registerForm">
+                    <div class="form-group">
+                        <label for="registerName">Nome Completo <span class="required">*</span></label>
+                        <input type="text" id="registerName" class="form-control" required>
+                        <span class="error-message">Nome é obrigatório</span>
+                        <span class="form-helper">Este nome aparecerá em seus receituários</span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="registerEmail">E-mail Profissional <span class="required">*</span></label>
+                        <input type="email" id="registerEmail" class="form-control" required>
+                        <span class="error-message">E-mail inválido</span>
+                    </div>
+                    
+                    <div class="input-group">
+                        <div class="form-group">
+                            <label for="registerCouncil">Conselho <span class="required">*</span></label>
+                            <div class="select-wrapper">
+                                <select id="registerCouncil" class="form-control" required>
+                                    <option value="">Selecione</option>
+                                    <option value="CRM">CRM - Medicina</option>
+                                    <option value="CRO">CRO - Odontologia</option>
+                                    <option value="COREN">COREN - Enfermagem</option>
+                                    <option value="CRF">CRF - Farmácia</option>
+                                    <option value="CREFITO">CREFITO - Fisioterapia</option>
+                                    <option value="CRN">CRN - Nutrição</option>
+                                    <option value="CRFA">CRFa - Fonoaudiologia</option>
+                                    <option value="CRP">CRP - Psicologia</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="registerState">Estado <span class="required">*</span></label>
+                            <div class="select-wrapper">
+                                <select id="registerState" class="form-control" required>
+                                    <option value="">UF</option>
+                                    <option value="AC">AC</option>
+                                    <option value="AL">AL</option>
+                                    <option value="AP">AP</option>
+                                    <option value="AM">AM</option>
+                                    <option value="BA">BA</option>
+                                    <option value="CE">CE</option>
+                                    <option value="DF">DF</option>
+                                    <option value="ES">ES</option>
+                                    <option value="GO">GO</option>
+                                    <option value="MA">MA</option>
+                                    <option value="MT">MT</option>
+                                    <option value="MS">MS</option>
+                                    <option value="MG">MG</option>
+                                    <option value="PA">PA</option>
+                                    <option value="PB">PB</option>
+                                    <option value="PR">PR</option>
+                                    <option value="PE">PE</option>
+                                    <option value="PI">PI</option>
+                                    <option value="RJ">RJ</option>
+                                    <option value="RN">RN</option>
+                                    <option value="RS">RS</option>
+                                    <option value="RO">RO</option>
+                                    <option value="RR">RR</option>
+                                    <option value="SC">SC</option>
+                                    <option value="SP">SP</option>
+                                    <option value="SE">SE</option>
+                                    <option value="TO">TO</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="registerNumber">Número do Registro <span class="required">*</span></label>
+                        <input type="text" id="registerNumber" class="form-control" placeholder="Ex: 123456" required>
+                        <span class="error-message">Número de registro inválido</span>
+                        <span class="form-helper">Apenas números, sem pontos ou traços</span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="registerSpecialty">Especialidade</label>
+                        <input type="text" id="registerSpecialty" class="form-control" placeholder="Ex: Clínica Geral">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="registerPhone">WhatsApp</label>
+                        <input type="tel" id="registerPhone" class="form-control" placeholder="(11) 98765-4321">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="registerPassword">Senha <span class="required">*</span></label>
+                        <input type="password" id="registerPassword" class="form-control" required>
+                        <span class="error-message">Senha deve ter no mínimo 8 caracteres</span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="registerPasswordConfirm">Confirmar Senha <span class="required">*</span></label>
+                        <input type="password" id="registerPasswordConfirm" class="form-control" required>
+                        <span class="error-message">As senhas não coincidem</span>
+                    </div>
+                    
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="acceptTerms" required>
+                        <label for="acceptTerms">
+                            Li e aceito os <a href="#" onclick="showTermsModal(); return false;">Termos de Uso</a> e a 
+                            <a href="#" onclick="showTermsModal(); return false;">Política de Privacidade</a>
+                        </label>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <span id="registerBtnText">Criar Conta</span>
+                    </button>
+                </form>
+            </div>
+            
+            <!-- Recover Panel -->
+            <div class="form-panel" id="recoverPanel">
+                <h2 class="form-title">Recuperar Senha</h2>
+                <p class="form-subtitle">Enviaremos um link de recuperação para seu e-mail cadastrado</p>
+                
+                <form id="recoverForm">
+                    <div class="form-group">
+                        <label for="recoverEmail">E-mail Cadastrado <span class="required">*</span></label>
+                        <input type="email" id="recoverEmail" class="form-control" required>
+                        <span class="error-message">E-mail inválido</span>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <span id="recoverBtnText">Enviar Link de Recuperação</span>
+                    </button>
+                </form>
+                
+                <div class="forgot-link">
+                    <a href="#" onclick="switchTab('login')">Voltar para o login</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Validation Modal -->
+    <div class="modal" id="validationModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-icon">🔍</div>
+                <h3 class="modal-title">Validação Profissional em Andamento</h3>
+            </div>
+            <p class="modal-message">
+                Seu cadastro foi recebido com sucesso! Estamos validando suas informações junto ao conselho regional.
+                <br><br>
+                Este processo é necessário para garantir a segurança e exclusividade do sistema para profissionais da saúde.
+                <br><br>
+                Você receberá um e-mail em até <strong>24 horas</strong> com a confirmação do seu acesso.
+            </p>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="closeModal()">Entendi</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Terms Modal -->
+    <div class="modal" id="termsModal">
+        <div class="modal-content" style="max-width: 700px; max-height: 90vh; overflow-y: auto;">
+            <div class="modal-header" style="position: sticky; top: 0; background: white; padding-bottom: 1rem; border-bottom: 2px solid var(--gray-light);">
+                <h3 class="modal-title">Termos de Uso e Política de Privacidade</h3>
+                <button onclick="closeTermsModal()" style="position: absolute; right: 1.5rem; top: 1.5rem; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-light);">×</button>
+            </div>
+            <div class="modal-body" style="padding: 1.5rem 0;">
+                <p style="color: var(--text-light); margin-bottom: 1.5rem;">
+                    <strong>Última atualização:</strong> 18/08/2025
+                </p>
+                
+                <p style="margin-bottom: 1.5rem; line-height: 1.8;">
+                    Ao utilizar o <strong>Receituário Pro</strong>, você concorda com estes Termos de Uso e com nossa Política de Privacidade. 
+                    Caso não concorde, não utilize o serviço.
+                </p>
+                
+                <h4 style="color: var(--primary); margin: 2rem 0 1rem;">1. Uso do Serviço</h4>
+                <p style="margin-bottom: 1.5rem; line-height: 1.8;">
+                    O Receituário Pro é uma plataforma digital destinada a profissionais da saúde para criação e gestão de receituários 
+                    eletrônicos. O uso do serviço deve ser feito de forma ética, responsável e em conformidade com as leis aplicáveis, 
+                    incluindo regulamentos de saúde e privacidade.
+                </p>
+                
+                <h4 style="color: var(--primary); margin: 2rem 0 1rem;">2. Coleta de Dados</h4>
+                <p style="margin-bottom: 1rem; line-height: 1.8;">
+                    Para oferecer o serviço e melhorar sua experiência, coletamos informações como:
+                </p>
+                <ul style="margin-left: 1.5rem; margin-bottom: 1.5rem; line-height: 1.8;">
+                    <li>Nome e CRM/CRO/registro profissional do usuário;</li>
+                    <li>Nome e idade do paciente (quando preenchidos nos receituários);</li>
+                    <li>Medicamentos, prescrições e observações registradas;</li>
+                    <li>Localização aproximada do usuário (opcional);</li>
+                    <li>Dados de uso da plataforma (tempo de sessão, funcionalidades utilizadas, etc.).</li>
+                </ul>
+                
+                <p style="margin-bottom: 1rem; line-height: 1.8;">
+                    Esses dados podem ser <strong>utilizados de forma anonimizada</strong> para:
+                </p>
+                <ul style="margin-left: 1.5rem; margin-bottom: 1.5rem; line-height: 1.8;">
+                    <li>Melhorar o serviço;</li>
+                    <li>Pesquisas e análises de mercado;</li>
+                    <li>Desenvolvimento de novas funcionalidades;</li>
+                    <li>Eventual compartilhamento com parceiros ou venda de dados <strong>somente de forma agregada e anonimizada</strong>, 
+                        garantindo a <strong>não identificação de pacientes ou profissionais individualmente</strong>, em conformidade com a LGPD.</li>
+                </ul>
+                
+                <h4 style="color: var(--primary); margin: 2rem 0 1rem;">3. Direitos do Usuário (LGPD)</h4>
+                <p style="margin-bottom: 1rem; line-height: 1.8;">Você tem direito a:</p>
+                <ul style="margin-left: 1.5rem; margin-bottom: 1.5rem; line-height: 1.8;">
+                    <li>Solicitar acesso aos seus dados;</li>
+                    <li>Corrigir ou atualizar seus dados;</li>
+                    <li>Solicitar exclusão ou anonimização de seus dados;</li>
+                    <li>Revogar consentimento para o uso de dados a qualquer momento, observando que isso pode limitar algumas funcionalidades do serviço.</li>
+                </ul>
+                
+                <h4 style="color: var(--primary); margin: 2rem 0 1rem;">4. Segurança</h4>
+                <p style="margin-bottom: 1.5rem; line-height: 1.8;">
+                    O Receituário Pro adota medidas técnicas e administrativas para proteger seus dados contra acesso não autorizado, 
+                    perda, alteração ou divulgação indevida.
+                </p>
+                
+                <h4 style="color: var(--primary); margin: 2rem 0 1rem;">5. Responsabilidade</h4>
+                <ul style="margin-left: 1.5rem; margin-bottom: 1.5rem; line-height: 1.8;">
+                    <li>Você é responsável pelo uso adequado da plataforma e pelas informações inseridas;</li>
+                    <li>O Receituário Pro <strong>não substitui prescrições legais</strong> de medicamentos controlados ou procedimentos médicos obrigatórios;</li>
+                    <li>Dados inseridos devem seguir a legislação vigente de saúde e privacidade.</li>
+                </ul>
+                
+                <h4 style="color: var(--primary); margin: 2rem 0 1rem;">6. Alterações</h4>
+                <p style="margin-bottom: 1.5rem; line-height: 1.8;">
+                    Podemos atualizar estes Termos de Uso e Política de Privacidade periodicamente. Alterações serão notificadas no site, 
+                    e o uso contínuo da plataforma constitui aceitação dos termos atualizados.
+                </p>
+                
+                <h4 style="color: var(--primary); margin: 2rem 0 1rem;">7. Aceitação</h4>
+                <p style="margin-bottom: 1.5rem; line-height: 1.8;">
+                    Ao clicar em "Aceito", você confirma que leu, entendeu e concorda com estes Termos de Uso e com a coleta e 
+                    tratamento de dados conforme descrito acima.
+                </p>
+                
+                <div style="padding: 1rem; background: var(--gray-light); border-radius: 10px; margin-top: 2rem;">
+                    <p style="color: var(--text-light); font-size: 0.9rem; text-align: center;">
+                        Para exercer seus direitos LGPD ou esclarecer dúvidas, entre em contato:<br>
+                        <strong>privacidade@receituariopro.com.br</strong>
+                    </p>
+                </div>
+            </div>
+            <div class="modal-footer" style="position: sticky; bottom: 0; background: white; padding-top: 1rem; border-top: 2px solid var(--gray-light);">
+                <button class="btn btn-primary" onclick="closeTermsModal()">Fechar</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Tab switching
+        function switchTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.tab === tabName) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Update panels
+            document.querySelectorAll('.form-panel').forEach(panel => {
+                panel.classList.remove('active');
+            });
+            
+            const panelMap = {
+                'login': 'loginPanel',
+                'register': 'registerPanel',
+                'recover': 'recoverPanel'
+            };
+            
+            const panel = document.getElementById(panelMap[tabName]);
+            if (panel) {
+                panel.classList.add('active');
+            }
+            
+            // Clear alerts
+            hideAlert();
+        }
+        
+        // Tab button click handlers
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+        });
+        
+        // Alert functions
+        function showAlert(message, type = 'warning') {
+            const alertBox = document.getElementById('alertBox');
+            const alertMessage = document.getElementById('alertMessage');
+            
+            alertBox.className = `alert alert-${type} show`;
+            alertMessage.textContent = message;
+        }
+        
+        function hideAlert() {
+            const alertBox = document.getElementById('alertBox');
+            alertBox.classList.remove('show');
+        }
+        
+        // Modal functions
+        function showValidationModal() {
+            document.getElementById('validationModal').classList.add('show');
+        }
+        
+        function closeModal() {
+            document.getElementById('validationModal').classList.remove('show');
+            // Redirect to home after closing
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 500);
+        }
+        
+        function showTermsModal() {
+            document.getElementById('termsModal').classList.add('show');
+        }
+        
+        function closeTermsModal() {
+            document.getElementById('termsModal').classList.remove('show');
+        }
+        
+        // Form validation
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+        
+        function validateRegistrationNumber(number, council) {
+            // Basic validation - only numbers
+            const re = /^\d+$/;
+            return re.test(number) && number.length >= 4 && number.length <= 10;
+        }
+        
+        function validatePassword(password) {
+            return password.length >= 8;
+        }
+        
+        // Login form handler
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            hideAlert();
+            
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const button = e.target.querySelector('button[type="submit"]');
+            const btnText = document.getElementById('loginBtnText');
+            
+            // Validate
+            if (!validateEmail(email)) {
+                showAlert('Por favor, insira um e-mail válido', 'error');
+                return;
+            }
+            
+            if (!password) {
+                showAlert('Por favor, insira sua senha', 'error');
+                return;
+            }
+            
+            // Show loading
+            button.disabled = true;
+            btnText.innerHTML = '<span class="loading-spinner"></span> Entrando...';
+            
+            // Simulate API call
+            setTimeout(() => {
+                // Check if user is validated (mock check)
+                if (email === 'demo@receituariopro.com') {
+                    showAlert('Sua conta ainda está em processo de validação', 'warning');
+                    button.disabled = false;
+                    btnText.textContent = 'Entrar';
+                } else {
+                    // Success - redirect to app
+                    window.location.href = 'app.html';
+                }
+            }, 1500);
+        });
+        
+        // Register form handler
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            hideAlert();
+            
+            const formData = {
+                name: document.getElementById('registerName').value,
+                email: document.getElementById('registerEmail').value,
+                council: document.getElementById('registerCouncil').value,
+                state: document.getElementById('registerState').value,
+                registrationNumber: document.getElementById('registerNumber').value,
+                specialty: document.getElementById('registerSpecialty').value,
+                phone: document.getElementById('registerPhone').value,
+                password: document.getElementById('registerPassword').value,
+                passwordConfirm: document.getElementById('registerPasswordConfirm').value,
+                acceptTerms: document.getElementById('acceptTerms').checked
+            };
+            
+            const button = e.target.querySelector('button[type="submit"]');
+            const btnText = document.getElementById('registerBtnText');
+            
+            // Validate all fields
+            if (!formData.name || formData.name.length < 3) {
+                showAlert('Por favor, insira seu nome completo', 'error');
+                return;
+            }
+            
+            if (!validateEmail(formData.email)) {
+                showAlert('Por favor, insira um e-mail válido', 'error');
+                return;
+            }
+            
+            if (!formData.council || !formData.state) {
+                showAlert('Por favor, selecione seu conselho e estado', 'error');
+                return;
+            }
+            
+            if (!validateRegistrationNumber(formData.registrationNumber, formData.council)) {
+                showAlert('Número de registro inválido. Use apenas números', 'error');
+                return;
+            }
+            
+            if (!validatePassword(formData.password)) {
+                showAlert('A senha deve ter no mínimo 8 caracteres', 'error');
+                return;
+            }
+            
+            if (formData.password !== formData.passwordConfirm) {
+                showAlert('As senhas não coincidem', 'error');
+                return;
+            }
+            
+            if (!formData.acceptTerms) {
+                showAlert('Você deve aceitar os termos de uso', 'error');
+                return;
+            }
+            
+            // Show loading
+            button.disabled = true;
+            btnText.innerHTML = '<span class="loading-spinner"></span> Criando conta...';
+            
+            // Simulate API call
+            setTimeout(() => {
+                // Show validation modal
+                showValidationModal();
+                
+                // Reset form
+                e.target.reset();
+                button.disabled = false;
+                btnText.textContent = 'Criar Conta';
+                
+                // In production, this would:
+                // 1. Send data to Supabase
+                // 2. Send validation email to admin
+                // 3. Create pending user record
+                console.log('Registration data:', formData);
+                
+                // Mock email to admin
+                console.log(`
+                    ADMIN EMAIL:
+                    New professional registration pending validation:
+                    Name: ${formData.name}
+                    Email: ${formData.email}
+                    Council: ${formData.council}-${formData.state} ${formData.registrationNumber}
+                    Specialty: ${formData.specialty || 'Not specified'}
+                `);
+            }, 1500);
+        });
+        
+        // Recover form handler
+        document.getElementById('recoverForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            hideAlert();
+            
+            const email = document.getElementById('recoverEmail').value;
+            const button = e.target.querySelector('button[type="submit"]');
+            const btnText = document.getElementById('recoverBtnText');
+            
+            if (!validateEmail(email)) {
+                showAlert('Por favor, insira um e-mail válido', 'error');
+                return;
+            }
+            
+            // Show loading
+            button.disabled = true;
+            btnText.innerHTML = '<span class="loading-spinner"></span> Enviando...';
+            
+            // Simulate API call
+            setTimeout(() => {
+                showAlert('Se este e-mail estiver cadastrado, você receberá as instruções de recuperação em instantes', 'success');
+                button.disabled = false;
+                btnText.textContent = 'Enviar Link de Recuperação';
+                
+                // Clear form
+                e.target.reset();
+            }, 1500);
+        });
+        
+        // Phone mask
+        document.getElementById('registerPhone').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 0) {
+                if (value.length <= 11) {
+                    value = value.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+                }
+                e.target.value = value;
+            }
+        });
+    </script>
+</body>
+</html>

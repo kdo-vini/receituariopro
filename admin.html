@@ -1,0 +1,1260 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Admin - Receituário Pro</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #667eea;
+            --primary-dark: #5a67d8;
+            --secondary: #764ba2;
+            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --text-dark: #1a202c;
+            --text-light: #718096;
+            --white: #ffffff;
+            --gray-light: #f7fafc;
+            --gray-lighter: #edf2f7;
+            --success: #48bb78;
+            --error: #f56565;
+            --warning: #ed8936;
+            --info: #4299e1;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--gray-light);
+            min-height: 100vh;
+        }
+        
+        /* Login Screen */
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--gradient);
+            padding: 1rem;
+        }
+        
+        .login-card {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 400px;
+            width: 100%;
+        }
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .login-header h1 {
+            font-size: 1.75rem;
+            font-weight: 800;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+        
+        .login-header p {
+            color: var(--text-light);
+        }
+        
+        /* Dashboard */
+        .dashboard {
+            display: none;
+        }
+        
+        .dashboard.active {
+            display: block;
+        }
+        
+        /* Header */
+        .admin-header {
+            background: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .admin-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .admin-logo img {
+            height: 32px;
+        }
+        
+        .admin-logo span {
+            font-weight: 700;
+            font-size: 1.25rem;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .admin-user {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .admin-user-info {
+            text-align: right;
+        }
+        
+        .admin-user-name {
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+        
+        .admin-user-role {
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+        
+        .btn-logout {
+            padding: 0.5rem 1rem;
+            background: var(--error);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .btn-logout:hover {
+            background: #e53e3e;
+            transform: translateY(-1px);
+        }
+        
+        /* Sidebar */
+        .admin-layout {
+            display: flex;
+            min-height: calc(100vh - 70px);
+        }
+        
+        .sidebar {
+            width: 250px;
+            background: white;
+            border-right: 1px solid var(--gray-lighter);
+            padding: 1.5rem 0;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+        }
+        
+        .sidebar-item {
+            margin-bottom: 0.25rem;
+        }
+        
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            color: var(--text-dark);
+            text-decoration: none;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        
+        .sidebar-link:hover {
+            background: var(--gray-light);
+            color: var(--primary);
+        }
+        
+        .sidebar-link.active {
+            background: linear-gradient(90deg, rgba(102, 126, 234, 0.1) 0%, transparent 100%);
+            color: var(--primary);
+            border-left: 3px solid var(--primary);
+        }
+        
+        .sidebar-icon {
+            font-size: 1.25rem;
+            width: 24px;
+            text-align: center;
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+        
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 2rem;
+        }
+        
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        .stat-icon.blue {
+            background: rgba(66, 153, 225, 0.1);
+            color: var(--info);
+        }
+        
+        .stat-icon.green {
+            background: rgba(72, 187, 120, 0.1);
+            color: var(--success);
+        }
+        
+        .stat-icon.yellow {
+            background: rgba(237, 137, 54, 0.1);
+            color: var(--warning);
+        }
+        
+        .stat-icon.purple {
+            background: rgba(102, 126, 234, 0.1);
+            color: var(--primary);
+        }
+        
+        .stat-content {
+            flex: 1;
+        }
+        
+        .stat-label {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .stat-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+        
+        .stat-change {
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
+        }
+        
+        .stat-change.positive {
+            color: var(--success);
+        }
+        
+        .stat-change.negative {
+            color: var(--error);
+        }
+        
+        /* Tables */
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+        }
+        
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .table-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+        
+        .table-actions {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .search-box {
+            padding: 0.5rem 1rem;
+            border: 2px solid var(--gray-lighter);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            width: 250px;
+        }
+        
+        .search-box:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .filter-select {
+            padding: 0.5rem 1rem;
+            border: 2px solid var(--gray-lighter);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        thead {
+            background: var(--gray-light);
+        }
+        
+        th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-dark);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        td {
+            padding: 1rem;
+            border-top: 1px solid var(--gray-lighter);
+            color: var(--text-dark);
+        }
+        
+        tbody tr:hover {
+            background: var(--gray-light);
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .status-badge.pending {
+            background: rgba(237, 137, 54, 0.1);
+            color: var(--warning);
+        }
+        
+        .status-badge.approved {
+            background: rgba(72, 187, 120, 0.1);
+            color: var(--success);
+        }
+        
+        .status-badge.rejected {
+            background: rgba(245, 101, 101, 0.1);
+            color: var(--error);
+        }
+        
+        .status-badge.active {
+            background: rgba(72, 187, 120, 0.1);
+            color: var(--success);
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .btn-action {
+            padding: 0.375rem 0.75rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-approve {
+            background: var(--success);
+            color: white;
+        }
+        
+        .btn-approve:hover {
+            background: #38a169;
+        }
+        
+        .btn-reject {
+            background: var(--error);
+            color: white;
+        }
+        
+        .btn-reject:hover {
+            background: #e53e3e;
+        }
+        
+        .btn-view {
+            background: var(--info);
+            color: white;
+        }
+        
+        .btn-view:hover {
+            background: #3182ce;
+        }
+        
+        /* Forms */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+            font-weight: 500;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--gray-lighter);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: var(--gradient);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .error-message {
+            color: var(--error);
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+        
+        .error-message.show {
+            display: block;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.show {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            margin-bottom: 1.5rem;
+        }
+        
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+        
+        .modal-body {
+            margin-bottom: 1.5rem;
+        }
+        
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .info-item {
+            padding: 0.75rem;
+            background: var(--gray-light);
+            border-radius: 8px;
+        }
+        
+        .info-label {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-bottom: 0.25rem;
+        }
+        
+        .info-value {
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+        
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--gray-lighter);
+        }
+        
+        .tab-btn {
+            padding: 1rem;
+            background: none;
+            border: none;
+            font-weight: 600;
+            color: var(--text-light);
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s;
+        }
+        
+        .tab-btn.active {
+            color: var(--primary);
+        }
+        
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--primary);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+            
+            .main-content {
+                padding: 1rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .table-actions {
+                flex-direction: column;
+            }
+            
+            .search-box {
+                width: 100%;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div class="login-container" id="loginScreen">
+        <div class="login-card">
+            <div class="login-header">
+                <h1>🔒 Admin Panel</h1>
+                <p>Acesso Restrito - Receituário Pro</p>
+            </div>
+            
+            <form id="adminLoginForm">
+                <div class="form-group">
+                    <label class="form-label">E-mail</label>
+                    <input type="email" id="adminEmail" class="form-control" required>
+                    <span class="error-message">E-mail inválido</span>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Senha</label>
+                    <input type="password" id="adminPassword" class="form-control" required>
+                    <span class="error-message">Senha incorreta</span>
+                </div>
+                
+                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                    Entrar
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Dashboard -->
+    <div class="dashboard" id="dashboard">
+        <!-- Header -->
+        <header class="admin-header">
+            <div class="admin-logo">
+                <img src="img/saas-logo.png" alt="Logo">
+                <span>Admin Panel</span>
+            </div>
+            
+            <div class="admin-user">
+                <div class="admin-user-info">
+                    <div class="admin-user-name">Vinicius</div>
+                    <div class="admin-user-role">Administrador</div>
+                </div>
+                <button class="btn-logout" onclick="logout()">Sair</button>
+            </div>
+        </header>
+        
+        <div class="admin-layout">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <ul class="sidebar-menu">
+                    <li class="sidebar-item">
+                        <a href="#" class="sidebar-link active" data-page="overview">
+                            <span class="sidebar-icon">📊</span>
+                            <span>Visão Geral</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="#" class="sidebar-link" data-page="validations">
+                            <span class="sidebar-icon">✅</span>
+                            <span>Validações</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="#" class="sidebar-link" data-page="professionals">
+                            <span class="sidebar-icon">👨‍⚕️</span>
+                            <span>Profissionais</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="#" class="sidebar-link" data-page="plans">
+                            <span class="sidebar-icon">💳</span>
+                            <span>Planos</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="#" class="sidebar-link" data-page="reports">
+                            <span class="sidebar-icon">📈</span>
+                            <span>Relatórios</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="#" class="sidebar-link" data-page="settings">
+                            <span class="sidebar-icon">⚙️</span>
+                            <span>Configurações</span>
+                        </a>
+                    </li>
+                </ul>
+            </aside>
+            
+            <!-- Main Content -->
+            <main class="main-content">
+                <!-- Overview Page -->
+                <div id="overviewPage" class="page-content active">
+                    <h1 class="page-title">Visão Geral</h1>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon blue">👥</div>
+                            <div class="stat-content">
+                                <div class="stat-label">Total de Profissionais</div>
+                                <div class="stat-value">247</div>
+                                <div class="stat-change positive">+12% este mês</div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon yellow">⏳</div>
+                            <div class="stat-content">
+                                <div class="stat-label">Validações Pendentes</div>
+                                <div class="stat-value">5</div>
+                                <div class="stat-change">Aguardando aprovação</div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon green">💰</div>
+                            <div class="stat-content">
+                                <div class="stat-label">Receita Mensal</div>
+                                <div class="stat-value">R$ 7.163</div>
+                                <div class="stat-change positive">+25% vs mês anterior</div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon purple">📋</div>
+                            <div class="stat-content">
+                                <div class="stat-label">Receituários/Mês</div>
+                                <div class="stat-value">3.842</div>
+                                <div class="stat-change positive">+18% este mês</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Recent Activity -->
+                    <div class="table-container">
+                        <div class="table-header">
+                            <h2 class="table-title">Atividade Recente</h2>
+                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Data/Hora</th>
+                                    <th>Tipo</th>
+                                    <th>Descrição</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>18/08/2025 14:32</td>
+                                    <td>Cadastro</td>
+                                    <td>Dr. Carlos Silva - CRM/SP 98765</td>
+                                    <td><span class="status-badge pending">Pendente</span></td>
+                                </tr>
+                                <tr>
+                                    <td>18/08/2025 12:15</td>
+                                    <td>Pagamento</td>
+                                    <td>Plano Essencial - Dra. Ana Costa</td>
+                                    <td><span class="status-badge approved">Aprovado</span></td>
+                                </tr>
+                                <tr>
+                                    <td>18/08/2025 10:45</td>
+                                    <td>Validação</td>
+                                    <td>Dr. Roberto Lima aprovado</td>
+                                    <td><span class="status-badge approved">Concluído</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Validations Page -->
+                <div id="validationsPage" class="page-content">
+                    <h1 class="page-title">Validações Pendentes</h1>
+                    
+                    <div class="table-container">
+                        <div class="table-header">
+                            <h2 class="table-title">Profissionais Aguardando Validação</h2>
+                            <div class="table-actions">
+                                <select class="filter-select">
+                                    <option>Todos</option>
+                                    <option>Pendentes</option>
+                                    <option>Aprovados</option>
+                                    <option>Rejeitados</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Data</th>
+                                    <th>Nome</th>
+                                    <th>Conselho</th>
+                                    <th>Registro</th>
+                                    <th>E-mail</th>
+                                    <th>Status</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="validationsList">
+                                <tr>
+                                    <td>18/08/2025</td>
+                                    <td>Dr. Carlos Silva</td>
+                                    <td>CRM-SP</td>
+                                    <td>98765</td>
+                                    <td>carlos@email.com</td>
+                                    <td><span class="status-badge pending">Pendente</span></td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="btn-action btn-view" onclick="viewProfessional(1)">Ver</button>
+                                            <button class="btn-action btn-approve" onclick="approveProfessional(1)">Aprovar</button>
+                                            <button class="btn-action btn-reject" onclick="rejectProfessional(1)">Rejeitar</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>17/08/2025</td>
+                                    <td>Dra. Maria Santos</td>
+                                    <td>CRO-RJ</td>
+                                    <td>54321</td>
+                                    <td>maria@email.com</td>
+                                    <td><span class="status-badge pending">Pendente</span></td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="btn-action btn-view" onclick="viewProfessional(2)">Ver</button>
+                                            <button class="btn-action btn-approve" onclick="approveProfessional(2)">Aprovar</button>
+                                            <button class="btn-action btn-reject" onclick="rejectProfessional(2)">Rejeitar</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Professionals Page -->
+                <div id="professionalsPage" class="page-content">
+                    <h1 class="page-title">Profissionais Cadastrados</h1>
+                    
+                    <div class="table-container">
+                        <div class="table-header">
+                            <h2 class="table-title">Lista de Profissionais</h2>
+                            <div class="table-actions">
+                                <input type="text" class="search-box" placeholder="Buscar profissional...">
+                                <button class="btn btn-primary">Exportar CSV</button>
+                            </div>
+                        </div>
+                        
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Conselho</th>
+                                    <th>Especialidade</th>
+                                    <th>Plano</th>
+                                    <th>Status</th>
+                                    <th>Cadastro</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Dr. João Oliveira</td>
+                                    <td>CRM-SP 12345</td>
+                                    <td>Cardiologia</td>
+                                    <td>Essencial</td>
+                                    <td><span class="status-badge active">Ativo</span></td>
+                                    <td>15/08/2025</td>
+                                    <td>
+                                        <button class="btn-action btn-view" onclick="viewProfessional(3)">Detalhes</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Dra. Ana Costa</td>
+                                    <td>CRM-RJ 67890</td>
+                                    <td>Pediatria</td>
+                                    <td>Essencial</td>
+                                    <td><span class="status-badge active">Ativo</span></td>
+                                    <td>10/08/2025</td>
+                                    <td>
+                                        <button class="btn-action btn-view" onclick="viewProfessional(4)">Detalhes</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Plans Page -->
+                <div id="plansPage" class="page-content">
+                    <h1 class="page-title">Planos e Assinaturas</h1>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon green">🎯</div>
+                            <div class="stat-content">
+                                <div class="stat-label">Plano Freemium</div>
+                                <div class="stat-value">152</div>
+                                <div class="stat-change">Usuários ativos</div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon purple">⭐</div>
+                            <div class="stat-content">
+                                <div class="stat-label">Plano Essencial</div>
+                                <div class="stat-value">95</div>
+                                <div class="stat-change">R$ 29/mês</div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon blue">🚀</div>
+                            <div class="stat-content">
+                                <div class="stat-label">Plano Profissional</div>
+                                <div class="stat-value">Em breve</div>
+                                <div class="stat-change">-</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="table-container">
+                        <div class="table-header">
+                            <h2 class="table-title">Configuração de Planos</h2>
+                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Plano</th>
+                                    <th>Preço Mensal</th>
+                                    <th>Preço Anual</th>
+                                    <th>Limite Receituários</th>
+                                    <th>Status</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Freemium</td>
+                                    <td>R$ 0</td>
+                                    <td>R$ 0</td>
+                                    <td>30/mês</td>
+                                    <td><span class="status-badge active">Ativo</span></td>
+                                    <td><button class="btn-action btn-view">Editar</button></td>
+                                </tr>
+                                <tr>
+                                    <td>Essencial</td>
+                                    <td>R$ 39</td>
+                                    <td>R$ 348 (R$ 29/mês)</td>
+                                    <td>Ilimitado</td>
+                                    <td><span class="status-badge active">Ativo</span></td>
+                                    <td><button class="btn-action btn-view">Editar</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Reports Page -->
+                <div id="reportsPage" class="page-content">
+                    <h1 class="page-title">Relatórios</h1>
+                    
+                    <div class="tabs">
+                        <button class="tab-btn active" data-tab="growth">Crescimento</button>
+                        <button class="tab-btn" data-tab="usage">Uso da Plataforma</button>
+                        <button class="tab-btn" data-tab="financial">Financeiro</button>
+                    </div>
+                    
+                    <div class="tab-content active" id="growthTab">
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-icon blue">📈</div>
+                                <div class="stat-content">
+                                    <div class="stat-label">Novos Usuários (Mês)</div>
+                                    <div class="stat-value">32</div>
+                                    <div class="stat-change positive">+28% vs mês anterior</div>
+                                </div>
+                            </div>
+                            
+                            <div class="stat-card">
+                                <div class="stat-icon green">🔄</div>
+                                <div class="stat-content">
+                                    <div class="stat-label">Taxa de Conversão</div>
+                                    <div class="stat-value">38%</div>
+                                    <div class="stat-change positive">Freemium → Pago</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="usageTab">
+                        <p>Estatísticas de uso em desenvolvimento...</p>
+                    </div>
+                    
+                    <div class="tab-content" id="financialTab">
+                        <p>Relatórios financeiros em desenvolvimento...</p>
+                    </div>
+                </div>
+                
+                <!-- Settings Page -->
+                <div id="settingsPage" class="page-content">
+                    <h1 class="page-title">Configurações</h1>
+                    
+                    <div class="table-container">
+                        <h2 class="table-title">Configurações do Sistema</h2>
+                        
+                        <form id="settingsForm">
+                            <div class="form-group">
+                                <label class="form-label">E-mail do Administrador</label>
+                                <input type="email" class="form-control" value="admin@receituariopro.com.br">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">URL do Stripe</label>
+                                <input type="text" class="form-control" placeholder="https://checkout.stripe.com/...">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Tempo de Validação (horas)</label>
+                                <input type="number" class="form-control" value="24">
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary">Salvar Configurações</button>
+                        </form>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    
+    <!-- Professional Details Modal -->
+    <div class="modal" id="professionalModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Detalhes do Profissional</h2>
+            </div>
+            <div class="modal-body">
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">Nome Completo</div>
+                        <div class="info-value" id="modalName">-</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">E-mail</div>
+                        <div class="info-value" id="modalEmail">-</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Conselho</div>
+                        <div class="info-value" id="modalCouncil">-</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Registro</div>
+                        <div class="info-value" id="modalRegister">-</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Especialidade</div>
+                        <div class="info-value" id="modalSpecialty">-</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Telefone</div>
+                        <div class="info-value" id="modalPhone">-</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Data de Cadastro</div>
+                        <div class="info-value" id="modalDate">-</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Status</div>
+                        <div class="info-value" id="modalStatus">-</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="closeModal()">Fechar</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Admin credentials (in production, this would be in backend)
+        const ADMIN_EMAIL = 'admin@receituariopro.com.br';
+        const ADMIN_PASSWORD = 'Admin@2025'; // In production, use hashed password
+        
+        // Check if already logged in
+        if (localStorage.getItem('adminLoggedIn') === 'true') {
+            showDashboard();
+        }
+        
+        // Login form handler
+        document.getElementById('adminLoginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('adminEmail').value;
+            const password = document.getElementById('adminPassword').value;
+            
+            if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+                localStorage.setItem('adminLoggedIn', 'true');
+                showDashboard();
+            } else {
+                alert('Credenciais inválidas!');
+            }
+        });
+        
+        // Show dashboard
+        function showDashboard() {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('dashboard').classList.add('active');
+        }
+        
+        // Logout
+        function logout() {
+            localStorage.removeItem('adminLoggedIn');
+            window.location.reload();
+        }
+        
+        // Sidebar navigation
+        document.querySelectorAll('.sidebar-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                // Update active link
+                document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+                
+                // Show corresponding page
+                const page = link.dataset.page;
+                document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
+                document.getElementById(page + 'Page').classList.add('active');
+            });
+        });
+        
+        // Tab navigation
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tab = btn.dataset.tab;
+                
+                // Update active tab button
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                // Show corresponding tab content
+                document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+                document.getElementById(tab + 'Tab').classList.add('active');
+            });
+        });
+        
+        // Professional actions
+        function viewProfessional(id) {
+            // Mock data - in production, fetch from database
+            const professionals = {
+                1: {
+                    name: 'Dr. Carlos Silva',
+                    email: 'carlos@email.com',
+                    council: 'CRM-SP',
+                    register: '98765',
+                    specialty: 'Cardiologia',
+                    phone: '(11) 98765-4321',
+                    date: '18/08/2025',
+                    status: 'Pendente'
+                },
+                2: {
+                    name: 'Dra. Maria Santos',
+                    email: 'maria@email.com',
+                    council: 'CRO-RJ',
+                    register: '54321',
+                    specialty: 'Ortodontia',
+                    phone: '(21) 97654-3210',
+                    date: '17/08/2025',
+                    status: 'Pendente'
+                }
+            };
+            
+            const prof = professionals[id] || {};
+            
+            document.getElementById('modalName').textContent = prof.name || '-';
+            document.getElementById('modalEmail').textContent = prof.email || '-';
+            document.getElementById('modalCouncil').textContent = prof.council || '-';
+            document.getElementById('modalRegister').textContent = prof.register || '-';
+            document.getElementById('modalSpecialty').textContent = prof.specialty || '-';
+            document.getElementById('modalPhone').textContent = prof.phone || '-';
+            document.getElementById('modalDate').textContent = prof.date || '-';
+            document.getElementById('modalStatus').textContent = prof.status || '-';
+            
+            document.getElementById('professionalModal').classList.add('show');
+        }
+        
+        function closeModal() {
+            document.getElementById('professionalModal').classList.remove('show');
+        }
+        
+        function approveProfessional(id) {
+            if (confirm('Aprovar este profissional?')) {
+                alert('Profissional aprovado! Email de confirmação será enviado.');
+                // In production: update database, send email
+                location.reload();
+            }
+        }
+        
+        function rejectProfessional(id) {
+            const reason = prompt('Motivo da rejeição:');
+            if (reason) {
+                alert('Profissional rejeitado. Email de notificação será enviado.');
+                // In production: update database, send email with reason
+                location.reload();
+            }
+        }
+        
+        // Settings form
+        document.getElementById('settingsForm')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            alert('Configurações salvas com sucesso!');
+        });
+        
+        // Close modal on outside click
+        window.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal')) {
+                e.target.classList.remove('show');
+            }
+        });
+    </script>
+</body>
+</html>

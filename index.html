@@ -1,0 +1,1633 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- SEO Meta Tags -->
+    <title>Receituário Pro - Sistema Digital de Prescrições Médicas | Rápido, Seguro e Profissional</title>
+    <meta name="description" content="Revolucione suas prescrições médicas com o Receituário Pro. Sistema 100% digital, assinatura eletrônica, templates personalizados. Teste grátis por 7 dias. Economize 2h por dia!">
+    <meta name="keywords" content="receituário digital, prescrição médica online, receita médica digital, sistema médico, prontuário eletrônico, assinatura digital médica, software médico, receituário eletrônico">
+    <meta name="author" content="Receituário Pro">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="Portuguese">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://receituariopro.com.br/">
+    <meta property="og:title" content="Receituário Pro - Sistema Digital de Prescrições Médicas">
+    <meta property="og:description" content="Modernize seu consultório com receituários digitais. Economize tempo, reduza erros e impressione seus pacientes. Teste grátis!">
+    <meta property="og:image" content="https://receituariopro.com.br/assets/og-image.jpg">
+    <meta property="og:locale" content="pt_BR">
+    <meta property="og:site_name" content="Receituário Pro">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://receituariopro.com.br/">
+    <meta property="twitter:title" content="Receituário Pro - Prescrições Médicas Digitais">
+    <meta property="twitter:description" content="Sistema completo para prescrições médicas digitais. Rápido, seguro e profissional.">
+    <meta property="twitter:image" content="https://receituariopro.com.br/assets/twitter-image.jpg">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://receituariopro.com.br/">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    
+    <!-- Preconnect to External Domains -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Schema.org Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "Receituário Pro",
+        "applicationCategory": "MedicalApplication",
+        "operatingSystem": "Web",
+        "offers": {
+            "@type": "Offer",
+            "price": "97.00",
+            "priceCurrency": "BRL"
+        },
+        "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.9",
+            "reviewCount": "327"
+        },
+        "description": "Sistema profissional de receituários médicos digitais com assinatura eletrônica"
+    }
+    </script>
+    
+    <style>
+        :root {
+            --primary: #667eea;
+            --primary-dark: #5a67d8;
+            --secondary: #764ba2;
+            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --text-dark: #1a202c;
+            --text-light: #718096;
+            --white: #ffffff;
+            --gray-light: #f7fafc;
+            --success: #48bb78;
+            --warning: #ed8936;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--text-dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        /* Loading Animation */
+        .page-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s, visibility 0.5s;
+        }
+        
+        .page-loader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+        
+        .loader-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+            z-index: 1000;
+            transition: all 0.3s;
+        }
+        
+        nav.scrolled {
+            background: rgba(255, 255, 255, 0.98);
+        }
+        
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .logo img {
+            height: 32px;
+            width: auto;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+        
+        .nav-links a {
+            color: var(--text-dark);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+        
+        .cta-button {
+            background: var(--gradient);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(102, 126, 234, 0.5);
+        }
+        
+        .mobile-menu {
+            display: none;
+            flex-direction: column;
+            gap: 0.25rem;
+            cursor: pointer;
+        }
+        
+        .mobile-menu span {
+            width: 25px;
+            height: 3px;
+            background: var(--text-dark);
+            transition: all 0.3s;
+        }
+        
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            display: flex;
+            align-items: center;
+            padding-top: 80px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(102, 126, 234, 0.2) 0%, transparent 70%);
+            animation: float 20s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            50% { transform: translate(-50px, 50px) rotate(180deg); }
+        }
+        
+        .hero-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .hero-content h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .hero-content .subtitle {
+            font-size: 1.25rem;
+            color: var(--text-light);
+            margin-bottom: 2rem;
+            line-height: 1.8;
+        }
+        
+        .hero-badges {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .badge {
+            background: white;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            font-size: 0.9rem;
+        }
+        
+        .badge-icon {
+            color: var(--success);
+        }
+        
+        .hero-cta {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            align-items: center;
+        }
+        
+        .btn-primary {
+            background: var(--gradient);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+            display: inline-block;
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(102, 126, 234, 0.5);
+            animation: none;
+        }
+        
+        .btn-secondary {
+            color: var(--primary);
+            padding: 1rem 2rem;
+            border: 2px solid var(--primary);
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+        
+        .btn-secondary:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .trust-indicators {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+        
+        .trust-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .hero-image {
+            position: relative;
+        }
+        
+        .hero-image img {
+            width: 100%;
+            height: auto;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            animation: float-image 3s ease-in-out infinite;
+        }
+        
+        @keyframes float-image {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .floating-card {
+            position: absolute;
+            background: white;
+            padding: 1rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            animation: float-card 4s ease-in-out infinite;
+        }
+        
+        @keyframes float-card {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(10px, -10px); }
+        }
+        
+        .floating-card-1 {
+            top: 20%;
+            left: -10%;
+            animation-delay: 0s;
+        }
+        
+        .floating-card-2 {
+            bottom: 20%;
+            right: -10%;
+            animation-delay: 1s;
+        }
+        
+        /* Features Section */
+        .features {
+            padding: 5rem 2rem;
+            background: var(--gray-light);
+        }
+        
+        .section-header {
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto 4rem;
+        }
+        
+        .section-header h2 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .section-header p {
+            color: var(--text-light);
+            font-size: 1.1rem;
+        }
+        
+        .features-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        
+        .feature-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--gradient);
+            transform: scaleX(0);
+            transition: transform 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+        }
+        
+        .feature-card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .feature-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+        }
+        
+        .feature-card p {
+            color: var(--text-light);
+            line-height: 1.8;
+        }
+        
+        /* Stats Section */
+        .stats {
+            padding: 5rem 2rem;
+            background: var(--gradient);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stats::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/></svg>');
+            background-size: 100px 100px;
+        }
+        
+        .stats-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 3rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        
+        .stat-label {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        /* Why Choose Section */
+        .why-choose {
+            padding: 5rem 2rem;
+            background: white;
+        }
+        
+        .market-stat {
+            max-width: 900px;
+            margin: 0 auto 3rem;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+            border-left: 4px solid var(--primary);
+            padding: 2rem;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        
+        .stat-icon {
+            font-size: 2.5rem;
+        }
+        
+        .stat-text {
+            color: var(--text-dark);
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+        
+        .stat-text strong {
+            color: var(--primary);
+            font-weight: 700;
+        }
+        
+        .benefits-grid {
+            max-width: 1200px;
+            margin: 0 auto 3rem;
+            display: grid;
+            gap: 2rem;
+        }
+        
+        .benefit-card {
+            background: var(--gray-light);
+            border-radius: 20px;
+            padding: 2rem;
+            display: flex;
+            gap: 2rem;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .benefit-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent 0%, rgba(102, 126, 234, 0.03) 100%);
+            transform: translateX(-100%);
+            transition: transform 0.5s;
+        }
+        
+        .benefit-card:hover::before {
+            transform: translateX(0);
+        }
+        
+        .benefit-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 25px rgba(0,0,0,0.1);
+        }
+        
+        .benefit-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            flex-shrink: 0;
+            line-height: 1;
+        }
+        
+        .benefit-content {
+            flex: 1;
+        }
+        
+        .benefit-content h3 {
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+        }
+        
+        .benefit-content p {
+            color: var(--text-light);
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+        
+        .benefit-badge {
+            display: inline-block;
+            background: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--primary);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+        
+        .comparison-stat {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 3rem;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.03) 0%, rgba(118, 75, 162, 0.03) 100%);
+            border-radius: 20px;
+        }
+        
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+        }
+        
+        .comparison-item h4 {
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            color: var(--text-dark);
+        }
+        
+        .comparison-list {
+            list-style: none;
+        }
+        
+        .comparison-list li {
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            border-radius: 10px;
+            font-weight: 500;
+        }
+        
+        .comparison-list.cons li {
+            background: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+        }
+        
+        .comparison-list.pros li {
+            background: rgba(72, 187, 120, 0.1);
+            color: #16a34a;
+        }
+        
+        @media (max-width: 768px) {
+            .benefit-card {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .benefit-number {
+                font-size: 2rem;
+            }
+            
+            .comparison-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            
+            .stat-card {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+        
+        /* Testimonials - Removed */
+        
+        /* Pricing */
+        .pricing {
+            padding: 5rem 2rem;
+            background: var(--gray-light);
+        }
+        
+        .billing-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin: 2rem 0 3rem;
+        }
+        
+        .billing-label {
+            color: var(--text-light);
+            font-weight: 500;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .toggle-slider {
+            background: var(--gradient);
+        }
+        
+        input:checked + .toggle-slider:before {
+            transform: translateX(30px);
+        }
+        
+        .billing-badge {
+            background: var(--success);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .pricing-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+        
+        .pricing-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2.5rem;
+            position: relative;
+            transition: all 0.3s;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        }
+        
+        .pricing-card.featured {
+            transform: scale(1.05);
+            box-shadow: 0 10px 40px rgba(102, 126, 234, 0.2);
+            border: 2px solid var(--primary);
+        }
+        
+        .pricing-card.featured::before {
+            content: 'MAIS POPULAR';
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--gradient);
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .pricing-card.disabled {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .coming-soon-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+        
+        .coming-soon-text {
+            font-size: 2rem;
+            font-weight: 800;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            transform: rotate(-15deg);
+        }
+        
+        .blurred {
+            filter: blur(4px);
+            user-select: none;
+        }
+        
+        .pricing-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+        
+        .pricing-card.featured:hover {
+            transform: scale(1.05) translateY(-5px);
+        }
+        
+        .pricing-card.disabled:hover {
+            transform: none;
+        }
+        
+        .plan-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        
+        .plan-price {
+            font-size: 3rem;
+            font-weight: 800;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+        
+        .plan-price span {
+            font-size: 1rem;
+            color: var(--text-light);
+        }
+        
+        .plan-description {
+            color: var(--text-light);
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .plan-features {
+            list-style: none;
+            margin: 2rem 0;
+        }
+        
+        .plan-features li {
+            padding: 0.75rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-dark);
+        }
+        
+        .plan-features li::before {
+            content: '✓';
+            color: var(--success);
+            font-weight: bold;
+        }
+        
+        /* CTA Section */
+        .cta-section {
+            padding: 5rem 2rem;
+            background: var(--gradient);
+            color: white;
+            text-align: center;
+        }
+        
+        .cta-section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .cta-section p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.95;
+        }
+        
+        .countdown {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .countdown-item {
+            text-align: center;
+        }
+        
+        .countdown-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            display: block;
+        }
+        
+        .countdown-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        /* Footer */
+        footer {
+            background: var(--text-dark);
+            color: white;
+            padding: 3rem 2rem 1rem;
+        }
+        
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .footer-column h3 {
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+        
+        .footer-column a {
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            display: block;
+            padding: 0.25rem 0;
+            transition: color 0.3s;
+        }
+        
+        .footer-column a:hover {
+            color: white;
+        }
+        
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.7);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .mobile-menu {
+                display: flex;
+            }
+            
+            .hero-container {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            
+            .hero-content h1 {
+                font-size: 2.5rem;
+            }
+            
+            .hero-cta {
+                flex-direction: column;
+            }
+            
+            .btn-primary, .btn-secondary {
+                width: 100%;
+            }
+            
+            .floating-card {
+                display: none;
+            }
+            
+            .pricing-card.featured {
+                transform: none;
+            }
+        }
+        
+        /* Animations on Scroll */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s ease;
+        }
+        
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <!-- Page Loader -->
+    <div class="page-loader" id="pageLoader">
+        <div class="loader-spinner"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav id="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <img src="img/saas-logo.png" alt="Receituário Pro Logo">
+                <span style="background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Receituário Pro</span>
+            </div>
+            <div class="nav-links">
+                <a href="#features">Recursos</a>
+                <a href="#why-choose">Por Que Escolher</a>
+                <a href="#pricing">Preços</a>
+                <a href="#faq">FAQ</a>
+                <a href="auth.html" class="cta-button">Acessar Sistema</a>
+            </div>
+            <div class="mobile-menu" id="mobileMenu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-container">
+            <div class="hero-content fade-in">
+                <h1>Prescrições Médicas Digitais em Segundos</h1>
+                <p class="subtitle">
+                    Abandone o papel e modernize seu consultório com o sistema mais completo 
+                    de receituários digitais do Brasil. Economize tempo, reduza erros e 
+                    impressione seus pacientes.
+                </p>
+                
+                <div class="hero-badges">
+                    <div class="badge">
+                        <span class="badge-icon">✓</span>
+                        <span>100% Digital</span>
+                    </div>
+                    <div class="badge">
+                        <span class="badge-icon">✓</span>
+                        <span>Assinatura Eletrônica</span>
+                    </div>
+                    <div class="badge">
+                        <span class="badge-icon">✓</span>
+                        <span>Sem Instalação</span>
+                    </div>
+                </div>
+                
+                <div class="hero-cta">
+                    <a href="#pricing" class="btn-primary">Começar Teste Grátis</a>
+                    <a href="#demo" class="btn-secondary">Ver Demonstração</a>
+                </div>
+                
+                <div class="trust-indicators">
+                    <div class="trust-item">
+                        <span>⭐⭐⭐⭐⭐</span>
+                        <span>4.9/5 (327 avaliações)</span>
+                    </div>
+                    <div class="trust-item">
+                        <span>🔒</span>
+                        <span>100% Seguro e Criptografado</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="hero-image fade-in">
+                <img src="data:image/svg+xml,%3Csvg viewBox='0 0 600 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23667eea'/%3E%3Cstop offset='100%25' style='stop-color:%23764ba2'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='600' height='400' rx='20' fill='white'/%3E%3Crect x='30' y='30' width='540' height='80' rx='10' fill='%23f7fafc'/%3E%3Crect x='30' y='130' width='540' height='200' rx='10' fill='%23f7fafc'/%3E%3Crect x='30' y='350' width='200' height='30' rx='15' fill='url(%23grad)'/%3E%3Ctext x='50' y='75' font-family='Arial' font-size='20' fill='%23333'%3EReceituário Digital%3C/text%3E%3C/svg%3E" alt="Dashboard do Receituário Pro">
+                
+                <div class="floating-card floating-card-1">
+                    <strong>+2000</strong><br>
+                    <small>Médicos Ativos</small>
+                </div>
+                
+                <div class="floating-card floating-card-2">
+                    <strong>50k+</strong><br>
+                    <small>Receitas/mês</small>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="section-header fade-in">
+            <h2>Tudo que Você Precisa em Um Só Lugar</h2>
+            <p>Funcionalidades pensadas para otimizar sua rotina médica</p>
+        </div>
+        
+        <div class="features-grid">
+            <div class="feature-card fade-in">
+                <div class="feature-icon">⚡</div>
+                <h3>Criação Instantânea</h3>
+                <p>Gere receituários completos em menos de 30 segundos com nossos templates inteligentes e personalizáveis.</p>
+            </div>
+            
+            <div class="feature-card fade-in">
+                <div class="feature-icon">✍️</div>
+                <h3>Assinatura Digital</h3>
+                <p>Assine digitalmente suas prescrições com validade jurídica. Upload de assinatura ou desenho direto na tela.</p>
+            </div>
+            
+            <div class="feature-card fade-in">
+                <div class="feature-icon">📱</div>
+                <h3>100% Responsivo</h3>
+                <p>Funciona perfeitamente em qualquer dispositivo. Atenda de onde estiver: consultório, hospital ou home office.</p>
+            </div>
+            
+            <div class="feature-card fade-in">
+                <div class="feature-icon">🔒</div>
+                <h3>Segurança Total</h3>
+                <p>Dados criptografados e backups automáticos. Conformidade com LGPD e padrões médicos de segurança.</p>
+            </div>
+            
+            <div class="feature-card fade-in">
+                <div class="feature-icon">📊</div>
+                <h3>Histórico Completo</h3>
+                <p>Acesse todo histórico de prescrições. Busca rápida por paciente, data ou medicamento.</p>
+            </div>
+            
+            <div class="feature-card fade-in">
+                <div class="feature-icon">🎨</div>
+                <h3>Personalização Total</h3>
+                <p>Templates para medicações, exames e procedimentos. Adicione seu logo e informações do consultório.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats">
+        <div class="stats-container">
+            <div class="stat-item fade-in">
+                <span class="stat-number" data-target="80">0</span><span style="font-size: 3rem; font-weight: 800;">%</span>
+                <span class="stat-label">Médicos escrevem à mão</span>
+            </div>
+            <div class="stat-item fade-in">
+                <span class="stat-number" data-target="2">0</span><span style="font-size: 3rem; font-weight: 800;">h</span>
+                <span class="stat-label">Economizadas por dia</span>
+            </div>
+            <div class="stat-item fade-in">
+                <span class="stat-number" data-target="30">0</span><span style="font-size: 3rem; font-weight: 800;">s</span>
+                <span class="stat-label">Por receituário</span>
+            </div>
+            <div class="stat-item fade-in">
+                <span class="stat-number" data-target="100">0</span><span style="font-size: 3rem; font-weight: 800;">%</span>
+                <span class="stat-label">Conformidade LGPD</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Choose Section -->
+    <section class="why-choose" id="why-choose">
+        <div class="section-header fade-in">
+            <h2>Por Que Escolher o Receituário Pro?</h2>
+            <p>Benefícios concretos que transformam sua prática médica</p>
+        </div>
+        
+        <div class="market-stat fade-in">
+            <div class="stat-card">
+                <span class="stat-icon">📊</span>
+                <p class="stat-text">
+                    <strong>Você sabia?</strong> Mais de 80% dos médicos brasileiros ainda escrevem receitas à mão, 
+                    perdendo em média 2 horas por dia com retrabalho e correções. O Receituário Pro resolve isso em segundos.
+                </p>
+            </div>
+        </div>
+        
+        <div class="benefits-grid">
+            <div class="benefit-card fade-in">
+                <div class="benefit-number">01</div>
+                <div class="benefit-content">
+                    <h3>✅ Validade Legal Garantida</h3>
+                    <p>
+                        Suas prescrições têm validade jurídica completa. Escolha entre assinatura digital 
+                        com certificação ou assinatura manual após impressão. Totalmente adequado às normas 
+                        do CFM e legislação brasileira vigente.
+                    </p>
+                    <div class="benefit-badge">
+                        <span>🔒 Conformidade CFM</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="benefit-card fade-in">
+                <div class="benefit-number">02</div>
+                <div class="benefit-content">
+                    <h3>⚡ Preenchimento Automático Inteligente</h3>
+                    <p>
+                        Seus dados profissionais (nome, CRM, especialidade, telefone) são preenchidos 
+                        automaticamente em todas as receitas. Data sempre atualizada. Templates prontos 
+                        para medicações, exames e procedimentos. Economize 70% do tempo de prescrição.
+                    </p>
+                    <div class="benefit-badge">
+                        <span>⏱️ 30 segundos por receita</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="benefit-card fade-in">
+                <div class="benefit-number">03</div>
+                <div class="benefit-content">
+                    <h3>📄 Exportação Profissional Instantânea</h3>
+                    <p>
+                        Gere PDFs de alta qualidade ou imagens PNG prontas para impressão em qualquer 
+                        tamanho de papel (A4, A5, Carta). Envie por WhatsApp, email ou imprima diretamente. 
+                        Formatação perfeita garantida em qualquer dispositivo.
+                    </p>
+                    <div class="benefit-badge">
+                        <span>🖨️ Print-ready em 1 clique</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="benefit-card fade-in">
+                <div class="benefit-number">04</div>
+                <div class="benefit-content">
+                    <h3>🔐 Segurança Total e Conformidade LGPD</h3>
+                    <p>
+                        Dados criptografados ponta a ponta. Backups automáticos diários. Total conformidade 
+                        com a Lei Geral de Proteção de Dados. Histórico completo de prescrições com busca 
+                        instantânea. Seus dados e dos pacientes 100% protegidos.
+                    </p>
+                    <div class="benefit-badge">
+                        <span>✓ Certificado LGPD</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="benefit-card fade-in">
+                <div class="benefit-number">05</div>
+                <div class="benefit-content">
+                    <h3>🌐 Acesso de Qualquer Lugar</h3>
+                    <p>
+                        Sistema 100% online, sem instalação. Funciona em computador, tablet ou celular. 
+                        Ideal para consultório, hospital, home office ou telemedicina. Sempre atualizado, 
+                        sempre disponível, sempre sincronizado.
+                    </p>
+                    <div class="benefit-badge">
+                        <span>☁️ 99.9% uptime garantido</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="comparison-stat fade-in">
+            <div class="comparison-grid">
+                <div class="comparison-item">
+                    <h4>Método Tradicional</h4>
+                    <ul class="comparison-list cons">
+                        <li>❌ 5-10 minutos por receita</li>
+                        <li>❌ Letra pode ficar ilegível</li>
+                        <li>❌ Sem histórico organizado</li>
+                        <li>❌ Retrabalho constante</li>
+                    </ul>
+                </div>
+                <div class="comparison-item">
+                    <h4>Com Receituário Pro</h4>
+                    <ul class="comparison-list pros">
+                        <li>✅ 30 segundos por receita</li>
+                        <li>✅ Sempre legível e profissional</li>
+                        <li>✅ Histórico completo e buscável</li>
+                        <li>✅ Zero retrabalho</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section class="pricing" id="pricing">
+        <div class="section-header fade-in">
+            <h2>Planos Que Cabem no Seu Bolso</h2>
+            <p>Escolha o melhor plano para sua prática médica</p>
+        </div>
+        
+        <!-- Billing Toggle -->
+        <div class="billing-toggle fade-in">
+            <span class="billing-label">Mensal</span>
+            <label class="toggle-switch">
+                <input type="checkbox" id="billingToggle" checked>
+                <span class="toggle-slider"></span>
+            </label>
+            <span class="billing-label">Anual</span>
+            <span class="billing-badge">Economize 25%</span>
+        </div>
+        
+        <div class="pricing-container">
+            <div class="pricing-card fade-in">
+                <h3 class="plan-name">Freemium</h3>
+                <div class="plan-price">
+                    R$ 0
+                    <span>/mês</span>
+                </div>
+                <p class="plan-description">Ideal para experimentar</p>
+                <ul class="plan-features">
+                    <li>Até 30 receituários/mês</li>
+                    <li>Templates básicos</li>
+                    <li>Assinatura digital</li>
+                    <li>Exportação PDF/PNG</li>
+                    <li>Suporte por email</li>
+                    <li>1 usuário</li>
+                </ul>
+                <a href="auth.html" class="btn-primary" style="width: 100%; text-align: center;">Começar Grátis</a>
+            </div>
+            
+            <div class="pricing-card featured fade-in">
+                <h3 class="plan-name">Essencial</h3>
+                <div class="plan-price">
+                    <span class="price-annual">R$ 29</span>
+                    <span class="price-monthly" style="display: none;">R$ 39</span>
+                    <span>/mês</span>
+                </div>
+                <p class="plan-description price-annual">R$ 348/ano (pago à vista)</p>
+                <p class="plan-description price-monthly" style="display: none;">Cobrado mensalmente</p>
+                <ul class="plan-features">
+                    <li><strong>Receituários ilimitados</strong></li>
+                    <li>Todos os templates</li>
+                    <li>Assinatura digital</li>
+                    <li>Exportação PDF/PNG</li>
+                    <li>Logo personalizado</li>
+                    <li>Histórico completo</li>
+                    <li>Suporte prioritário</li>
+                    <li>1 usuário</li>
+                </ul>
+                <a href="auth.html" class="btn-primary" style="width: 100%; text-align: center;">Assinar Agora</a>
+            </div>
+            
+            <div class="pricing-card disabled fade-in">
+                <div class="coming-soon-overlay">
+                    <span class="coming-soon-text">Em Breve</span>
+                </div>
+                <h3 class="plan-name blurred">Profissional</h3>
+                <div class="plan-price blurred">
+                    R$ --
+                    <span>/mês</span>
+                </div>
+                <p class="plan-description blurred">Para clínicas e equipes</p>
+                <ul class="plan-features blurred">
+                    <li>Tudo do Essencial</li>
+                    <li>Múltiplos usuários</li>
+                    <li>Multi-especialidades</li>
+                    <li>Relatórios avançados</li>
+                    <li>API de integração</li>
+                    <li>Treinamento incluído</li>
+                    <li>Suporte 24/7</li>
+                    <li>Personalização completa</li>
+                </ul>
+                <button class="btn-primary" style="width: 100%; text-align: center; opacity: 0.5; cursor: not-allowed;" disabled>Em Breve</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="features" id="faq" style="background: white;">
+        <div class="section-header fade-in">
+            <h2>Perguntas Frequentes</h2>
+            <p>Tire suas dúvidas sobre o Receituário Pro</p>
+        </div>
+        
+        <div style="max-width: 800px; margin: 0 auto; padding: 0 2rem;">
+            <details class="fade-in" style="margin-bottom: 1rem; padding: 1.5rem; background: var(--gray-light); border-radius: 10px;">
+                <summary style="cursor: pointer; font-weight: 600; color: var(--text-dark);">
+                    O sistema funciona em qualquer dispositivo?
+                </summary>
+                <p style="margin-top: 1rem; color: var(--text-light); line-height: 1.8;">
+                    Sim! O Receituário Pro é 100% responsivo e funciona perfeitamente em computadores, tablets e smartphones. 
+                    Você só precisa de uma conexão com internet.
+                </p>
+            </details>
+            
+            <details class="fade-in" style="margin-bottom: 1rem; padding: 1.5rem; background: var(--gray-light); border-radius: 10px;">
+                <summary style="cursor: pointer; font-weight: 600; color: var(--text-dark);">
+                    A assinatura digital tem validade jurídica?
+                </summary>
+                <p style="margin-top: 1rem; color: var(--text-light); line-height: 1.8;">
+                    Sim, seguimos todas as normas do CFM e legislação brasileira. As assinaturas digitais têm a mesma 
+                    validade das assinaturas manuscritas quando feitas em nosso sistema seguro.
+                </p>
+            </details>
+            
+            <details class="fade-in" style="margin-bottom: 1rem; padding: 1.5rem; background: var(--gray-light); border-radius: 10px;">
+                <summary style="cursor: pointer; font-weight: 600; color: var(--text-dark);">
+                    Posso cancelar a qualquer momento?
+                </summary>
+                <p style="margin-top: 1rem; color: var(--text-light); line-height: 1.8;">
+                    Claro! Não há fidelidade. Você pode cancelar sua assinatura a qualquer momento, sem multas ou taxas 
+                    adicionais. Simples e transparente.
+                </p>
+            </details>
+            
+            <details class="fade-in" style="margin-bottom: 1rem; padding: 1.5rem; background: var(--gray-light); border-radius: 10px;">
+                <summary style="cursor: pointer; font-weight: 600; color: var(--text-dark);">
+                    Meus dados estão seguros?
+                </summary>
+                <p style="margin-top: 1rem; color: var(--text-light); line-height: 1.8;">
+                    Absolutamente! Utilizamos criptografia de ponta a ponta, servidores seguros e fazemos backups automáticos 
+                    diários. Somos 100% compatíveis com a LGPD.
+                </p>
+            </details>
+            
+            <details class="fade-in" style="margin-bottom: 1rem; padding: 1.5rem; background: var(--gray-light); border-radius: 10px;">
+                <summary style="cursor: pointer; font-weight: 600; color: var(--text-dark);">
+                    Vocês oferecem suporte?
+                </summary>
+                <p style="margin-top: 1rem; color: var(--text-light); line-height: 1.8;">
+                    Sim! Oferecemos suporte completo via chat, email e telefone. Nossa equipe está sempre pronta para 
+                    ajudar você a aproveitar ao máximo o sistema.
+                </p>
+            </details>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-container">
+            <div class="footer-column">
+                <h3>Receituário Pro</h3>
+                <p style="color: rgba(255,255,255,0.7); line-height: 1.8;">
+                    O sistema mais completo de receituários digitais do Brasil. 
+                    Modernize seu consultório hoje mesmo.
+                </p>
+            </div>
+            
+            <div class="footer-column">
+                <h3>Produto</h3>
+                <a href="#features">Recursos</a>
+                <a href="#pricing">Preços</a>
+                <a href="#why-choose">Benefícios</a>
+                <a href="app.html">Acessar Sistema</a>
+            </div>
+            
+            <div class="footer-column">
+                <h3>Empresa</h3>
+                <a href="#">Sobre Nós</a>
+                <a href="#">Blog</a>
+                <a href="#">Carreiras</a>
+                <a href="#">Contato</a>
+            </div>
+            
+            <div class="footer-column">
+                <h3>Legal</h3>
+                <a href="#">Termos de Uso</a>
+                <a href="#">Privacidade</a>
+                <a href="#">LGPD</a>
+                <a href="#">Cookies</a>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2024 Receituário Pro. Todos os direitos reservados. CNPJ: 00.000.000/0001-00</p>
+        </div>
+    </footer>
+
+    <script>
+        // Page Loader
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('pageLoader').classList.add('hidden');
+            }, 500);
+        });
+
+        // Navbar Scroll Effect
+        window.addEventListener('scroll', () => {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Smooth Scroll for Links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // Animated Counter
+        const animateCounters = () => {
+            const counters = document.querySelectorAll('.stat-number');
+            
+            counters.forEach(counter => {
+                const target = parseFloat(counter.getAttribute('data-target'));
+                const increment = target / 100;
+                let current = 0;
+                
+                const updateCounter = () => {
+                    if (current < target) {
+                        current += increment;
+                        if (target < 10) {
+                            counter.textContent = current.toFixed(1);
+                        } else {
+                            counter.textContent = Math.ceil(current).toLocaleString('pt-BR');
+                        }
+                        requestAnimationFrame(updateCounter);
+                    } else {
+                        if (target < 10) {
+                            counter.textContent = target.toFixed(1);
+                        } else {
+                            counter.textContent = Math.ceil(target).toLocaleString('pt-BR');
+                        }
+                    }
+                };
+                
+                updateCounter();
+            });
+        };
+
+        // Intersection Observer for Animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    
+                    // Trigger counter animation when stats section is visible
+                    if (entry.target.classList.contains('stats')) {
+                        animateCounters();
+                        observer.unobserve(entry.target);
+                    }
+                }
+            });
+        }, observerOptions);
+
+        // Observe all fade-in elements
+        document.querySelectorAll('.fade-in').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Also observe stats section
+        const statsSection = document.querySelector('.stats');
+        if (statsSection) {
+            observer.observe(statsSection);
+        }
+
+        // Billing Toggle
+        const billingToggle = document.getElementById('billingToggle');
+        if (billingToggle) {
+            billingToggle.addEventListener('change', function() {
+                const annualPrices = document.querySelectorAll('.price-annual');
+                const monthlyPrices = document.querySelectorAll('.price-monthly');
+                
+                if (this.checked) {
+                    // Show annual
+                    annualPrices.forEach(el => el.style.display = 'inline');
+                    monthlyPrices.forEach(el => el.style.display = 'none');
+                } else {
+                    // Show monthly
+                    annualPrices.forEach(el => el.style.display = 'none');
+                    monthlyPrices.forEach(el => el.style.display = 'inline');
+                }
+            });
+        }
+
+        // Mobile Menu Toggle
+        document.getElementById('mobileMenu').addEventListener('click', function() {
+            this.classList.toggle('active');
+            // Add mobile menu functionality here
+        });
+
+        // Form submission handlers (add your logic here)
+        document.querySelectorAll('.btn-primary').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                if (btn.textContent.includes('Teste') || btn.textContent.includes('Começar')) {
+                    e.preventDefault();
+                    // Add your signup/trial logic here
+                    alert('Redirecionando para cadastro...');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

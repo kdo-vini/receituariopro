@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Sistema de Geração de Receituários Médicos Digital">
+    <meta name="author" content="Receituário Digital">
+    
+    <title>Receituário Digital - Sistema de Prescrições Médicas</title>
+    
+    <!-- External Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Main Container -->
+    <div class="container" role="main">
+        
+        <!-- Application Header -->
+        <header class="header">
+            <h1>📋 Receituário Digital</h1>
+            <p>Sistema de Geração de Receituários Médicos</p>
+        </header>
+
+        <!-- Control Panel Section -->
+        <section class="controls" aria-label="Controles do Receituário">
+            
+            <!-- Template Selection -->
+            <nav class="template-selector" role="navigation" aria-label="Tipo de Receituário">
+                <button class="template-btn active" 
+                        data-template="medicacao" 
+                        aria-pressed="true">
+                    💊 Medicação
+                </button>
+                <button class="template-btn" 
+                        data-template="exames" 
+                        aria-pressed="false">
+                    🔬 Exames
+                </button>
+                <button class="template-btn" 
+                        data-template="procedimentos" 
+                        aria-pressed="false">
+                    🏥 Procedimentos
+                </button>
+                <button class="template-btn" 
+                        data-template="livre" 
+                        aria-pressed="false">
+                    📝 Livre
+                </button>
+            </nav>
+
+            <!-- Patient Information Form -->
+            <form class="patient-form" id="patientForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="patientName">Nome do Paciente:</label>
+                        <input type="text" 
+                               id="patientName" 
+                               name="patientName"
+                               placeholder="Digite o nome do paciente"
+                               autocomplete="name"
+                               required>
+                    </div>
+                    <div class="form-group">
+                        <label for="prescriptionDate">Data:</label>
+                        <input type="date" 
+                               id="prescriptionDate" 
+                               name="prescriptionDate"
+                               required>
+                    </div>
+                </div>
+            </form>
+        </section>
+
+        <!-- Prescription Preview Section -->
+        <section class="preview-container" aria-label="Visualização do Receituário">
+            <article class="prescription-preview" id="prescriptionPreview">
+                
+                <!-- Prescription Header with Clinic Info -->
+                <header class="prescription-header">
+                    <div class="clinic-logo" id="clinicLogo">CLÍNICA MÉDICA</div>
+                    <div class="doctor-info">
+                        <h2 id="doctorName">Dr. João Silva</h2>
+                        <p id="doctorCRM">CRM: 12345-SP</p>
+                        <p id="doctorSpecialty">Especialista em Clínica Geral</p>
+                        <p id="doctorPhone">Tel: (11) 98765-4321</p>
+                    </div>
+                </header>
+
+                <!-- Patient Information Display -->
+                <div class="patient-info">
+                    <p>
+                        <strong>Paciente:</strong> 
+                        <span id="patientDisplay">_________________________</span>
+                    </p>
+                    <p>
+                        <strong>Data:</strong> 
+                        <span id="dateDisplay">__/__/____</span>
+                    </p>
+                </div>
+
+                <!-- Main Prescription Content -->
+                <div class="prescription-content">
+                    <textarea id="prescriptionText" 
+                              name="prescriptionContent"
+                              placeholder="Digite aqui o conteúdo do receituário..."
+                              aria-label="Conteúdo da Prescrição"></textarea>
+                </div>
+
+                <!-- Digital Signature Section -->
+                <footer class="signature-section">
+                    <div class="signature-container">
+                        <!-- Signature Canvas -->
+                        <canvas id="signatureCanvas" 
+                                class="signature-canvas" 
+                                width="300" 
+                                height="100"
+                                aria-label="Área de Assinatura Digital"></canvas>
+                        
+                        <!-- Signature Controls -->
+                        <div class="signature-controls" id="signatureControls">
+                            <button type="button" 
+                                    class="btn btn-secondary" 
+                                    id="clearSignatureBtn">
+                                Limpar
+                            </button>
+                            <button type="button" 
+                                    class="btn btn-primary" 
+                                    id="uploadSignatureBtn">
+                                Upload
+                            </button>
+                            <input type="file" 
+                                   id="signatureUpload" 
+                                   accept="image/*" 
+                                   style="display: none;" 
+                                   aria-label="Upload de Assinatura">
+                        </div>
+                    </div>
+                    
+                    <!-- Doctor Signature Line -->
+                    <div class="signature-line">
+                        <p class="doctor-name" id="signatureDoctorName">Dr. João Silva</p>
+                        <p class="doctor-crm" id="signatureDoctorCRM">CRM: 12345-SP</p>
+                    </div>
+                </footer>
+            </article>
+        </section>
+
+        <!-- Action Buttons Section -->
+        <section class="action-buttons" aria-label="Ações">
+            <!-- Paper Size Selection -->
+            <fieldset class="paper-size-selector">
+                <legend>Tamanho do papel:</legend>
+                <div class="radio-group">
+                    <label>
+                        <input type="radio" 
+                               name="paperSize" 
+                               value="a4" 
+                               checked>
+                        A4
+                    </label>
+                    <label>
+                        <input type="radio" 
+                               name="paperSize" 
+                               value="a5">
+                        A5
+                    </label>
+                    <label>
+                        <input type="radio" 
+                               name="paperSize" 
+                               value="letter">
+                        Carta
+                    </label>
+                </div>
+            </fieldset>
+            
+            <!-- Export and Save Buttons -->
+            <button type="button" 
+                    class="btn btn-primary" 
+                    id="generatePdfBtn">
+                📄 Gerar PDF
+            </button>
+            <button type="button" 
+                    class="btn btn-primary" 
+                    id="generatePngBtn">
+                🖼️ Gerar Imagem
+            </button>
+            <button type="button" 
+                    class="btn btn-secondary" 
+                    id="saveHistoryBtn">
+                💾 Salvar Histórico
+            </button>
+        </section>
+    </div>
+
+    <!-- Toast Notification (Hidden by default) -->
+    <div id="toast" class="toast" role="alert" aria-live="polite"></div>
+
+    <!-- JavaScript Modules -->
+    <script src="js/config.js"></script>
+    <script src="js/templates.js"></script>
+    <script src="js/signature.js"></script>
+    <script src="js/export.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
