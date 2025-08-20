@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login | Receituário Pro - Acesso Exclusivo para Profissionais da Saúde</title>
-    <meta name="description" content="Acesse o Receituário Pro - Sistema exclusivo para profissionais da saúde com validação CRM/CRO/CREFITO">
+    <meta name="description" content="Acesse o Receituário Pro - Sistema exclusivo para profissionais da saúde com trial gratuito de 30 dias">
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -341,57 +341,6 @@
             transform: none;
         }
         
-        .divider {
-            text-align: center;
-            margin: 1.5rem 0;
-            position: relative;
-        }
-        
-        .divider::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: var(--gray-light);
-        }
-        
-        .divider span {
-            background: white;
-            padding: 0 1rem;
-            position: relative;
-            color: var(--text-light);
-            font-size: 0.9rem;
-        }
-        
-        .social-login {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-        
-        .social-btn {
-            flex: 1;
-            padding: 0.75rem;
-            border: 2px solid var(--gray-light);
-            background: white;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            font-weight: 500;
-            color: var(--text-dark);
-        }
-        
-        .social-btn:hover {
-            border-color: var(--primary);
-            transform: translateY(-2px);
-        }
-        
         .forgot-link {
             text-align: center;
             margin-top: 1rem;
@@ -450,7 +399,7 @@
             width: 80px;
             height: 80px;
             margin: 0 auto 1rem;
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            background: linear-gradient(135deg, rgba(72, 187, 120, 0.1) 0%, rgba(72, 187, 120, 0.2) 100%);
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -472,6 +421,7 @@
         
         .modal-footer {
             margin-top: 2rem;
+            text-align: center;
         }
         
         .loading-spinner {
@@ -546,14 +496,14 @@
                     <h1>Receituário Pro</h1>
                 </div>
                 <h2>Sistema Exclusivo para Profissionais da Saúde</h2>
-                <p>Modernize suas prescrições com segurança e praticidade. Nosso sistema é validado e exclusivo para médicos, dentistas e profissionais registrados.</p>
+                <p>Modernize suas prescrições com segurança e praticidade. <strong>30 dias grátis</strong> para testar todos os recursos!</p>
                 
                 <ul class="benefits-list">
-                    <li>Validação profissional CRM/CRO/CREFITO</li>
-                    <li>Assinatura digital com validade jurídica</li>
-                    <li>Conformidade total com LGPD</li>
-                    <li>Suporte especializado 24/7</li>
-                    <li>Histórico completo de prescrições</li>
+                    <li>🎁 Trial gratuito de 30 dias completos</li>
+                    <li>📋 Receituários ilimitados durante o trial</li>
+                    <li>✅ Assinatura digital com validade jurídica</li>
+                    <li>🔒 Conformidade total com LGPD</li>
+                    <li>📱 Acesso de qualquer dispositivo</li>
                 </ul>
             </div>
         </div>
@@ -608,8 +558,8 @@
             
             <!-- Register Panel -->
             <div class="form-panel" id="registerPanel">
-                <h2 class="form-title">Crie sua conta</h2>
-                <p class="form-subtitle">Exclusivo para profissionais da saúde com registro ativo</p>
+                <h2 class="form-title">Começar Trial Gratuito</h2>
+                <p class="form-subtitle">30 dias grátis • Acesso completo • Sem cartão de crédito</p>
                 
                 <form id="registerForm">
                     <div class="form-group">
@@ -718,7 +668,7 @@
                     </div>
                     
                     <button type="submit" class="btn btn-primary">
-                        <span id="registerBtnText">Criar Conta</span>
+                        <span id="registerBtnText">🎁 Começar Trial Grátis</span>
                     </button>
                 </form>
             </div>
@@ -747,11 +697,13 @@
         </div>
     </div>
     
-    <!-- Validation Modal -->
-              <div class="modal-header" id="validationModal">
+    <!-- ✅ MODAL ATUALIZADO - Conta Criada com Sucesso -->
+    <div class="modal" id="successModal">
+        <div class="modal-content">
+            <div class="modal-header">
                 <div class="modal-icon">✅</div>
                 <h3 class="modal-title">Conta Criada com Sucesso!</h3>
-            
+            </div>
             <p class="modal-message">
                 Sua conta foi criada com sucesso! 
                 <br><br>
@@ -762,7 +714,12 @@
                 <br><br>
                 Você terá acesso completo durante o período de teste!
             </p>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="closeModal()">Entendi</button>
+            </div>
+        </div>
     </div>
+    
     <!-- Terms Modal -->
     <div class="modal" id="termsModal">
         <div class="modal-content" style="max-width: 700px; max-height: 90vh; overflow-y: auto;">
@@ -780,14 +737,20 @@
                     Caso não concorde, não utilize o serviço.
                 </p>
                 
-                <h4 style="color: var(--primary); margin: 2rem 0 1rem;">1. Uso do Serviço</h4>
+                <h4 style="color: var(--primary); margin: 2rem 0 1rem;">1. Trial Gratuito</h4>
                 <p style="margin-bottom: 1.5rem; line-height: 1.8;">
-                    O Receituário Pro é uma plataforma digital destinada a profissionais da saúde para criação e gestão de receituários 
-                    eletrônicos. O uso do serviço deve ser feito de forma ética, responsável e em conformidade com as leis aplicáveis, 
-                    incluindo regulamentos de saúde e privacidade.
+                    Oferecemos um período de teste gratuito de 30 dias com acesso completo aos recursos. 
+                    Após o período, o serviço será cobrado automaticamente conforme o plano escolhido, 
+                    a menos que seja cancelado antes do vencimento.
                 </p>
                 
-                <h4 style="color: var(--primary); margin: 2rem 0 1rem;">2. Coleta de Dados</h4>
+                <h4 style="color: var(--primary); margin: 2rem 0 1rem;">2. Uso do Serviço</h4>
+                <p style="margin-bottom: 1.5rem; line-height: 1.8;">
+                    O Receituário Pro é uma plataforma digital destinada a profissionais da saúde para criação e gestão de receituários 
+                    eletrônicos. O uso do serviço deve ser feito de forma ética, responsável e em conformidade com as leis aplicáveis.
+                </p>
+                
+                <h4 style="color: var(--primary); margin: 2rem 0 1rem;">3. Coleta de Dados</h4>
                 <p style="margin-bottom: 1rem; line-height: 1.8;">
                     Para oferecer o serviço e melhorar sua experiência, coletamos informações como:
                 </p>
@@ -795,54 +758,21 @@
                     <li>Nome e CRM/CRO/registro profissional do usuário;</li>
                     <li>Nome e idade do paciente (quando preenchidos nos receituários);</li>
                     <li>Medicamentos, prescrições e observações registradas;</li>
-                    <li>Localização aproximada do usuário (opcional);</li>
                     <li>Dados de uso da plataforma (tempo de sessão, funcionalidades utilizadas, etc.).</li>
-                </ul>
-                
-                <p style="margin-bottom: 1rem; line-height: 1.8;">
-                    Esses dados podem ser <strong>utilizados de forma anonimizada</strong> para:
-                </p>
-                <ul style="margin-left: 1.5rem; margin-bottom: 1.5rem; line-height: 1.8;">
-                    <li>Melhorar o serviço;</li>
-                    <li>Pesquisas e análises de mercado;</li>
-                    <li>Desenvolvimento de novas funcionalidades;</li>
-                    <li>Eventual compartilhamento com parceiros ou venda de dados <strong>somente de forma agregada e anonimizada</strong>, 
-                        garantindo a <strong>não identificação de pacientes ou profissionais individualmente</strong>, em conformidade com a LGPD.</li>
-                </ul>
-                
-                <h4 style="color: var(--primary); margin: 2rem 0 1rem;">3. Direitos do Usuário (LGPD)</h4>
-                <p style="margin-bottom: 1rem; line-height: 1.8;">Você tem direito a:</p>
-                <ul style="margin-left: 1.5rem; margin-bottom: 1.5rem; line-height: 1.8;">
-                    <li>Solicitar acesso aos seus dados;</li>
-                    <li>Corrigir ou atualizar seus dados;</li>
-                    <li>Solicitar exclusão ou anonimização de seus dados;</li>
-                    <li>Revogar consentimento para o uso de dados a qualquer momento, observando que isso pode limitar algumas funcionalidades do serviço.</li>
                 </ul>
                 
                 <h4 style="color: var(--primary); margin: 2rem 0 1rem;">4. Segurança</h4>
                 <p style="margin-bottom: 1.5rem; line-height: 1.8;">
                     O Receituário Pro adota medidas técnicas e administrativas para proteger seus dados contra acesso não autorizado, 
-                    perda, alteração ou divulgação indevida.
+                    perda, alteração ou divulgação indevida. Todos os arquivos são protegidos com hash SHA-256 para garantir integridade.
                 </p>
                 
                 <h4 style="color: var(--primary); margin: 2rem 0 1rem;">5. Responsabilidade</h4>
                 <ul style="margin-left: 1.5rem; margin-bottom: 1.5rem; line-height: 1.8;">
                     <li>Você é responsável pelo uso adequado da plataforma e pelas informações inseridas;</li>
-                    <li>O Receituário Pro <strong>não substitui prescrições legais</strong> de medicamentos controlados ou procedimentos médicos obrigatórios;</li>
+                    <li>O Receituário Pro facilita a criação de receituários, mas a responsabilidade médica permanece com o profissional;</li>
                     <li>Dados inseridos devem seguir a legislação vigente de saúde e privacidade.</li>
                 </ul>
-                
-                <h4 style="color: var(--primary); margin: 2rem 0 1rem;">6. Alterações</h4>
-                <p style="margin-bottom: 1.5rem; line-height: 1.8;">
-                    Podemos atualizar estes Termos de Uso e Política de Privacidade periodicamente. Alterações serão notificadas no site, 
-                    e o uso contínuo da plataforma constitui aceitação dos termos atualizados.
-                </p>
-                
-                <h4 style="color: var(--primary); margin: 2rem 0 1rem;">7. Aceitação</h4>
-                <p style="margin-bottom: 1.5rem; line-height: 1.8;">
-                    Ao clicar em "Aceito", você confirma que leu, entendeu e concorda com estes Termos de Uso e com a coleta e 
-                    tratamento de dados conforme descrito acima.
-                </p>
                 
                 <div style="padding: 1rem; background: var(--gray-light); border-radius: 10px; margin-top: 2rem;">
                     <p style="color: var(--text-light); font-size: 0.9rem; text-align: center;">
@@ -858,6 +788,10 @@
     </div>
     
     <script>
+        // ========================================
+        // ✅ FUNÇÕES ATUALIZADAS
+        // ========================================
+        
         // Tab switching
         function switchTab(tabName) {
             // Update tab buttons
@@ -907,16 +841,17 @@
             alertBox.classList.remove('show');
         }
         
-        // Modal functions
-        function showValidationModal() {
-            document.getElementById('validationModal').classList.add('show');
+        // ✅ MODAL FUNCTIONS ATUALIZADAS
+        function showSuccessModal() {
+            document.getElementById('successModal').classList.add('show');
         }
         
         function closeModal() {
-            document.getElementById('validationModal').classList.remove('show');
-            // Redirect to home after closing
+            document.getElementById('successModal').classList.remove('show');
+            // Redirecionar para login após fechar
             setTimeout(() => {
-                window.location.href = 'index.html';
+                switchTab('login');
+                showAlert('Agora você pode fazer login com suas credenciais!', 'success');
             }, 500);
         }
         
@@ -944,77 +879,71 @@
             return password.length >= 8;
         }
         
-        // Login form handler
+        // ✅ LOGIN FORM HANDLER ATUALIZADO
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             hideAlert();
-
+            
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
             const button = e.target.querySelector('button[type="submit"]');
             const btnText = document.getElementById('loginBtnText');
-
+            
             // Validate
             if (!validateEmail(email)) {
                 showAlert('Por favor, insira um e-mail válido', 'error');
                 return;
             }
-
+            
             if (!password) {
                 showAlert('Por favor, insira sua senha', 'error');
                 return;
             }
-
+            
             // Show loading
             button.disabled = true;
             btnText.innerHTML = '<span class="loading-spinner"></span> Entrando...';
-
+            
             try {
-                const result = await loginUser(email, password);
-
+                // ✅ USAR NOVA FUNÇÃO DE LOGIN
+                const result = await window.authFunctions.loginUser(email, password);
+                
                 if (result.success) {
-                            // Após o login success, adicione:
-console.log('Login result:', result);
-console.log('User data:', result.user);
-console.log('Auth session:', await supabase.auth.getSession());
-                    // Redirecionar baseado no tipo de usuário
-                    if (result.user.is_admin) {
-                        window.location.href = 'admin.html';
-                    } else {
+                    // ✅ VERIFICAR TRIAL STATUS
+                    if (result.trialStatus && !result.trialStatus.has_access) {
+                        if (result.trialStatus.reason === 'trial_expired') {
+                            showAlert('Seu trial de 30 dias expirou. Faça upgrade para continuar usando o sistema.', 'warning');
+                            // Redirecionar para página de pagamento após 3 segundos
+                            setTimeout(() => {
+                                window.location.href = 'index.html#pricing';
+                            }, 3000);
+                        } else {
+                            showAlert('Problema com sua assinatura. Entre em contato com o suporte.', 'error');
+                        }
+                        button.disabled = false;
+                        btnText.textContent = 'Entrar';
+                        return;
+                    }
+                    
+                    // ✅ LOGIN SUCESSO - REDIRECIONAR PARA APP
+                    showAlert('Login realizado com sucesso! Redirecionando...', 'success');
+                    setTimeout(() => {
                         window.location.href = 'app.html';
-                    }
+                    }, 1000);
                 } else {
-                    // Melhorar mensagens de erro
-                            // Após o login success, adicione:
-console.log('Login result:', result);
-console.log('User data:', result.user);
-console.log('Auth session:', await supabase.auth.getSession());
-                    let errorMessage = result.error;
-
-                    if (errorMessage.includes('Email logins are disabled')) {
-                        errorMessage = 'Sistema temporariamente indisponível. Tente novamente.';
-                    } else if (errorMessage.includes('Invalid login credentials')) {
-                        errorMessage = 'E-mail ou senha incorretos.';
-                    } else if (errorMessage.includes('Email not confirmed')) {
-                        errorMessage = 'Verifique seu e-mail para confirmar a conta.';
-                    } else if (errorMessage.includes('Too many requests')) {
-                        errorMessage = 'Muitas tentativas. Aguarde alguns minutos.';
-                    } else if (errorMessage.includes('User not found')) {
-                        errorMessage = 'E-mail não cadastrado no sistema.';
-                    }
-
-                    showAlert(errorMessage, 'error');
+                    showAlert(result.error || 'Erro ao fazer login', 'error');
+                    button.disabled = false;
+                    btnText.textContent = 'Entrar';
                 }
-            } catch (err) {
-                showAlert('Erro inesperado. Tente novamente mais tarde.', 'error');
-                console.error(err);
-            } finally {
+            } catch (error) {
+                console.error('Login error:', error);
+                showAlert('Erro ao fazer login. Tente novamente.', 'error');
                 button.disabled = false;
-                btnText.innerHTML = 'Entrar';
+                btnText.textContent = 'Entrar';
             }
         });
-
-        // Register form handler
+        
+        // ✅ REGISTER FORM HANDLER ATUALIZADO
         document.getElementById('registerForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             hideAlert();
@@ -1051,7 +980,7 @@ console.log('Auth session:', await supabase.auth.getSession());
                 return;
             }
             
-            if (!validateRegistrationNumber(formData.registrationNumber)) {
+            if (!validateRegistrationNumber(formData.registrationNumber, formData.council)) {
                 showAlert('Número de registro inválido. Use apenas números', 'error');
                 return;
             }
@@ -1076,25 +1005,27 @@ console.log('Auth session:', await supabase.auth.getSession());
             btnText.innerHTML = '<span class="loading-spinner"></span> Criando conta...';
             
             try {
-                const result = await registerProfessional(formData);
+                // ✅ USAR NOVA FUNÇÃO DE REGISTRO (COM TRIAL AUTOMÁTICO)
+                const result = await window.authFunctions.registerProfessional(formData);
                 
                 if (result.success) {
-                    // Show validation modal
-                    showValidationModal();
+                    // ✅ MOSTRAR MODAL DE SUCESSO ATUALIZADO
+                    showSuccessModal();
                     
                     // Reset form
                     e.target.reset();
                     button.disabled = false;
-                    btnText.textContent = 'Criar Conta';
+                    btnText.textContent = '🎁 Começar Trial Grátis';
                 } else {
                     showAlert(result.error || 'Erro ao criar conta', 'error');
                     button.disabled = false;
-                    btnText.textContent = 'Criar Conta';
+                    btnText.textContent = '🎁 Começar Trial Grátis';
                 }
             } catch (error) {
+                console.error('Registration error:', error);
                 showAlert('Erro ao criar conta. Tente novamente.', 'error');
                 button.disabled = false;
-                btnText.textContent = 'Criar Conta';
+                btnText.textContent = '🎁 Começar Trial Grátis';
             }
         });
         
@@ -1117,7 +1048,7 @@ console.log('Auth session:', await supabase.auth.getSession());
             btnText.innerHTML = '<span class="loading-spinner"></span> Enviando...';
             
             try {
-                const result = await resetPassword(email);
+                const result = await window.authFunctions.resetPassword(email);
                 
                 if (result.success) {
                     showAlert('Se este e-mail estiver cadastrado, você receberá as instruções de recuperação em instantes', 'success');
@@ -1127,10 +1058,10 @@ console.log('Auth session:', await supabase.auth.getSession());
                 }
             } catch (error) {
                 showAlert('Erro ao processar solicitação', 'error');
-            } finally {
-                button.disabled = false;
-                btnText.textContent = 'Enviar Link de Recuperação';
             }
+            
+            button.disabled = false;
+            btnText.textContent = 'Enviar Link de Recuperação';
         });
         
         // Phone mask
@@ -1143,7 +1074,13 @@ console.log('Auth session:', await supabase.auth.getSession());
                 e.target.value = value;
             }
         });
-
+        
+        // Close modal on outside click
+        window.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal')) {
+                e.target.classList.remove('show');
+            }
+        });
     </script>
 </body>
 </html>
