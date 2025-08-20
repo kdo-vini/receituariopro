@@ -7,8 +7,8 @@
 // CONFIGURAÇÕES DO SUPABASE
 // ========================================
 
-const SUPABASE_URL = 'https://kqumjmacwlpaxfuziooy.supabase.co'; // Substitua
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtxdW1qbWFjd2xwYXhmdXppb295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU1NDI3NDUsImV4cCI6MjA3MTExODc0NX0.gwCdzsL5YjfNx_Krav5l12PtuReHxibOQBLc80b-4UE'; // Substitua
+const SUPABASE_URL = 'https://kqumjmacwlpaxfuziooy.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtxdW1qbWFjd2xwYXhmdXppb295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU1NDI3NDUsImV4cCI6MjA3MTExODc0NX0.gwCdzsL5YjfNx_Krav5l12PtuReHxibOQBLc80b-4UE';
 
 // Inicializar cliente Supabase
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -17,12 +17,12 @@ const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 // CONFIGURAÇÕES DO STRIPE
 // ========================================
 
-const STRIPE_PUBLIC_KEY = 'pk_live_51RxYCmLUJWyE4PkYzYnJstmaICs14Lcmz8kSerkExOzCOdfdhH8m5gZuf65KUJMLAHcq9R7kh2VYeApsMLPtdIkU00u3IFh6E6'; // Substitua
+const STRIPE_PUBLIC_KEY = 'pk_live_51RxYCmLUJWyE4PkYzYnJstmaICs14Lcmz8kSerkExOzCOdfdhH8m5gZuf65KUJMLAHcq9R7kh2VYeApsMLPtdIkU00u3IFh6E6';
 
-// Links de pagamento do Stripe (pegue no dashboard)
+// Links de pagamento do Stripe
 const STRIPE_LINKS = {
-    essential_monthly: 'https://buy.stripe.com/bJeaEYaht4mV5zC8pJ00000', // Substitua
-    essential_yearly: 'https://buy.stripe.com/7sY8wQcpBcTrbY0cFZ00001'   // Substitua
+    essential_monthly: 'https://buy.stripe.com/bJeaEYaht4mV5zC8pJ00000',
+    essential_yearly: 'https://buy.stripe.com/7sY8wQcpBcTrbY0cFZ00001'
 };
 
 // ========================================
@@ -48,7 +48,6 @@ async function registerProfessional(userData) {
         if (authError) throw authError;
 
         // 2. Criar registro na tabela users
-        // Não precisamos definir status - vai usar o default 'active'
         const { data: user, error: userError } = await supabase
             .from('users')
             .insert({
@@ -59,121 +58,36 @@ async function registerProfessional(userData) {
                 state: userData.state,
                 registration_number: userData.registrationNumber,
                 specialty: userData.specialty || null,
-                phone: userData.phone || null
-                // status: omitido, usará default 'active'
+                phone: userData.phone || null,
+                status: 'active', // Agora aprovação automática para trial
+                is_admin: false
             })
             .select()
             .single();
 
-        if (userError) {
-            console.error('Detalhes do erro ao criar usuário:', {
-                error: userError,
-                message: userError.message,
-                details: userError.details,
-                hint: userError.hint,
-                code: userError.code
-            });
-            throw userError;
-        }
+        if (userError) throw userError;
 
-        // 3. Criar registro de consentimento LGPD
-        const { error: consentError } = await supabase
-            .from('consent_records')
-            .insert({
-                user_id: authData.user.id,
-                consent_type: 'terms_and_privacy',
-                version: '1.0',
-                accepted: true,
-                ip_address: await getUserIP()
-            });
+        // 3. Criar assinatura trial (30 dias)
+        const trialEndDate = new Date();
+        trialEndDate.setDate(trialEndDate.getDate() + 30);
 
-        if (consentError) {
-            console.warn('Erro ao salvar consentimento:', consentError);
-            // Não vamos falhar o registro por causa disso
-        }
-
-        // 4. Criar assinatura trial (período de teste gratuito)
         const { error: subError } = await supabase
             .from('subscriptions')
             .insert({
                 user_id: authData.user.id,
-                plan: 'trial', // Período de teste gratuito
+                plan: 'trial',
                 status: 'active',
-                trial_ends_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() // 30 dias grátis
+                trial_ends_at: trialEndDate.toISOString()
             });
 
-        if (subError) {
-            console.warn('Erro ao criar assinatura trial:', subError);
-            // Não vamos falhar o registro por causa disso
-        }
+        if (subError) throw subError;
 
-        return { 
-            success: true, 
-            user,
-            message: 'Cadastro realizado! Verifique seu email para confirmar a conta.' 
-        };
+        return { success: true, user };
 
     } catch (error) {
         console.error('Registration error:', error);
         return { success: false, error: error.message };
     }
-}
-
-/**
- * Traduzir erros do Supabase para português
- */
-function translateError(error) {
-    // Mapear mensagens de erro conhecidas
-    const errorMap = {
-        // Erros de autenticação
-        'Invalid login credentials': 'E-mail ou senha incorretos',
-        'Email not confirmed': 'Por favor, confirme seu email antes de fazer login. Verifique sua caixa de entrada.',
-        'User not found': 'Usuário não encontrado',
-        'Invalid email': 'E-mail inválido',
-        'Password should be at least 6 characters': 'A senha deve ter pelo menos 6 caracteres',
-        'User already registered': 'Este e-mail já está cadastrado',
-        'Email link is invalid or has expired': 'O link expirou ou é inválido',
-        'New password should be different from the old password': 'A nova senha deve ser diferente da senha atual',
-        'Token has expired or is invalid': 'Token expirado ou inválido',
-        'A user with this email address has already been registered': 'Este e-mail já está cadastrado',
-        'Unable to validate email address: invalid format': 'Formato de e-mail inválido',
-        'Password is too weak': 'Senha muito fraca. Use letras, números e símbolos',
-        'Auth session missing!': 'Sessão expirada. Faça login novamente',
-        'Invalid refresh token': 'Sessão expirada. Faça login novamente',
-        
-        // Erros de banco de dados
-        'duplicate key value violates unique constraint': 'Este registro já existe',
-        'violates check constraint': 'Dados inválidos para este campo',
-        'null value in column': 'Campo obrigatório não preenchido',
-        'foreign key violation': 'Referência inválida',
-        
-        // Erros de rede
-        'Failed to fetch': 'Erro de conexão. Verifique sua internet',
-        'Network request failed': 'Falha na conexão. Tente novamente',
-        
-        // Erros de permissão
-        'new row violates row-level security policy': 'Você não tem permissão para esta ação',
-        'permission denied': 'Permissão negada',
-        
-        // Erros específicos
-        'Email rate limit exceeded': 'Muitas tentativas. Aguarde alguns minutos',
-        'Database error': 'Erro no servidor. Tente novamente',
-        'Internal server error': 'Erro interno. Entre em contato com o suporte'
-    };
-    
-    // Converter erro para string
-    const errorMessage = error?.message || error?.error_description || error?.error || String(error);
-    
-    // Procurar correspondência parcial
-    for (const [key, value] of Object.entries(errorMap)) {
-        if (errorMessage.toLowerCase().includes(key.toLowerCase())) {
-            return value;
-        }
-    }
-    
-    // Se não encontrar tradução, retornar mensagem genérica amigável
-    console.error('Erro não traduzido:', errorMessage);
-    return 'Ocorreu um erro. Por favor, tente novamente.';
 }
 
 /**
@@ -187,12 +101,7 @@ async function loginUser(email, password) {
             password
         });
 
-        if (authError) {
-            return { 
-                success: false, 
-                error: translateError(authError)
-            };
-        }
+        if (authError) throw authError;
 
         // 2. Buscar dados do usuário
         const { data: user, error: userError } = await supabase
@@ -201,22 +110,30 @@ async function loginUser(email, password) {
             .eq('id', authData.user.id)
             .single();
 
-        if (userError) {
+        if (userError) throw userError;
+
+        // 3. Verificar se é admin
+        if (email === 'techne.br@gmail.com' || user.is_admin) {
+            return { success: true, user, isAdmin: true };
+        }
+
+        // 4. Verificar status do usuário regular
+        if (user.status === 'pending') {
+            await supabase.auth.signOut();
             return { 
                 success: false, 
-                error: translateError(userError)
+                error: 'Sua conta ainda está em validação. Aguarde até 24h.' 
             };
         }
 
-        // 3. Verificar se email foi confirmado
-        if (!authData.user.email_confirmed_at) {
+        if (user.status === 'rejected') {
+            await supabase.auth.signOut();
             return { 
                 success: false, 
-                error: 'Por favor, confirme seu email antes de fazer login. Verifique sua caixa de entrada.' 
+                error: 'Seu cadastro foi rejeitado. Entre em contato com o suporte.' 
             };
         }
 
-        // 4. Verificar status (só suspended bloqueia)
         if (user.status === 'suspended') {
             await supabase.auth.signOut();
             return { 
@@ -225,11 +142,11 @@ async function loginUser(email, password) {
             };
         }
 
-        return { success: true, user };
+        return { success: true, user, isAdmin: false };
 
     } catch (error) {
         console.error('Login error:', error);
-        return { success: false, error: translateError(error) };
+        return { success: false, error: error.message };
     }
 }
 
@@ -254,18 +171,12 @@ async function resetPassword(email) {
             redirectTo: `${window.location.origin}/auth.html?reset=true`
         });
 
-        if (error) {
-            return { 
-                success: false, 
-                error: translateError(error)
-            };
-        }
-        
+        if (error) throw error;
         return { success: true };
 
     } catch (error) {
         console.error('Reset password error:', error);
-        return { success: false, error: translateError(error) };
+        return { success: false, error: error.message };
     }
 }
 
@@ -282,12 +193,12 @@ async function savePrescription(prescriptionData) {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) throw new Error('Usuário não autenticado');
 
-        // 2. Verificar limite do plano
+        // 2. Para trial, não há limite durante os 30 dias
         const canCreate = await checkPrescriptionLimit(user.id);
-        if (!canCreate) {
+        if (!canCreate.allowed) {
             return { 
                 success: false, 
-                error: 'Limite de receituários atingido. Faça upgrade do plano.' 
+                error: canCreate.message
             };
         }
 
@@ -299,15 +210,13 @@ async function savePrescription(prescriptionData) {
                 patient_name: prescriptionData.patientName,
                 content: prescriptionData.content,
                 template_type: prescriptionData.template,
-                signature_data: prescriptionData.signature
+                signature_data: prescriptionData.signature,
+                created_at: new Date().toISOString()
             })
             .select()
             .single();
 
         if (error) throw error;
-
-        // 4. Atualizar contador
-        await updatePrescriptionCount(user.id);
 
         return { success: true, data };
 
@@ -327,68 +236,39 @@ async function checkPrescriptionLimit(userId) {
             .from('subscriptions')
             .select('*')
             .eq('user_id', userId)
+            .eq('status', 'active')
             .single();
 
-        if (!subscription) return false;
-
-        // 2. Se for plano essential, sem limite
-        if (subscription.plan === 'essential') {
-            return true;
+        if (!subscription) {
+            return { allowed: false, message: 'Nenhuma assinatura ativa encontrada' };
         }
 
-        // 3. Se for trial, verificar se ainda está no período de teste
+        // 2. Se for plano essencial pago, sem limite
+        if (subscription.plan === 'essential') {
+            return { allowed: true, message: 'Receituários ilimitados' };
+        }
+
+        // 3. Se for trial, verificar se ainda está no período
         if (subscription.plan === 'trial') {
-            // Verificar se trial ainda está válido
-            if (subscription.trial_ends_at) {
-                const trialEnd = new Date(subscription.trial_ends_at);
-                const now = new Date();
-                
-                if (now > trialEnd) {
-                    // Trial expirado
-                    return false;
-                }
+            const trialEnd = new Date(subscription.trial_ends_at);
+            const now = new Date();
+            
+            if (now > trialEnd) {
+                return { 
+                    allowed: false, 
+                    message: 'Período de trial expirado. Faça upgrade para continuar.' 
+                };
             }
             
-            // Durante o trial, limite de 30 receituários
-            const startOfMonth = new Date();
-            startOfMonth.setDate(1);
-            startOfMonth.setHours(0, 0, 0, 0);
-
-            const { count } = await supabase
-                .from('prescriptions')
-                .select('*', { count: 'exact', head: true })
-                .eq('user_id', userId)
-                .gte('created_at', startOfMonth.toISOString());
-
-            return count < 30;
+            return { allowed: true, message: 'Trial ativo - receituários ilimitados' };
         }
 
-        return false;
+        return { allowed: false, message: 'Plano não reconhecido' };
 
     } catch (error) {
         console.error('Check limit error:', error);
-        return false;
+        return { allowed: false, message: 'Erro ao verificar limite' };
     }
-}
-
-/**
- * Atualizar contador de receituários
- */
-async function updatePrescriptionCount(userId) {
-    const startOfMonth = new Date();
-    startOfMonth.setDate(1);
-    startOfMonth.setHours(0, 0, 0, 0);
-
-    const { count } = await supabase
-        .from('prescriptions')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', userId)
-        .gte('created_at', startOfMonth.toISOString());
-
-    await supabase
-        .from('subscriptions')
-        .update({ prescriptions_count: count })
-        .eq('user_id', userId);
 }
 
 /**
@@ -416,7 +296,7 @@ async function getPrescriptionHistory() {
 }
 
 // ========================================
-// FUNÇÕES ADMINISTRATIVAS SIMPLIFICADAS
+// FUNÇÕES ADMINISTRATIVAS
 // ========================================
 
 /**
@@ -429,7 +309,7 @@ async function loginAdmin(email, password) {
         if (!loginResult.success) return loginResult;
 
         // 2. Verificar se é admin
-        if (!loginResult.user.is_admin) {
+        if (!loginResult.isAdmin) {
             await supabase.auth.signOut();
             return { success: false, error: 'Acesso negado' };
         }
@@ -443,63 +323,67 @@ async function loginAdmin(email, password) {
 }
 
 /**
- * Buscar todos os profissionais
+ * Buscar profissionais pendentes
  */
-async function getAllProfessionals() {
+async function getPendingProfessionals() {
     try {
         const { data, error } = await supabase
             .from('users')
             .select('*')
-            .neq('is_admin', true)
+            .eq('status', 'pending')
             .order('created_at', { ascending: false });
 
         if (error) throw error;
         return { success: true, data };
 
     } catch (error) {
-        console.error('Get professionals error:', error);
+        console.error('Get pending error:', error);
         return { success: false, error: error.message };
     }
 }
 
 /**
- * Suspender profissional (única ação administrativa necessária)
+ * Aprovar profissional
  */
-async function suspendProfessional(userId, reason) {
+async function approveProfessional(userId) {
     try {
         const { error } = await supabase
             .from('users')
             .update({ 
-                status: 'suspended'
+                status: 'active',
+                updated_at: new Date().toISOString()
             })
             .eq('id', userId);
 
         if (error) throw error;
+
         return { success: true };
 
     } catch (error) {
-        console.error('Suspend error:', error);
+        console.error('Approve error:', error);
         return { success: false, error: error.message };
     }
 }
 
 /**
- * Reativar profissional
+ * Rejeitar profissional
  */
-async function reactivateProfessional(userId) {
+async function rejectProfessional(userId, reason) {
     try {
         const { error } = await supabase
             .from('users')
             .update({ 
-                status: 'active'
+                status: 'rejected',
+                updated_at: new Date().toISOString()
             })
             .eq('id', userId);
 
         if (error) throw error;
+
         return { success: true };
 
     } catch (error) {
-        console.error('Reactivate error:', error);
+        console.error('Reject error:', error);
         return { success: false, error: error.message };
     }
 }
@@ -513,7 +397,13 @@ async function getDashboardStats() {
         const { count: totalUsers } = await supabase
             .from('users')
             .select('*', { count: 'exact', head: true })
-            .neq('is_admin', true);
+            .eq('is_admin', false);
+
+        // Validações pendentes
+        const { count: pendingValidations } = await supabase
+            .from('users')
+            .select('*', { count: 'exact', head: true })
+            .eq('status', 'pending');
 
         // Receituários do mês
         const startOfMonth = new Date();
@@ -523,23 +413,31 @@ async function getDashboardStats() {
             .select('*', { count: 'exact', head: true })
             .gte('created_at', startOfMonth.toISOString());
 
-        // Assinaturas ativas
-        const { count: activeSubscriptions } = await supabase
+        // Assinaturas trial ativas
+        const { count: trialSubscriptions } = await supabase
+            .from('subscriptions')
+            .select('*', { count: 'exact', head: true })
+            .eq('plan', 'trial')
+            .eq('status', 'active');
+
+        // Assinaturas pagas ativas
+        const { count: paidSubscriptions } = await supabase
             .from('subscriptions')
             .select('*', { count: 'exact', head: true })
             .eq('plan', 'essential')
             .eq('status', 'active');
 
-        // Receita mensal (R$ 29 * assinaturas)
-        const monthlyRevenue = activeSubscriptions * 29;
+        // Receita mensal estimada (R$ 29 * assinaturas pagas)
+        const monthlyRevenue = paidSubscriptions * 29;
 
         return {
             success: true,
             data: {
                 totalUsers,
-                pendingValidations: 0, // Não há mais validações pendentes
+                pendingValidations,
                 monthlyPrescriptions,
-                activeSubscriptions,
+                trialSubscriptions,
+                paidSubscriptions,
                 monthlyRevenue
             }
         };
@@ -579,19 +477,6 @@ function redirectToCheckout(plan) {
 // ========================================
 
 /**
- * Obter IP do usuário
- */
-async function getUserIP() {
-    try {
-        const response = await fetch('https://api.ipify.org?format=json');
-        const data = await response.json();
-        return data.ip;
-    } catch {
-        return null;
-    }
-}
-
-/**
  * Verificar sessão atual
  */
 async function checkSession() {
@@ -611,7 +496,11 @@ supabase.auth.onAuthStateChange((event, session) => {
     
     if (event === 'SIGNED_OUT') {
         console.log('User signed out');
-        window.location.href = '/auth.html';
+        // Só redireciona se não estiver já na página de auth
+        if (!window.location.pathname.includes('auth.html') && 
+            !window.location.pathname.includes('index.html')) {
+            window.location.href = '/auth.html';
+        }
     }
 });
 
@@ -630,9 +519,9 @@ window.prescriptionFunctions = {
     checkPrescriptionLimit
 };
 window.adminFunctions = {
-    getAllProfessionals,
-    suspendProfessional,
-    reactivateProfessional,
+    getPendingProfessionals,
+    approveProfessional,
+    rejectProfessional,
     getDashboardStats
 };
 window.paymentFunctions = {

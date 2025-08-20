@@ -49,7 +49,6 @@
             overflow: hidden;
         }
 
-        /* Header */
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -81,7 +80,7 @@
             border-radius: 10px;
         }
 
-        .prescription-count {
+        .trial-info {
             background: rgba(255, 255, 255, 0.2);
             padding: 5px 12px;
             border-radius: 20px;
@@ -96,9 +95,7 @@
             cursor: pointer;
             transition: all 0.3s;
             text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
+            display: inline-block;
         }
 
         .btn-white {
@@ -111,42 +108,76 @@
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
 
-        /* Main Layout */
         .main-layout {
             display: grid;
-            grid-template-columns: 320px 1fr;
+            grid-template-columns: 350px 1fr;
             min-height: calc(100vh - 200px);
         }
 
-        /* Sidebar Controls */
         .sidebar {
             background: var(--gray-light);
             padding: 25px;
             border-right: 1px solid #e2e8f0;
+            overflow-y: auto;
         }
 
-        .controls-section {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        /* Template Selector */
+        .template-section {
+            margin-bottom: 30px;
         }
 
-        .controls-section h3 {
-            color: var(--text-dark);
+        .template-section h3 {
+            margin-bottom: 15px;
             font-size: 16px;
-            margin-bottom: 15px;
+            color: var(--text-dark);
         }
 
-        /* Patient Info */
-        .form-group {
-            margin-bottom: 15px;
+        .template-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
         }
 
-        .form-group label {
-            display: block;
+        .template-card {
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            background: white;
+        }
+
+        .template-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .template-card.active {
+            border-color: var(--primary);
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .template-icon {
+            font-size: 20px;
             margin-bottom: 5px;
+        }
+
+        .template-name {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+
+        /* Form Controls */
+        .form-section {
+            margin-bottom: 20px;
+        }
+
+        .form-section label {
+            display: block;
+            margin-bottom: 8px;
             color: var(--text-dark);
             font-weight: 500;
             font-size: 14px;
@@ -167,55 +198,6 @@
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
-        /* Template Selector */
-        .template-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
-        .template-btn {
-            padding: 12px 8px;
-            border: 2px solid #e2e8f0;
-            background: white;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 12px;
-            text-align: center;
-            font-weight: 500;
-        }
-
-        .template-btn:hover {
-            border-color: var(--primary);
-            transform: translateY(-2px);
-        }
-
-        .template-btn.active {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
-
-        /* Paper Size */
-        .paper-size-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .paper-size-group label {
-            display: flex;
-            align-items: center;
-            font-size: 13px;
-            cursor: pointer;
-        }
-
-        .paper-size-group input {
-            margin-right: 5px;
-        }
-
         /* Preview Area */
         .preview-container {
             padding: 30px;
@@ -234,26 +216,23 @@
             position: relative;
         }
 
-        /* Prescription Header */
         .prescription-header {
             padding: 20px;
             margin-bottom: 30px;
-            background: linear-gradient(to right, #f7fafc 0%, white 100%);
-            border-left: 4px solid #e2e8f0;
             border-radius: 8px;
-            display: flex;
-            align-items: center;
-            gap: 20px;
+            background: linear-gradient(to right, #f7fafc 0%, white 100%);
+            border-left: 4px solid var(--primary);
         }
 
         .clinic-logo {
-            max-width: 120px;
+            max-width: 150px;
             max-height: 60px;
             object-fit: contain;
+            margin-bottom: 15px;
         }
 
         .clinic-logo-placeholder {
-            width: 120px;
+            width: 150px;
             height: 60px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             border-radius: 8px;
@@ -262,22 +241,21 @@
             justify-content: center;
             color: white;
             font-weight: bold;
-            font-size: 14px;
+            margin-bottom: 15px;
         }
 
         .doctor-info h2 {
             color: var(--text-dark);
-            font-size: 18px;
+            font-size: 20px;
             margin-bottom: 5px;
         }
 
         .doctor-info p {
             color: var(--text-light);
-            margin: 2px 0;
-            font-size: 13px;
+            margin: 3px 0;
+            font-size: 14px;
         }
 
-        /* Patient Info */
         .patient-info {
             margin-bottom: 30px;
             padding: 15px;
@@ -285,16 +263,6 @@
             border-radius: 8px;
         }
 
-        .patient-info p {
-            margin: 5px 0;
-            font-size: 14px;
-        }
-
-        .patient-info strong {
-            color: var(--text-dark);
-        }
-
-        /* Prescription Content */
         .prescription-content {
             min-height: 400px;
             margin-bottom: 30px;
@@ -309,49 +277,27 @@
             font-size: 14px;
             line-height: 1.8;
             resize: vertical;
-            font-family: inherit;
         }
 
-        .prescription-content textarea:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        .prescription-footer {
+            margin-top: 60px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
         }
 
-        /* Signature Section */
         .signature-section {
             margin-top: 50px;
             text-align: center;
         }
 
-        .signature-display {
-            max-width: 250px;
-            max-height: 80px;
-            object-fit: contain;
-            margin: 0 auto 10px;
-            border: 1px solid #e2e8f0;
-            border-radius: 4px;
+        .signature-canvas {
+            border: 2px dashed #e2e8f0;
+            border-radius: 8px;
+            cursor: crosshair;
             background: white;
+            margin: 20px auto;
         }
 
-        .signature-line {
-            border-top: 2px solid #333;
-            width: 250px;
-            margin: 10px auto;
-            padding-top: 10px;
-        }
-
-        .signature-line p {
-            margin: 5px 0;
-            color: var(--text-dark);
-        }
-
-        .signature-line .doctor-crm {
-            color: var(--text-light);
-            font-size: 12px;
-        }
-
-        /* Action Buttons */
         .action-buttons {
             padding: 20px 30px;
             background: white;
@@ -359,7 +305,6 @@
             display: flex;
             justify-content: center;
             gap: 15px;
-            flex-wrap: wrap;
         }
 
         .btn-primary {
@@ -386,57 +331,31 @@
             border-radius: 8px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
         }
 
-        .btn-secondary:hover {
-            background: #5a6268;
-            transform: translateY(-2px);
-        }
-
-        /* Loading */
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 1s ease-in-out infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* Alert */
-        .alert {
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--success);
+            color: white;
             padding: 15px 20px;
             border-radius: 8px;
-            margin: 20px 30px;
-            display: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 1000;
         }
 
-        .alert.show {
-            display: block;
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
         }
 
-        .alert-success {
-            background: rgba(72, 187, 120, 0.1);
-            color: var(--success);
-            border: 1px solid rgba(72, 187, 120, 0.3);
-        }
-
-        .alert-error {
-            background: rgba(245, 101, 101, 0.1);
-            color: var(--error);
-            border: 1px solid rgba(245, 101, 101, 0.3);
-        }
-
-        .alert-warning {
-            background: rgba(237, 137, 54, 0.1);
-            color: var(--warning);
-            border: 1px solid rgba(237, 137, 54, 0.3);
+        .toast.error {
+            background: var(--error);
         }
 
         /* Responsive */
@@ -461,11 +380,6 @@
             .template-grid {
                 grid-template-columns: 1fr;
             }
-            
-            .prescription-header {
-                flex-direction: column;
-                text-align: center;
-            }
         }
     </style>
 </head>
@@ -474,17 +388,6 @@
     <script src="js/supabase-config.js"></script>
     
     <div class="container">
-        <!-- Alert Messages -->
-        <div class="alert alert-success" id="alertSuccess">
-            <span id="alertSuccessMessage"></span>
-        </div>
-        <div class="alert alert-error" id="alertError">
-            <span id="alertErrorMessage"></span>
-        </div>
-        <div class="alert alert-warning" id="alertWarning">
-            <span id="alertWarningMessage"></span>
-        </div>
-        
         <!-- Header -->
         <div class="header">
             <h1>
@@ -492,81 +395,67 @@
                 Receituário Pro
             </h1>
             <div class="header-actions">
-                <div class="prescription-count" id="prescriptionCount">
-                    <span id="countText">0/30</span> receituários este mês
+                <div class="trial-info" id="trialInfo">
+                    <span id="trialText">Trial - 30 dias</span>
                 </div>
                 <div class="user-info">
                     <span id="userName">Carregando...</span>
                 </div>
-                <a href="profile.html" class="btn btn-white">
-                    <span>👤</span> Acessar Perfil
-                </a>
-                <button class="btn btn-white" onclick="logoutUser()">
-                    <span>🚪</span> Sair
-                </button>
+                <a href="profile.html" class="btn btn-white">👤 Perfil</a>
+                <button class="btn btn-white" onclick="logout()">Sair</button>
             </div>
         </div>
 
         <div class="main-layout">
-            <!-- Sidebar Controls -->
+            <!-- Sidebar -->
             <div class="sidebar">
-                <!-- Patient Info -->
-                <div class="controls-section">
-                    <h3>Informações do Paciente</h3>
-                    
-                    <div class="form-group">
-                        <label for="patientName">Nome do Paciente</label>
-                        <input type="text" id="patientName" class="form-control" placeholder="Digite o nome do paciente">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="prescriptionDate">Data</label>
-                        <input type="date" id="prescriptionDate" class="form-control">
-                    </div>
-                </div>
-                <div class="upgrade-banner" id="upgradeBanner" style="display: none;">
-        <h4>🚀 Seu período de teste acaba em <span id="trialDays">30</span> dias!</h4>
-        <p>Assine o plano Essencial para continuar usando</p>
-        <button class="btn-upgrade" onclick="upgradeNow()">Assinar Agora</button>
-    </div>
                 <!-- Template Selection -->
-                <div class="controls-section">
+                <div class="template-section">
                     <h3>Tipo de Receituário</h3>
-                    
                     <div class="template-grid">
-                        <button class="template-btn active" data-template="medicacao">
-                            💊 Medicação
-                        </button>
-                        <button class="template-btn" data-template="exames">
-                            🔬 Exames
-                        </button>
-                        <button class="template-btn" data-template="procedimentos">
-                            🏥 Procedimentos
-                        </button>
-                        <button class="template-btn" data-template="livre">
-                            📝 Livre
-                        </button>
+                        <div class="template-card active" data-template="medicacao" onclick="selectTemplate('medicacao')">
+                            <div class="template-icon">💊</div>
+                            <div class="template-name">Medicação</div>
+                        </div>
+                        
+                        <div class="template-card" data-template="exames" onclick="selectTemplate('exames')">
+                            <div class="template-icon">🔬</div>
+                            <div class="template-name">Exames</div>
+                        </div>
+                        
+                        <div class="template-card" data-template="procedimento" onclick="selectTemplate('procedimento')">
+                            <div class="template-icon">🏥</div>
+                            <div class="template-name">Encaminhamento</div>
+                        </div>
+                        
+                        <div class="template-card" data-template="atestado" onclick="selectTemplate('atestado')">
+                            <div class="template-icon">📋</div>
+                            <div class="template-name">Atestado</div>
+                        </div>
+                        
+                        <div class="template-card" data-template="laudo" onclick="selectTemplate('laudo')">
+                            <div class="template-icon">📄</div>
+                            <div class="template-name">Laudo</div>
+                        </div>
+                        
+                        <div class="template-card" data-template="livre" onclick="selectTemplate('livre')">
+                            <div class="template-icon">✏️</div>
+                            <div class="template-name">Livre</div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Paper Size -->
-                <div class="controls-section">
-                    <h3>Tamanho do Papel</h3>
-                    
-                    <div class="paper-size-group">
-                        <label>
-                            <input type="radio" name="paperSize" value="a4" checked>
-                            A4
-                        </label>
-                        <label>
-                            <input type="radio" name="paperSize" value="a5">
-                            A5
-                        </label>
-                        <label>
-                            <input type="radio" name="paperSize" value="letter">
-                            Carta
-                        </label>
-                    </div>
+                <!-- Patient Info -->
+                <div class="form-section">
+                    <label for="patientName">Nome do Paciente</label>
+                    <input type="text" id="patientName" class="form-control" placeholder="Digite o nome do paciente">
+                </div>
+
+                <div class="form-section">
+                    <label for="prescriptionDate">Data</label>
+                    <input type="date" id="prescriptionDate" class="form-control">
+                </div>>
+                    <input type="date" id="prescriptionDate" class="form-control" onchange="updateDateDisplay()">
                 </div>
             </div>
 
@@ -576,15 +465,13 @@
                     <!-- Header -->
                     <div class="prescription-header">
                         <div id="clinicLogoContainer">
-                            <div class="clinic-logo-placeholder" id="logoPlaceholder">CLÍNICA</div>
-                            <img id="clinicLogo" class="clinic-logo" style="display: none;" alt="Logo da Clínica">
+                            <div class="clinic-logo-placeholder" id="logoPlaceholder">RECEITUÁRIO PRO</div>
                         </div>
                         <div class="doctor-info">
                             <h2 id="doctorName">Dr. Nome do Médico</h2>
                             <p id="doctorCRM">CRM: 00000-UF</p>
                             <p id="doctorSpecialty">Especialidade</p>
                             <p id="doctorPhone">Telefone: (00) 00000-0000</p>
-                            <p id="doctorAddress" style="display: none;">Endereço</p>
                         </div>
                     </div>
 
@@ -596,26 +483,25 @@
 
                     <!-- Content -->
                     <div class="prescription-content">
-                        <textarea id="prescriptionText" placeholder="Digite aqui o conteúdo do receituário...
-
-Para medicações:
-- Nome do medicamento - Dosagem
-  Posologia: Como tomar
-  Quantidade: X caixas
-
-Para exames:
-- Solicito:
-  • Exame 1
-  • Exame 2"></textarea>
+                        <textarea id="prescriptionText" placeholder="Digite aqui o conteúdo do receituário..." 
+                                  style="display: none;" oninput="updatePrescriptionDisplay()"></textarea>
+                        <div class="prescription-content-display" id="prescriptionDisplay" 
+                             style="min-height: 400px; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px; 
+                                    font-size: 14px; line-height: 1.8; background: white; white-space: pre-wrap;"
+                             contenteditable="true" oninput="syncTextareaFromDiv()">
+                            Digite aqui o conteúdo do receituário...
+                        </div>
                     </div>
 
-                    <!-- Signature -->
-                    <div class="signature-section">
-                        <img id="signatureDisplay" class="signature-display" style="display: none;" alt="Assinatura">
-                        
-                        <div class="signature-line">
-                            <p id="signatureName">Dr. Nome do Médico</p>
-                            <p id="signatureCRM" class="doctor-crm">CRM: 00000-UF</p>
+                    <!-- Footer -->
+                    <div class="prescription-footer">
+                        <!-- Signature -->
+                        <div class="signature-section">
+                            <canvas id="signatureCanvas" class="signature-canvas" width="300" height="100"></canvas>
+                            <div style="border-top: 2px solid #333; width: 300px; margin: 10px auto;">
+                                <p id="signatureName" style="margin-top: 10px;">Dr. Nome do Médico</p>
+                                <p id="signatureCRM" style="color: var(--text-light); font-size: 13px;">CRM: 00000-UF</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -624,20 +510,14 @@ Para exames:
 
         <!-- Action Buttons -->
         <div class="action-buttons">
-            <button class="btn btn-primary" onclick="generatePDF()">
-                <span>📄</span> Gerar PDF
-            </button>
-            <button class="btn btn-primary" onclick="generatePNG()">
-                <span>🖼️</span> Gerar PNG
-            </button>
-            <button class="btn btn-primary" onclick="savePrescription()">
-                <span>💾</span> Salvar Histórico
-            </button>
-            <button class="btn btn-secondary" onclick="clearForm()">
-                <span>🗑️</span> Limpar
-            </button>
+            <button class="btn btn-primary" onclick="generatePDF()">📄 Gerar PDF</button>
+            <button class="btn btn-primary" onclick="generatePNG()">🖼️ Gerar PNG</button>
+            <button class="btn btn-primary" onclick="savePrescription()">💾 Salvar</button>
         </div>
     </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
 
     <script>
         // ========================================
@@ -646,97 +526,173 @@ Para exames:
         let currentUser = null;
         let currentSubscription = null;
         let currentTemplate = 'medicacao';
-        let prescriptionCount = 0;
+        let signatureCanvas = null;
+        let signatureCtx = null;
+        let isDrawing = false;
 
-        // Templates
+        // Templates with medical content
         const templates = {
             medicacao: {
                 title: 'Receituário de Medicação',
-                content: `USO INTERNO
+                content: `<strong>USO INTERNO</strong><br><br>
 
-1. ________________________________
-   Posologia: _____________________
-   Quantidade: ____________________
+<strong>1.</strong> Dipirona 500mg - Comprimidos<br>
+&nbsp;&nbsp;&nbsp;<em>Posologia:</em> 1 comprimido de 6/6 horas, se dor ou febre<br>
+&nbsp;&nbsp;&nbsp;<em>Quantidade:</em> 20 comprimidos<br><br>
 
-2. ________________________________
-   Posologia: _____________________
-   Quantidade: ____________________
+<strong>2.</strong> Omeprazol 20mg - Cápsulas<br>
+&nbsp;&nbsp;&nbsp;<em>Posologia:</em> 1 cápsula pela manhã, em jejum<br>
+&nbsp;&nbsp;&nbsp;<em>Quantidade:</em> 30 cápsulas<br><br>
 
-3. ________________________________
-   Posologia: _____________________
-   Quantidade: ____________________
+<strong>3.</strong> ________________________________<br>
+&nbsp;&nbsp;&nbsp;<em>Posologia:</em> _____________________<br>
+&nbsp;&nbsp;&nbsp;<em>Quantidade:</em> ____________________<br><br>
 
-Orientações:
-_________________________________
-_________________________________`,
-                placeholder: 'Digite as medicações e posologia...'
+<strong>Orientações:</strong><br>
+• Tomar os medicamentos nos horários prescritos<br>
+• Não interromper o tratamento sem orientação médica<br>
+• Retornar em caso de efeitos adversos`
             },
             
             exames: {
                 title: 'Solicitação de Exames',
-                content: `SOLICITO OS SEGUINTES EXAMES:
+                content: `<strong>SOLICITO OS SEGUINTES EXAMES:</strong><br><br>
 
-□ Hemograma completo
-□ Glicemia de jejum
-□ Colesterol total e frações
-□ Triglicerídeos
-□ TGO/TGP
-□ TSH e T4 livre
-□ Urina tipo I
-□ Creatinina
-□ Ureia
-□ _______________________________
-□ _______________________________
-□ _______________________________
+<strong>EXAMES LABORATORIAIS:</strong><br>
+☐ Hemograma completo com plaquetas<br>
+☐ Glicemia de jejum<br>
+☐ Hemoglobina glicada (HbA1c)<br>
+☐ Colesterol total e frações (HDL, LDL)<br>
+☐ Triglicerídeos<br>
+☐ TGO/TGP (transaminases)<br>
+☐ Ureia e creatinina<br>
+☐ Ácido úrico<br>
+☐ TSH e T4 livre<br>
+☐ Vitamina D (25-OH)<br>
+☐ Vitamina B12<br>
+☐ Ferritina<br>
+☐ PCR (proteína C reativa)<br>
+☐ VHS (velocidade de hemossedimentação)<br>
+☐ Urina tipo I (EAS)<br><br>
 
-Observações clínicas:
-_________________________________
-_________________________________
+<strong>EXAMES DE IMAGEM:</strong><br>
+☐ Raio-X de tórax<br>
+☐ Ultrassom de abdome total<br>
+☐ Ecocardiograma<br>
+☐ ________________________________<br><br>
 
-Hipótese diagnóstica:
-_________________________________`,
-                placeholder: 'Marque ou adicione os exames necessários...'
+<strong>Observações clínicas:</strong><br>
+_________________________________<br><br>
+
+<strong>Hipótese diagnóstica/CID:</strong><br>
+_________________________________`
             },
             
-            procedimentos: {
-                title: 'Encaminhamento / Procedimento',
-                content: `ENCAMINHAMENTO MÉDICO
+            procedimento: {
+                title: 'Encaminhamento Médico',
+                content: `<strong>ENCAMINHAMENTO MÉDICO</strong><br><br>
 
-Prezado(a) Colega,
+<strong>Prezado(a) Colega,</strong><br><br>
 
-Encaminho o(a) paciente para:
-_________________________________
-_________________________________
+Encaminho o(a) paciente acima identificado(a) para:<br>
+☐ Cardiologia &nbsp;&nbsp;&nbsp; ☐ Endocrinologia &nbsp;&nbsp;&nbsp; ☐ Gastroenterologia<br>
+☐ Neurologia &nbsp;&nbsp;&nbsp; ☐ Ortopedia &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ☐ Dermatologia<br>
+☐ Ginecologia &nbsp;&nbsp;&nbsp; ☐ Urologia &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ☐ Pneumologia<br>
+☐ Oftalmologia &nbsp;&nbsp;&nbsp; ☐ Otorrinolaringologia<br>
+☐ Outros: _________________________________<br><br>
 
-Motivo do encaminhamento:
-_________________________________
-_________________________________
-_________________________________
+<strong>Motivo do encaminhamento:</strong><br>
+_________________________________<br>
+_________________________________<br><br>
 
-Diagnóstico / CID:
-_________________________________
+<strong>Diagnóstico principal/CID:</strong><br>
+_________________________________<br><br>
 
-História clínica resumida:
-_________________________________
-_________________________________
-_________________________________
+<strong>História clínica resumida:</strong><br>
+_________________________________<br>
+_________________________________<br><br>
 
-Exames realizados:
-_________________________________
-_________________________________
+<strong>Exames já realizados:</strong><br>
+_________________________________<br><br>
 
-Medicações em uso:
-_________________________________
-_________________________________
+<strong>Medicações em uso:</strong><br>
+_________________________________<br><br>
 
-Atenciosamente,`,
-                placeholder: 'Descreva o encaminhamento ou procedimento...'
+Atenciosamente,`
+            },
+            
+            atestado: {
+                title: 'Atestado Médico',
+                content: `<center><strong>ATESTADO MÉDICO</strong></center><br><br>
+
+Atesto para os devidos fins que o(a) paciente acima identificado(a) esteve sob meus cuidados médicos e <strong>necessita se afastar de suas atividades</strong> por motivo de:<br><br>
+
+☐ Doença &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ☐ Repouso médico<br>
+☐ Procedimento médico &nbsp;&nbsp;&nbsp;&nbsp; ☐ Acompanhar familiar<br>
+☐ Outros: _________________________________<br><br>
+
+<strong>Descrição:</strong><br>
+_________________________________<br>
+_________________________________<br><br>
+
+<strong>Período de afastamento:</strong><br>
+De: <u>&nbsp;&nbsp;&nbsp;___/___/____&nbsp;&nbsp;&nbsp;</u> até <u>&nbsp;&nbsp;&nbsp;___/___/____&nbsp;&nbsp;&nbsp;</u><br><br>
+
+<strong>CID-10:</strong> _____________________________<br><br>
+
+<strong>Observações:</strong><br>
+☐ Deve evitar esforços físicos<br>
+☐ Deve permanecer em repouso domiciliar<br>
+☐ Apto para atividades leves<br>
+☐ Outras: _________________________________<br><br>
+
+Por ser verdade, firmo o presente.`
+            },
+            
+            laudo: {
+                title: 'Laudo Médico',
+                content: `<center><strong>LAUDO MÉDICO</strong></center><br><br>
+
+<strong>EXAME REALIZADO:</strong><br>
+☐ Consulta clínica &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ☐ Avaliação cardiológica<br>
+☐ Exame físico geral &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ☐ Avaliação neurológica<br>
+☐ Outros: _________________________________<br><br>
+
+<strong>INDICAÇÃO CLÍNICA:</strong><br>
+_________________________________<br>
+_________________________________<br><br>
+
+<strong>MÉTODO/TÉCNICA:</strong><br>
+_________________________________<br><br>
+
+<strong>ACHADOS DO EXAME:</strong><br>
+<strong>• Exame físico geral:</strong><br>
+&nbsp;&nbsp;- Estado geral: _________________________<br>
+&nbsp;&nbsp;- Pressão arterial: ______ x ______ mmHg<br>
+&nbsp;&nbsp;- Frequência cardíaca: _______ bpm<br>
+&nbsp;&nbsp;- Temperatura: _______ °C<br>
+&nbsp;&nbsp;- Peso: _______ kg &nbsp;&nbsp;&nbsp; Altura: _______ cm<br><br>
+
+<strong>• Sistemas específicos:</strong><br>
+&nbsp;&nbsp;- Cardiovascular: _________________________<br>
+&nbsp;&nbsp;- Respiratório: ___________________________<br>
+&nbsp;&nbsp;- Abdome: _______________________________<br>
+&nbsp;&nbsp;- Neurológico: ____________________________<br><br>
+
+<strong>CONCLUSÃO:</strong><br>
+_________________________________<br>
+_________________________________<br><br>
+
+<strong>RECOMENDAÇÕES:</strong><br>
+☐ Manter acompanhamento médico regular<br>
+☐ Retornar em _____ dias/semanas/meses<br>
+☐ Solicitar exames complementares<br>
+☐ Outras: _________________________________`
             },
             
             livre: {
                 title: 'Receituário Livre',
-                content: '',
-                placeholder: 'Digite o conteúdo do receituário...'
+                content: ''
             }
         };
 
@@ -744,490 +700,195 @@ Atenciosamente,`,
         // INITIALIZATION
         // ========================================
         document.addEventListener('DOMContentLoaded', async () => {
-            // Check authentication
-            const sessionData = await checkSessionOrRedirect();
-            if (!sessionData) return;
+            await initializeApp();
+        });
 
-            currentUser = sessionData.user;
-            
-            // Load user data and populate prescription
-            await loadUserData();
+        async function initializeApp() {
+            // Check authentication and redirect admin
+            const session = await checkSession();
+            if (!session) {
+                window.location.href = 'auth.html';
+                return;
+            }
+
+            // Check if admin
+            if (session.user.email === 'techne.br@gmail.com') {
+                window.location.href = 'admin.html';
+                return;
+            }
+
+            // Load user data
+            await loadUserData(session.user.id);
             
             // Initialize components
             initializeDate();
-            setupEventListeners();
+            initializeSignature();
             
-            // Load prescription count
-            await updatePrescriptionCount();
-            
-            // Load template
+            // Load default template
             loadTemplate('medicacao');
-        });
-
-        // ========================================
-        // LOAD USER DATA
-        // ========================================
-        async function loadUserData() {
-    try {
-        const userData = await getCurrentUserData();
-        if (!userData) return;
-
-        currentUser = userData;
-        currentSubscription = userData.subscriptions?.[0] || { plan: 'freemium' };
-
-        // Update header
-        document.getElementById('userName').textContent = userData.name;
-
-        // Populate doctor info
-        document.getElementById('doctorName').textContent = userData.name;
-        document.getElementById('doctorCRM').textContent = `${userData.council}-${userData.state} ${userData.registration_number}`;
-        document.getElementById('doctorSpecialty').textContent = userData.specialty || 'Especialista';
-        document.getElementById('doctorPhone').textContent = userData.phone ? `Tel: ${userData.phone}` : '';
-        
-        // Signature display names
-        document.getElementById('signatureName').textContent = userData.name;
-        document.getElementById('signatureCRM').textContent = `${userData.council}-${userData.state} ${userData.registration_number}`;
-
-        // Address (optional)
-        if (userData.address) {
-            document.getElementById('doctorAddress').textContent = userData.address;
-            document.getElementById('doctorAddress').style.display = 'block';
-        }
-
-        // Logo (only for Essential plan)
-        if (currentSubscription?.plan === 'essential' && userData.logo_url) {
-            const logoImg = document.getElementById('clinicLogo');
-            const logoPlaceholder = document.getElementById('logoPlaceholder');
             
-            logoImg.src = userData.logo_url;
-            logoImg.style.display = 'block';
-            logoPlaceholder.style.display = 'none';
+            // Set up auto-population for patient name
+            setupAutoPopulation();
         }
 
-        // Signature (all plans) - CORRIGIDO
-        if (userData.signature_url) {
-            const signatureImg = document.getElementById('signatureDisplay');
-            signatureImg.src = userData.signature_url;
-            signatureImg.style.display = 'block';
-        } else {
-            // Verificar localStorage como fallback
-            const localSignature = localStorage.getItem('user_signature');
-            if (localSignature) {
-                const signatureImg = document.getElementById('signatureDisplay');
-                signatureImg.src = localSignature;
-                signatureImg.style.display = 'block';
-            }
-        }
-
-        // Update prescription count with correct plan
-        await updatePrescriptionCount();
-
-    } catch (error) {
-        console.error('Error loading user data:', error);
-        showAlert('Erro ao carregar dados do usuário', 'error');
-    }
-}
-
-        // ========================================
-        // EVENT LISTENERS
-        // ========================================
-        function setupEventListeners() {
-            // Template selection
-            document.querySelectorAll('.template-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    // Update active state
-                    document.querySelectorAll('.template-btn').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    
-                    // Load template
-                    const template = btn.dataset.template;
-                    loadTemplate(template);
-                });
-            });
-
-            // Patient name input
-            document.getElementById('patientName').addEventListener('input', (e) => {
-                const display = document.getElementById('patientDisplay');
-                const value = e.target.value.trim();
-                display.textContent = value || '_________________________';
-            });
-
-            // Date input
-            document.getElementById('prescriptionDate').addEventListener('change', updateDateDisplay);
-        }
-
-        // ========================================
-        // TEMPLATE MANAGEMENT
-        // ========================================
-        function loadTemplate(templateName) {
-            const template = templates[templateName];
-            if (!template) return;
+        function setupAutoPopulation() {
+            // Auto-populate patient name
+            const patientInput = document.getElementById('patientName');
+            patientInput.addEventListener('input', updatePatientDisplay);
             
-            currentTemplate = templateName;
-            const textarea = document.getElementById('prescriptionText');
-            textarea.value = template.content;
-            textarea.placeholder = template.placeholder;
-        }
-
-        // ========================================
-        // DATE MANAGEMENT
-        // ========================================
-        function initializeDate() {
+            // Auto-populate date
             const dateInput = document.getElementById('prescriptionDate');
-            const today = new Date();
-            dateInput.valueAsDate = today;
+            dateInput.addEventListener('change', updateDateDisplay);
+            
+            // Initialize displays
+            updatePatientDisplay();
             updateDateDisplay();
         }
 
-        function updateDateDisplay() {
-            const dateInput = document.getElementById('prescriptionDate');
-            const display = document.getElementById('dateDisplay');
-            
-            if (dateInput.value) {
-                const date = new Date(dateInput.value + 'T00:00:00');
-                const day = String(date.getDate()).padStart(2, '0');
-                const month = String(date.getMonth() + 1).padStart(2, '0');
-                const year = date.getFullYear();
-                display.textContent = `${day}/${month}/${year}`;
-            } else {
-                display.textContent = '__/__/____';
-            }
-        }
-
-        // Atualizar contador de receituários
-async function updatePrescriptionCount() {
-    try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
-        
-        // Contar receituários do mês
-        const startOfMonth = new Date();
-        startOfMonth.setDate(1);
-        startOfMonth.setHours(0, 0, 0, 0);
-        
-        const { count } = await supabase
-            .from('prescriptions')
-            .select('*', { count: 'exact', head: true })
-            .eq('user_id', user.id)
-            .gte('created_at', startOfMonth.toISOString());
-        
-        // Buscar plano do usuário
-        const { data: subscription } = await supabase
-            .from('subscriptions')
-            .select('*')
-            .eq('user_id', user.id)
-            .single();
-        
-        const countText = document.getElementById('countText');
-        
-        if (subscription?.plan === 'trial') {
-            // Mostrar limite para trial
-            countText.textContent = `${count}/30 receituários este mês`;
-            
-            // Avisar se está próximo do limite
-            if (count >= 25) {
-                countText.style.color = '#ed8936';
-            }
-            if (count >= 30) {
-                countText.style.color = '#f56565';
-                countText.textContent = `${count}/30 - Limite atingido!`;
-            }
-        } else if (subscription?.plan === 'essential') {
-            // Sem limite para essential
-            countText.textContent = `${count} receituários este mês`;
-        }
-        
-    } catch (error) {
-        console.error('Erro ao atualizar contador:', error);
-    }
-}
-
-// Chamar ao carregar
-updatePrescriptionCount();
-
         // ========================================
-        // EXPORT FUNCTIONS
+        // USER DATA MANAGEMENT
         // ========================================
-        async function generatePDF() {
+        async function loadUserData(userId) {
             try {
-                showAlert('Gerando PDF...', 'success');
-                
-                const element = document.getElementById('prescriptionPreview');
-                const paperSize = document.querySelector('input[name="paperSize"]:checked').value;
-                
-                // Prepare for export
-                const textarea = document.getElementById('prescriptionText');
-                const originalDisplay = textarea.style.display;
-                
-                // Create formatted content div
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = formatTextForExport(textarea.value);
-                tempDiv.style.padding = '20px';
-                tempDiv.style.minHeight = '400px';
-                tempDiv.style.fontSize = '14px';
-                tempDiv.style.lineHeight = '1.8';
-                tempDiv.style.whiteSpace = 'pre-wrap';
-                
-                // Replace textarea with formatted content
-                textarea.style.display = 'none';
-                textarea.parentNode.insertBefore(tempDiv, textarea);
-                
-                // Generate PDF
-                const canvas = await html2canvas(element, {
-                    scale: 2,
-                    useCORS: true,
-                    logging: false,
-                    backgroundColor: '#ffffff'
-                });
-                
-                const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF('p', 'mm', paperSize);
-                
-                const paperDimensions = {
-                    a4: { width: 210, height: 297 },
-                    a5: { width: 148, height: 210 },
-                    letter: { width: 216, height: 279 }
-                };
-                
-                const imgData = canvas.toDataURL('image/png', 0.95);
-                const imgWidth = paperDimensions[paperSize].width - 20;
-                const imgHeight = (canvas.height * imgWidth) / canvas.width;
-                
-                pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
-                
-                // Generate filename
-                const patientName = document.getElementById('patientName').value || 'Paciente';
-                const date = document.getElementById('dateDisplay').textContent.replace(/\//g, '-');
-                const safeName = patientName.replace(/[^a-z0-9]/gi, '_');
-                const fileName = `Receituario_${safeName}_${date}.pdf`;
-                
-                pdf.save(fileName);
-                
-                // Restore textarea
-                tempDiv.remove();
-                textarea.style.display = originalDisplay;
-                
-                showAlert('PDF gerado com sucesso!', 'success');
-                
-            } catch (error) {
-                console.error('Error generating PDF:', error);
-                showAlert('Erro ao gerar PDF', 'error');
-            }
-        }
+                const { data: user, error } = await supabaseClient
+                    .from('users')
+                    .select('*')
+                    .eq('id', userId)
+                    .single();
 
-        async function generatePNG() {
-            try {
-                showAlert('Gerando imagem...', 'success');
+                if (error) throw error;
+
+                currentUser = user;
                 
-                const element = document.getElementById('prescriptionPreview');
+                // Update UI with user data
+                document.getElementById('userName').textContent = user.name || 'Usuário';
+                document.getElementById('doctorName').textContent = user.name || 'Dr. Nome';
+                document.getElementById('doctorCRM').textContent = `${user.council || 'CRM'}: ${user.registration_number || '00000'}-${user.state || 'UF'}`;
+                document.getElementById('doctorSpecialty').textContent = user.specialty || 'Especialidade';
+                document.getElementById('doctorPhone').textContent = user.phone ? `Tel: ${user.phone}` : 'Tel: (00) 00000-0000';
                 
-                // Prepare for export
-                const textarea = document.getElementById('prescriptionText');
-                const originalDisplay = textarea.style.display;
+                // Update signature info
+                document.getElementById('signatureName').textContent = user.name || 'Dr. Nome';
+                document.getElementById('signatureCRM').textContent = `${user.council || 'CRM'}: ${user.registration_number || '00000'}-${user.state || 'UF'}`;
                 
-                // Create formatted content div
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = formatTextForExport(textarea.value);
-                tempDiv.style.padding = '20px';
-                tempDiv.style.minHeight = '400px';
-                tempDiv.style.fontSize = '14px';
-                tempDiv.style.lineHeight = '1.8';
-                tempDiv.style.whiteSpace = 'pre-wrap';
-                
-                // Replace textarea with formatted content
-                textarea.style.display = 'none';
-                textarea.parentNode.insertBefore(tempDiv, textarea);
-                
-                // Generate PNG
-                const canvas = await html2canvas(element, {
-                    scale: 2,
-                    useCORS: true,
-                    logging: false,
-                    backgroundColor: '#ffffff'
-                });
-                
-                // Generate filename
-                const patientName = document.getElementById('patientName').value || 'Paciente';
-                const date = document.getElementById('dateDisplay').textContent.replace(/\//g, '-');
-                const safeName = patientName.replace(/[^a-z0-9]/gi, '_');
-                const fileName = `Receituario_${safeName}_${date}.png`;
-                
-                // Download
-                const link = document.createElement('a');
-                link.download = fileName;
-                link.href = canvas.toDataURL('image/png');
-                link.click();
-                
-                // Restore textarea
-                tempDiv.remove();
-                textarea.style.display = originalDisplay;
-                
-                showAlert('Imagem gerada com sucesso!', 'success');
-                
+                // Load logo if exists
+                if (user.logo_url) {
+                    const logoPlaceholder = document.getElementById('logoPlaceholder');
+                    logoPlaceholder.innerHTML = `<img src="${user.logo_url}" class="clinic-logo" alt="Logo da Clínica">`;
+                }
+
+                // Load subscription data
+                await loadSubscriptionData(userId);
+
             } catch (error) {
                 console.error('Error generating PNG:', error);
-                showAlert('Erro ao gerar imagem', 'error');
+                showToast('Erro ao gerar imagem', 'error');
             }
         }
 
-        function formatTextForExport(text) {
-            return text
-                .replace(/\n/g, '<br>')
-                .replace(/\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;')
-                .replace(/  /g, '&nbsp;&nbsp;');
-        }
-
-        // ========================================
-        // SAVE PRESCRIPTION
-        // ========================================
         async function savePrescription() {
             try {
+                const patientName = document.getElementById('patientName').value;
+                const content = document.getElementById('prescriptionText').value;
+                
+                if (!patientName.trim()) {
+                    showToast('Por favor, preencha o nome do paciente', 'error');
+                    return;
+                }
+                
+                if (!content.trim()) {
+                    showToast('Por favor, preencha o conteúdo do receituário', 'error');
+                    return;
+                }
+                
+                showToast('Salvando receituário...', 'info');
+                
                 const prescriptionData = {
-                    patientName: document.getElementById('patientName').value,
-                    content: document.getElementById('prescriptionText').value,
+                    patientName: patientName,
+                    content: content,
                     template: currentTemplate,
-                    signature: currentUser.signature_url || null
+                    signature: signatureCanvas.toDataURL()
                 };
                 
-                if (!prescriptionData.patientName) {
-                    showAlert('Por favor, preencha o nome do paciente', 'warning');
-                    return;
-                }
-                
-                if (!prescriptionData.content) {
-                    showAlert('Por favor, preencha o conteúdo do receituário', 'warning');
-                    return;
-                }
-                
-                showAlert('Salvando receituário...', 'success');
-                
-                const result = await savePrescription(prescriptionData);
+                const result = await savePrescriptionToDatabase(prescriptionData);
                 
                 if (result.success) {
-                    showAlert('✅ Receituário salvo no histórico!', 'success');
-                    await updatePrescriptionCount();
+                    showToast('Receituário salvo com sucesso!', 'success');
                 } else {
-                    showAlert(result.error || 'Erro ao salvar receituário', 'error');
+                    showToast(result.error || 'Erro ao salvar receituário', 'error');
                 }
                 
             } catch (error) {
                 console.error('Error saving prescription:', error);
-                showAlert('Erro ao salvar receituário', 'error');
+                showToast('Erro ao salvar receituário', 'error');
+            }
+        }
+
+        async function savePrescriptionToDatabase(prescriptionData) {
+            try {
+                const { data: { user } } = await supabaseClient.auth.getUser();
+                if (!user) throw new Error('Usuário não autenticado');
+
+                const { data, error } = await supabaseClient
+                    .from('prescriptions')
+                    .insert({
+                        user_id: user.id,
+                        patient_name: prescriptionData.patientName,
+                        content: prescriptionData.content,
+                        template_type: prescriptionData.template,
+                        signature_data: prescriptionData.signature
+                    })
+                    .select()
+                    .single();
+
+                if (error) throw error;
+
+                return { success: true, data };
+
+            } catch (error) {
+                console.error('Save prescription error:', error);
+                return { success: false, error: error.message };
             }
         }
 
         // ========================================
         // UTILITY FUNCTIONS
         // ========================================
-        function clearForm() {
-            if (!confirm('Deseja limpar todos os campos?')) return;
+        function generateFileName(extension) {
+            const patientName = document.getElementById('patientName').value || 'Paciente';
+            const date = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+            const safeName = patientName.replace(/[^a-z0-9]/gi, '_');
             
-            document.getElementById('patientName').value = '';
-            document.getElementById('patientDisplay').textContent = '_________________________';
-            
-            initializeDate();
-            
-            loadTemplate(currentTemplate);
-            
-            showAlert('Formulário limpo', 'success');
+            return `Receituario_${safeName}_${date}.${extension}`;
         }
 
-        function showAlert(message, type = 'success') {
-            hideAllAlerts();
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type} show`;
             
-            const alertElement = document.getElementById(`alert${type.charAt(0).toUpperCase() + type.slice(1)}`);
-            const messageElement = document.getElementById(`alert${type.charAt(0).toUpperCase() + type.slice(1)}Message`);
-            
-            if (alertElement && messageElement) {
-                messageElement.textContent = message;
-                alertElement.classList.add('show');
-                
-                // Auto-hide after 5 seconds
-                setTimeout(() => {
-                    alertElement.classList.remove('show');
-                }, 5000);
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        async function logout() {
+            try {
+                await supabaseClient.auth.signOut();
+                window.location.href = 'auth.html';
+            } catch (error) {
+                console.error('Logout error:', error);
+                window.location.href = 'auth.html';
             }
         }
 
-        function hideAllAlerts() {
-            document.querySelectorAll('.alert').forEach(alert => {
-                alert.classList.remove('show');
-            });
-        }
-        
         // ========================================
-// VERIFICAR E MOSTRAR BANNER DE TRIAL
-// ========================================
-async function checkTrialStatus() {
-    try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
-        
-        // Buscar assinatura do usuário
-        const { data: subscription } = await supabase
-            .from('subscriptions')
-            .select('*')
-            .eq('user_id', user.id)
-            .single();
-        
-        if (!subscription) return;
-        
-        // Se está em trial, mostrar banner
-        if (subscription.plan === 'trial') {
-            const banner = document.getElementById('upgradeBanner');
-            const trialDaysSpan = document.getElementById('trialDays');
-            
-            // Calcular dias restantes
-            if (subscription.trial_ends_at) {
-                const endDate = new Date(subscription.trial_ends_at);
-                const today = new Date();
-                const daysLeft = Math.ceil((endDate - today) / (1000 * 60 * 60 * 24));
-                
-                if (daysLeft > 0) {
-                    trialDaysSpan.textContent = daysLeft;
-                    banner.style.display = 'block';
-                    
-                    // Mudar cor do banner baseado nos dias restantes
-                    if (daysLeft <= 3) {
-                        banner.style.background = 'linear-gradient(135deg, #f56565 0%, #e53e3e 100%)';
-                    } else if (daysLeft <= 7) {
-                        banner.style.background = 'linear-gradient(135deg, #ed8936 0%, #dd6b20 100%)';
-                    }
-                } else {
-                    // Trial expirado
-                    trialDaysSpan.textContent = '0';
-                    banner.innerHTML = `
-                        <h4>⚠️ Seu período de teste expirou!</h4>
-                        <p>Assine agora para continuar usando o sistema</p>
-                        <button class="btn-upgrade" onclick="upgradeNow()">Assinar Agora</button>
-                    `;
-                    banner.style.display = 'block';
-                    banner.style.background = 'linear-gradient(135deg, #f56565 0%, #e53e3e 100%)';
-                }
-            }
+        // AUTH HELPER FUNCTIONS
+        // ========================================
+        async function checkSession() {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            return session;
         }
-        
-        // Se tem plano essential, esconder banner
-        if (subscription.plan === 'essential') {
-            document.getElementById('upgradeBanner').style.display = 'none';
-        }
-        
-    } catch (error) {
-        console.error('Erro ao verificar trial:', error);
-    }
-}
-
-// Função para fazer upgrade
-function upgradeNow() {
-    // Redirecionar para checkout do Stripe
-    window.paymentFunctions.redirectToCheckout('monthly');
-}
-
-// Chamar ao carregar a página
-document.addEventListener('DOMContentLoaded', () => {
-    checkTrialStatus();
-});
     </script>
-    
 </body>
 </html>
