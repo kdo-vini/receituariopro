@@ -37,29 +37,29 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            padding: 20px;
         }
 
         .container {
-            max-width: 1400px;
-            margin: 0 auto;
+            max-width: 100%;
+            margin: 0;
             background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            overflow: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 20px 30px;
+            padding: 15px 25px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
 
         .header h1 {
-            font-size: 24px;
+            font-size: 20px;
             display: flex;
             align-items: center;
             gap: 10px;
@@ -75,27 +75,29 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            padding: 8px 15px;
+            padding: 6px 12px;
             background: rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
+            border-radius: 8px;
+            font-size: 14px;
         }
 
         .trial-info {
             background: rgba(255, 255, 255, 0.2);
             padding: 5px 12px;
             border-radius: 20px;
-            font-size: 14px;
+            font-size: 13px;
         }
 
         .btn {
-            padding: 10px 20px;
+            padding: 8px 16px;
             border: none;
-            border-radius: 8px;
+            border-radius: 6px;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.3s;
             text-decoration: none;
             display: inline-block;
+            font-size: 14px;
         }
 
         .btn-white {
@@ -109,40 +111,42 @@
         }
 
         .main-layout {
-            display: grid;
-            grid-template-columns: 350px 1fr;
-            min-height: calc(100vh - 200px);
+            display: flex;
+            flex: 1;
+            overflow: hidden;
         }
 
         .sidebar {
+            width: 320px;
             background: var(--gray-light);
-            padding: 25px;
+            padding: 20px;
             border-right: 1px solid #e2e8f0;
             overflow-y: auto;
+            flex-shrink: 0;
         }
 
         /* Template Selector */
         .template-section {
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
 
         .template-section h3 {
-            margin-bottom: 15px;
-            font-size: 16px;
+            margin-bottom: 12px;
+            font-size: 14px;
             color: var(--text-dark);
+            font-weight: 600;
         }
 
         .template-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin-bottom: 20px;
+            gap: 8px;
         }
 
         .template-card {
             border: 2px solid #e2e8f0;
             border-radius: 8px;
-            padding: 12px;
+            padding: 10px;
             cursor: pointer;
             transition: all 0.3s;
             text-align: center;
@@ -152,20 +156,21 @@
         .template-card:hover {
             border-color: var(--primary);
             transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
         }
 
         .template-card.active {
             border-color: var(--primary);
-            background: rgba(102, 126, 234, 0.05);
+            background: rgba(102, 126, 234, 0.08);
         }
 
         .template-icon {
             font-size: 20px;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
         }
 
         .template-name {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 500;
             color: var(--text-dark);
         }
@@ -177,17 +182,17 @@
 
         .form-section label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             color: var(--text-dark);
             font-weight: 500;
-            font-size: 14px;
+            font-size: 13px;
         }
 
         .form-control {
             width: 100%;
-            padding: 10px;
+            padding: 8px 12px;
             border: 2px solid #e2e8f0;
-            border-radius: 8px;
+            border-radius: 6px;
             font-size: 14px;
             transition: all 0.3s;
         }
@@ -198,37 +203,59 @@
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
+        /* Signature Controls */
+        .signature-controls {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
         /* Preview Area */
         .preview-container {
-            padding: 30px;
+            flex: 1;
+            padding: 20px;
             background: #f8f9fa;
             display: flex;
             justify-content: center;
             overflow-y: auto;
         }
 
+        .prescription-wrapper {
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
         .prescription-preview {
-            width: 210mm;
-            min-height: 297mm;
             background: white;
             padding: 40px;
             box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-            position: relative;
+            border-radius: 8px;
+            min-height: 600px;
         }
 
         .prescription-header {
             padding: 20px;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             border-radius: 8px;
             background: linear-gradient(to right, #f7fafc 0%, white 100%);
             border-left: 4px solid var(--primary);
-        }
-
-        .clinic-logo {
-            max-width: 150px;
-            max-height: 60px;
-            object-fit: contain;
-            margin-bottom: 15px;
         }
 
         .clinic-logo-placeholder {
@@ -241,52 +268,58 @@
             justify-content: center;
             color: white;
             font-weight: bold;
-            margin-bottom: 15px;
+            font-size: 14px;
+            margin-bottom: 12px;
         }
 
         .doctor-info h2 {
             color: var(--text-dark);
-            font-size: 20px;
+            font-size: 18px;
             margin-bottom: 5px;
         }
 
         .doctor-info p {
             color: var(--text-light);
-            margin: 3px 0;
-            font-size: 14px;
+            margin: 2px 0;
+            font-size: 13px;
         }
 
         .patient-info {
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             padding: 15px;
             background: var(--gray-light);
             border-radius: 8px;
         }
 
+        .patient-info p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
         .prescription-content {
-            min-height: 400px;
+            min-height: 350px;
             margin-bottom: 30px;
         }
 
-        .prescription-content textarea {
-            width: 100%;
-            min-height: 400px;
+        .prescription-text-display {
+            min-height: 350px;
             padding: 20px;
             border: 1px solid #e2e8f0;
             border-radius: 8px;
             font-size: 14px;
             line-height: 1.8;
-            resize: vertical;
+            background: white;
+            white-space: pre-wrap;
+            outline: none;
         }
 
-        .prescription-footer {
-            margin-top: 60px;
-            padding-top: 20px;
-            border-top: 1px solid #e2e8f0;
+        .prescription-text-display:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
         .signature-section {
-            margin-top: 50px;
+            margin-top: 40px;
             text-align: center;
         }
 
@@ -295,42 +328,42 @@
             border-radius: 8px;
             cursor: crosshair;
             background: white;
-            margin: 20px auto;
+            margin: 15px auto;
         }
 
+        .signature-line {
+            border-top: 2px solid #333;
+            width: 300px;
+            margin: 10px auto;
+            padding-top: 8px;
+        }
+
+        /* Action Buttons */
         .action-buttons {
-            padding: 20px 30px;
             background: white;
-            border-top: 1px solid #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
             display: flex;
             justify-content: center;
-            gap: 15px;
+            gap: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
 
         .btn-primary {
             background: var(--gradient);
             color: white;
-            padding: 12px 30px;
+            padding: 10px 24px;
             border: none;
-            border-radius: 8px;
+            border-radius: 6px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
+            font-size: 14px;
         }
 
         .btn-primary:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-secondary {
-            background: #6c757d;
-            color: white;
-            padding: 12px 30px;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
         }
 
         /* Toast */
@@ -340,13 +373,14 @@
             right: 20px;
             background: var(--success);
             color: white;
-            padding: 15px 20px;
+            padding: 12px 20px;
             border-radius: 8px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
             transform: translateY(100px);
             opacity: 0;
             transition: all 0.3s;
             z-index: 1000;
+            font-size: 14px;
         }
 
         .toast.show {
@@ -358,27 +392,70 @@
             background: var(--error);
         }
 
+        .toast.warning {
+            background: var(--warning);
+        }
+
+        /* Loading */
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
         /* Responsive */
         @media (max-width: 1024px) {
-            .main-layout {
-                grid-template-columns: 1fr;
-            }
-            
             .sidebar {
-                border-right: none;
-                border-bottom: 1px solid #e2e8f0;
+                width: 280px;
             }
         }
 
         @media (max-width: 768px) {
-            .prescription-preview {
-                width: 100%;
-                min-height: auto;
-                padding: 20px;
+            .main-layout {
+                flex-direction: column;
             }
             
-            .template-grid {
-                grid-template-columns: 1fr;
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid #e2e8f0;
+            }
+
+            .prescription-preview {
+                padding: 20px;
+            }
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+
+            .header, .sidebar, .action-buttons {
+                display: none !important;
+            }
+
+            .preview-container {
+                padding: 0;
+                background: white;
+            }
+
+            .prescription-preview {
+                box-shadow: none;
+                padding: 20px;
+            }
+
+            .prescription-text-display {
+                border: none;
             }
         }
     </style>
@@ -391,18 +468,19 @@
         <!-- Header -->
         <div class="header">
             <h1>
-                <img src="img/saas-logo.png" alt="Logo" style="height: 32px;">
+                <span>📋</span>
                 Receituário Pro
             </h1>
             <div class="header-actions">
                 <div class="trial-info" id="trialInfo">
-                    <span id="trialText">Trial - 30 dias</span>
+                    <span id="trialText">Carregando...</span>
                 </div>
                 <div class="user-info">
+                    <span>👤</span>
                     <span id="userName">Carregando...</span>
                 </div>
-                <a href="profile.html" class="btn btn-white">👤 Perfil</a>
-                <button class="btn btn-white" onclick="logout()">Sair</button>
+                <a href="profile.html" class="btn btn-white">⚙️ Perfil</a>
+                <button class="btn btn-white" onclick="logout()">🚪 Sair</button>
             </div>
         </div>
 
@@ -411,7 +489,7 @@
             <div class="sidebar">
                 <!-- Template Selection -->
                 <div class="template-section">
-                    <h3>Tipo de Receituário</h3>
+                    <h3>📝 Tipo de Receituário</h3>
                     <div class="template-grid">
                         <div class="template-card active" data-template="medicacao" onclick="selectTemplate('medicacao')">
                             <div class="template-icon">💊</div>
@@ -447,72 +525,98 @@
 
                 <!-- Patient Info -->
                 <div class="form-section">
-                    <label for="patientName">Nome do Paciente</label>
-                    <input type="text" id="patientName" class="form-control" placeholder="Digite o nome do paciente">
+                    <label for="patientName">👤 Nome do Paciente</label>
+                    <input type="text" id="patientName" class="form-control" 
+                           placeholder="Digite o nome do paciente"
+                           oninput="updatePatientDisplay()">
                 </div>
 
                 <div class="form-section">
-                    <label for="prescriptionDate">Data</label>
-                    <input type="date" id="prescriptionDate" class="form-control">
-                </div>>
-                    <input type="date" id="prescriptionDate" class="form-control" onchange="updateDateDisplay()">
+                    <label for="prescriptionDate">📅 Data</label>
+                    <input type="date" id="prescriptionDate" class="form-control" 
+                           onchange="updateDateDisplay()">
+                </div>
+
+                <!-- Signature Section -->
+                <div class="form-section">
+                    <label>✍️ Assinatura Digital</label>
+                    <canvas id="signatureCanvas" class="signature-canvas" width="280" height="80"></canvas>
+                    <div class="signature-controls">
+                        <button class="btn-secondary" onclick="clearSignature()">Limpar</button>
+                        <button class="btn-secondary" onclick="document.getElementById('signatureUpload').click()">
+                            Upload
+                        </button>
+                        <input type="file" id="signatureUpload" accept="image/*" 
+                               style="display: none;" onchange="handleSignatureUpload(event)">
+                    </div>
                 </div>
             </div>
 
             <!-- Preview Area -->
             <div class="preview-container">
-                <div class="prescription-preview" id="prescriptionPreview">
-                    <!-- Header -->
-                    <div class="prescription-header">
-                        <div id="clinicLogoContainer">
-                            <div class="clinic-logo-placeholder" id="logoPlaceholder">RECEITUÁRIO PRO</div>
+                <div class="prescription-wrapper">
+                    <div class="prescription-preview" id="prescriptionPreview">
+                        <!-- Header -->
+                        <div class="prescription-header">
+                            <div id="clinicLogoContainer">
+                                <div class="clinic-logo-placeholder" id="logoPlaceholder">
+                                    RECEITUÁRIO PRO
+                                </div>
+                            </div>
+                            <div class="doctor-info">
+                                <h2 id="doctorName">Dr. Nome do Médico</h2>
+                                <p id="doctorCRM">CRM: 00000-UF</p>
+                                <p id="doctorSpecialty">Especialidade</p>
+                                <p id="doctorPhone">Telefone: (00) 00000-0000</p>
+                                <p id="doctorAddress" style="display: none;"></p>
+                            </div>
                         </div>
-                        <div class="doctor-info">
-                            <h2 id="doctorName">Dr. Nome do Médico</h2>
-                            <p id="doctorCRM">CRM: 00000-UF</p>
-                            <p id="doctorSpecialty">Especialidade</p>
-                            <p id="doctorPhone">Telefone: (00) 00000-0000</p>
+
+                        <!-- Patient Info -->
+                        <div class="patient-info">
+                            <p><strong>Paciente:</strong> <span id="patientDisplay">_________________________</span></p>
+                            <p><strong>Data:</strong> <span id="dateDisplay">__/__/____</span></p>
                         </div>
-                    </div>
 
-                    <!-- Patient Info -->
-                    <div class="patient-info">
-                        <p><strong>Paciente:</strong> <span id="patientDisplay">_________________________</span></p>
-                        <p><strong>Data:</strong> <span id="dateDisplay">__/__/____</span></p>
-                    </div>
-
-                    <!-- Content -->
-                    <div class="prescription-content">
-                        <textarea id="prescriptionText" placeholder="Digite aqui o conteúdo do receituário..." 
-                                  style="display: none;" oninput="updatePrescriptionDisplay()"></textarea>
-                        <div class="prescription-content-display" id="prescriptionDisplay" 
-                             style="min-height: 400px; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px; 
-                                    font-size: 14px; line-height: 1.8; background: white; white-space: pre-wrap;"
-                             contenteditable="true" oninput="syncTextareaFromDiv()">
-                            Digite aqui o conteúdo do receituário...
+                        <!-- Content -->
+                        <div class="prescription-content">
+                            <div class="prescription-text-display" 
+                                 id="prescriptionTextDisplay"
+                                 contenteditable="true">Digite aqui o conteúdo do receituário...</div>
                         </div>
-                    </div>
 
-                    <!-- Footer -->
-                    <div class="prescription-footer">
                         <!-- Signature -->
                         <div class="signature-section">
-                            <canvas id="signatureCanvas" class="signature-canvas" width="300" height="100"></canvas>
-                            <div style="border-top: 2px solid #333; width: 300px; margin: 10px auto;">
-                                <p id="signatureName" style="margin-top: 10px;">Dr. Nome do Médico</p>
-                                <p id="signatureCRM" style="color: var(--text-light); font-size: 13px;">CRM: 00000-UF</p>
+                            <canvas id="signaturePreview" class="signature-canvas" 
+                                    width="300" height="100" style="display: none;"></canvas>
+                            <div class="signature-line">
+                                <p id="signatureName" style="margin-top: 8px; font-weight: 500;">
+                                    Dr. Nome do Médico
+                                </p>
+                                <p id="signatureCRM" style="color: var(--text-light); font-size: 12px;">
+                                    CRM: 00000-UF
+                                </p>
                             </div>
                         </div>
                     </div>
+
+                    <!-- Action Buttons -->
+                    <div class="action-buttons">
+                        <button class="btn btn-primary" onclick="generatePDF()">
+                            📄 Gerar PDF
+                        </button>
+                        <button class="btn btn-primary" onclick="generatePNG()">
+                            🖼️ Gerar Imagem
+                        </button>
+                        <button class="btn btn-primary" onclick="savePrescription()">
+                            💾 Salvar no Histórico
+                        </button>
+                        <button class="btn btn-primary" onclick="printPrescription()">
+                            🖨️ Imprimir
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
-
-        <!-- Action Buttons -->
-        <div class="action-buttons">
-            <button class="btn btn-primary" onclick="generatePDF()">📄 Gerar PDF</button>
-            <button class="btn btn-primary" onclick="generatePNG()">🖼️ Gerar PNG</button>
-            <button class="btn btn-primary" onclick="savePrescription()">💾 Salvar</button>
         </div>
     </div>
 
@@ -530,164 +634,123 @@
         let signatureCtx = null;
         let isDrawing = false;
 
-        // Templates with medical content
+        // Templates
         const templates = {
             medicacao: {
                 title: 'Receituário de Medicação',
-                content: `<strong>USO INTERNO</strong><br><br>
+                content: `USO INTERNO
 
-<strong>1.</strong> Dipirona 500mg - Comprimidos<br>
-&nbsp;&nbsp;&nbsp;<em>Posologia:</em> 1 comprimido de 6/6 horas, se dor ou febre<br>
-&nbsp;&nbsp;&nbsp;<em>Quantidade:</em> 20 comprimidos<br><br>
+1. _________________________________
+   Posologia: _____________________
+   Quantidade: ____________________
 
-<strong>2.</strong> Omeprazol 20mg - Cápsulas<br>
-&nbsp;&nbsp;&nbsp;<em>Posologia:</em> 1 cápsula pela manhã, em jejum<br>
-&nbsp;&nbsp;&nbsp;<em>Quantidade:</em> 30 cápsulas<br><br>
+2. _________________________________
+   Posologia: _____________________
+   Quantidade: ____________________
 
-<strong>3.</strong> ________________________________<br>
-&nbsp;&nbsp;&nbsp;<em>Posologia:</em> _____________________<br>
-&nbsp;&nbsp;&nbsp;<em>Quantidade:</em> ____________________<br><br>
+3. _________________________________
+   Posologia: _____________________
+   Quantidade: ____________________
 
-<strong>Orientações:</strong><br>
-• Tomar os medicamentos nos horários prescritos<br>
-• Não interromper o tratamento sem orientação médica<br>
-• Retornar em caso de efeitos adversos`
+Orientações:
+_________________________________
+_________________________________`
             },
             
             exames: {
                 title: 'Solicitação de Exames',
-                content: `<strong>SOLICITO OS SEGUINTES EXAMES:</strong><br><br>
+                content: `SOLICITO OS SEGUINTES EXAMES:
 
-<strong>EXAMES LABORATORIAIS:</strong><br>
-☐ Hemograma completo com plaquetas<br>
-☐ Glicemia de jejum<br>
-☐ Hemoglobina glicada (HbA1c)<br>
-☐ Colesterol total e frações (HDL, LDL)<br>
-☐ Triglicerídeos<br>
-☐ TGO/TGP (transaminases)<br>
-☐ Ureia e creatinina<br>
-☐ Ácido úrico<br>
-☐ TSH e T4 livre<br>
-☐ Vitamina D (25-OH)<br>
-☐ Vitamina B12<br>
-☐ Ferritina<br>
-☐ PCR (proteína C reativa)<br>
-☐ VHS (velocidade de hemossedimentação)<br>
-☐ Urina tipo I (EAS)<br><br>
+□ Hemograma completo
+□ Glicemia de jejum
+□ Colesterol total e frações
+□ Triglicerídeos
+□ TGO/TGP
+□ TSH e T4 livre
+□ Urina tipo I
+□ Creatinina
+□ Ureia
+□ _______________________________
+□ _______________________________
 
-<strong>EXAMES DE IMAGEM:</strong><br>
-☐ Raio-X de tórax<br>
-☐ Ultrassom de abdome total<br>
-☐ Ecocardiograma<br>
-☐ ________________________________<br><br>
+Observações clínicas:
+_________________________________
 
-<strong>Observações clínicas:</strong><br>
-_________________________________<br><br>
-
-<strong>Hipótese diagnóstica/CID:</strong><br>
+Hipótese diagnóstica:
 _________________________________`
             },
             
             procedimento: {
                 title: 'Encaminhamento Médico',
-                content: `<strong>ENCAMINHAMENTO MÉDICO</strong><br><br>
+                content: `ENCAMINHAMENTO MÉDICO
 
-<strong>Prezado(a) Colega,</strong><br><br>
+Prezado(a) Colega,
 
-Encaminho o(a) paciente acima identificado(a) para:<br>
-☐ Cardiologia &nbsp;&nbsp;&nbsp; ☐ Endocrinologia &nbsp;&nbsp;&nbsp; ☐ Gastroenterologia<br>
-☐ Neurologia &nbsp;&nbsp;&nbsp; ☐ Ortopedia &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ☐ Dermatologia<br>
-☐ Ginecologia &nbsp;&nbsp;&nbsp; ☐ Urologia &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ☐ Pneumologia<br>
-☐ Oftalmologia &nbsp;&nbsp;&nbsp; ☐ Otorrinolaringologia<br>
-☐ Outros: _________________________________<br><br>
+Encaminho o(a) paciente para:
+_________________________________
+_________________________________
 
-<strong>Motivo do encaminhamento:</strong><br>
-_________________________________<br>
-_________________________________<br><br>
+Motivo do encaminhamento:
+_________________________________
+_________________________________
 
-<strong>Diagnóstico principal/CID:</strong><br>
-_________________________________<br><br>
+Diagnóstico / CID:
+_________________________________
 
-<strong>História clínica resumida:</strong><br>
-_________________________________<br>
-_________________________________<br><br>
+História clínica resumida:
+_________________________________
+_________________________________
 
-<strong>Exames já realizados:</strong><br>
-_________________________________<br><br>
+Exames realizados:
+_________________________________
 
-<strong>Medicações em uso:</strong><br>
-_________________________________<br><br>
+Medicações em uso:
+_________________________________
 
 Atenciosamente,`
             },
             
             atestado: {
                 title: 'Atestado Médico',
-                content: `<center><strong>ATESTADO MÉDICO</strong></center><br><br>
+                content: `ATESTADO MÉDICO
 
-Atesto para os devidos fins que o(a) paciente acima identificado(a) esteve sob meus cuidados médicos e <strong>necessita se afastar de suas atividades</strong> por motivo de:<br><br>
+Atesto para os devidos fins que o(a) paciente acima identificado(a) esteve sob meus cuidados médicos no dia de hoje.
 
-☐ Doença &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ☐ Repouso médico<br>
-☐ Procedimento médico &nbsp;&nbsp;&nbsp;&nbsp; ☐ Acompanhar familiar<br>
-☐ Outros: _________________________________<br><br>
+Necessita de _____ dia(s) de afastamento de suas atividades.
 
-<strong>Descrição:</strong><br>
-_________________________________<br>
-_________________________________<br><br>
+Período: de ___/___/____ até ___/___/____
 
-<strong>Período de afastamento:</strong><br>
-De: <u>&nbsp;&nbsp;&nbsp;___/___/____&nbsp;&nbsp;&nbsp;</u> até <u>&nbsp;&nbsp;&nbsp;___/___/____&nbsp;&nbsp;&nbsp;</u><br><br>
+CID: _____________
 
-<strong>CID-10:</strong> _____________________________<br><br>
-
-<strong>Observações:</strong><br>
-☐ Deve evitar esforços físicos<br>
-☐ Deve permanecer em repouso domiciliar<br>
-☐ Apto para atividades leves<br>
-☐ Outras: _________________________________<br><br>
-
-Por ser verdade, firmo o presente.`
+Observações:
+_________________________________
+_________________________________`
             },
             
             laudo: {
                 title: 'Laudo Médico',
-                content: `<center><strong>LAUDO MÉDICO</strong></center><br><br>
+                content: `LAUDO MÉDICO
 
-<strong>EXAME REALIZADO:</strong><br>
-☐ Consulta clínica &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ☐ Avaliação cardiológica<br>
-☐ Exame físico geral &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ☐ Avaliação neurológica<br>
-☐ Outros: _________________________________<br><br>
+Exame realizado: _________________
+Data: ___/___/____
 
-<strong>INDICAÇÃO CLÍNICA:</strong><br>
-_________________________________<br>
-_________________________________<br><br>
+Indicação clínica:
+_________________________________
 
-<strong>MÉTODO/TÉCNICA:</strong><br>
-_________________________________<br><br>
+Técnica:
+_________________________________
 
-<strong>ACHADOS DO EXAME:</strong><br>
-<strong>• Exame físico geral:</strong><br>
-&nbsp;&nbsp;- Estado geral: _________________________<br>
-&nbsp;&nbsp;- Pressão arterial: ______ x ______ mmHg<br>
-&nbsp;&nbsp;- Frequência cardíaca: _______ bpm<br>
-&nbsp;&nbsp;- Temperatura: _______ °C<br>
-&nbsp;&nbsp;- Peso: _______ kg &nbsp;&nbsp;&nbsp; Altura: _______ cm<br><br>
+Achados:
+_________________________________
+_________________________________
+_________________________________
 
-<strong>• Sistemas específicos:</strong><br>
-&nbsp;&nbsp;- Cardiovascular: _________________________<br>
-&nbsp;&nbsp;- Respiratório: ___________________________<br>
-&nbsp;&nbsp;- Abdome: _______________________________<br>
-&nbsp;&nbsp;- Neurológico: ____________________________<br><br>
+Conclusão:
+_________________________________
+_________________________________
 
-<strong>CONCLUSÃO:</strong><br>
-_________________________________<br>
-_________________________________<br><br>
-
-<strong>RECOMENDAÇÕES:</strong><br>
-☐ Manter acompanhamento médico regular<br>
-☐ Retornar em _____ dias/semanas/meses<br>
-☐ Solicitar exames complementares<br>
-☐ Outras: _________________________________`
+Observações:
+_________________________________`
             },
             
             livre: {
@@ -704,45 +767,34 @@ _________________________________<br><br>
         });
 
         async function initializeApp() {
-            // Check authentication and redirect admin
-            const session = await checkSession();
-            if (!session) {
-                window.location.href = 'auth.html';
-                return;
+            try {
+                // Check authentication
+                const session = await checkSession();
+                if (!session) {
+                    window.location.href = 'auth.html';
+                    return;
+                }
+
+                // Check if admin
+                if (session.user.email === 'techne.br@gmail.com') {
+                    window.location.href = 'admin.html';
+                    return;
+                }
+
+                // Load user data
+                await loadUserData(session.user.id);
+                
+                // Initialize components
+                initializeDate();
+                initializeSignature();
+                
+                // Load default template
+                loadTemplate('medicacao');
+                
+            } catch (error) {
+                console.error('Initialization error:', error);
+                showToast('Erro ao inicializar sistema', 'error');
             }
-
-            // Check if admin
-            if (session.user.email === 'techne.br@gmail.com') {
-                window.location.href = 'admin.html';
-                return;
-            }
-
-            // Load user data
-            await loadUserData(session.user.id);
-            
-            // Initialize components
-            initializeDate();
-            initializeSignature();
-            
-            // Load default template
-            loadTemplate('medicacao');
-            
-            // Set up auto-population for patient name
-            setupAutoPopulation();
-        }
-
-        function setupAutoPopulation() {
-            // Auto-populate patient name
-            const patientInput = document.getElementById('patientName');
-            patientInput.addEventListener('input', updatePatientDisplay);
-            
-            // Auto-populate date
-            const dateInput = document.getElementById('prescriptionDate');
-            dateInput.addEventListener('change', updateDateDisplay);
-            
-            // Initialize displays
-            updatePatientDisplay();
-            updateDateDisplay();
         }
 
         // ========================================
@@ -765,7 +817,13 @@ _________________________________<br><br>
                 document.getElementById('doctorName').textContent = user.name || 'Dr. Nome';
                 document.getElementById('doctorCRM').textContent = `${user.council || 'CRM'}: ${user.registration_number || '00000'}-${user.state || 'UF'}`;
                 document.getElementById('doctorSpecialty').textContent = user.specialty || 'Especialidade';
-                document.getElementById('doctorPhone').textContent = user.phone ? `Tel: ${user.phone}` : 'Tel: (00) 00000-0000';
+                document.getElementById('doctorPhone').textContent = user.phone ? `Tel: ${user.phone}` : '';
+                
+                // Add address if available
+                if (user.address) {
+                    document.getElementById('doctorAddress').textContent = user.address;
+                    document.getElementById('doctorAddress').style.display = 'block';
+                }
                 
                 // Update signature info
                 document.getElementById('signatureName').textContent = user.name || 'Dr. Nome';
@@ -773,30 +831,344 @@ _________________________________<br><br>
                 
                 // Load logo if exists
                 if (user.logo_url) {
-                    const logoPlaceholder = document.getElementById('logoPlaceholder');
-                    logoPlaceholder.innerHTML = `<img src="${user.logo_url}" class="clinic-logo" alt="Logo da Clínica">`;
+                    document.getElementById('logoPlaceholder').innerHTML = 
+                        `<img src="${user.logo_url}" style="max-width: 100%; max-height: 100%; object-fit: contain;" alt="Logo">`;
+                }
+
+                // Load signature if exists
+                if (user.signature_url) {
+                    loadSignatureFromUrl(user.signature_url);
                 }
 
                 // Load subscription data
                 await loadSubscriptionData(userId);
 
             } catch (error) {
+                console.error('Error loading user data:', error);
+                showToast('Erro ao carregar dados do usuário', 'error');
+            }
+        }
+
+        async function loadSubscriptionData(userId) {
+            try {
+                const { data: subscription, error } = await supabaseClient
+                    .from('subscriptions')
+                    .select('*')
+                    .eq('user_id', userId)
+                    .eq('status', 'active')
+                    .single();
+
+                if (error) throw error;
+
+                currentSubscription = subscription;
+                
+                // Update trial display
+                if (subscription.plan === 'trial' && subscription.trial_ends_at) {
+                    const trialEnd = new Date(subscription.trial_ends_at);
+                    const now = new Date();
+                    const daysLeft = Math.ceil((trialEnd - now) / (1000 * 60 * 60 * 24));
+                    
+                    document.getElementById('trialText').textContent = 
+                        daysLeft > 0 ? `Trial - ${daysLeft} dias` : 'Trial Expirado';
+                    
+                    if (daysLeft <= 3) {
+                        document.getElementById('trialInfo').style.background = 'rgba(237, 137, 54, 0.3)';
+                    }
+                    
+                    if (daysLeft <= 0) {
+                        showToast('Seu período de trial expirou. Faça upgrade para continuar usando.', 'warning');
+                    }
+                } else if (subscription.plan === 'essential') {
+                    document.getElementById('trialText').textContent = 'Plano Essencial';
+                    document.getElementById('trialInfo').style.background = 'rgba(72, 187, 120, 0.3)';
+                }
+
+            } catch (error) {
+                console.error('Error loading subscription:', error);
+            }
+        }
+
+        // ========================================
+        // TEMPLATE MANAGEMENT
+        // ========================================
+        function selectTemplate(templateName) {
+            // Update active state
+            document.querySelectorAll('.template-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            
+            const selectedCard = document.querySelector(`[data-template="${templateName}"]`);
+            if (selectedCard) {
+                selectedCard.classList.add('active');
+            }
+            
+            // Load template
+            currentTemplate = templateName;
+            loadTemplate(templateName);
+        }
+
+        function loadTemplate(templateName) {
+            const template = templates[templateName];
+            if (template) {
+                document.getElementById('prescriptionTextDisplay').innerText = template.content;
+            }
+        }
+
+        // ========================================
+        // FORM UPDATES
+        // ========================================
+        function updatePatientDisplay() {
+            const patientName = document.getElementById('patientName').value;
+            document.getElementById('patientDisplay').textContent = 
+                patientName || '_________________________';
+        }
+
+        function updateDateDisplay() {
+            const dateInput = document.getElementById('prescriptionDate').value;
+            if (dateInput) {
+                const date = new Date(dateInput + 'T00:00:00');
+                const day = String(date.getDate()).padStart(2, '0');
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const year = date.getFullYear();
+                document.getElementById('dateDisplay').textContent = `${day}/${month}/${year}`;
+            } else {
+                document.getElementById('dateDisplay').textContent = '__/__/____';
+            }
+        }
+
+        function initializeDate() {
+            const today = new Date();
+            const dateString = today.toISOString().split('T')[0];
+            document.getElementById('prescriptionDate').value = dateString;
+            updateDateDisplay();
+        }
+
+        // ========================================
+        // SIGNATURE MANAGEMENT
+        // ========================================
+        function initializeSignature() {
+            signatureCanvas = document.getElementById('signatureCanvas');
+            signatureCtx = signatureCanvas.getContext('2d');
+            
+            signatureCtx.lineCap = 'round';
+            signatureCtx.lineJoin = 'round';
+            signatureCtx.lineWidth = 2;
+            signatureCtx.strokeStyle = '#000000';
+            
+            // Mouse events
+            signatureCanvas.addEventListener('mousedown', startDrawing);
+            signatureCanvas.addEventListener('mousemove', draw);
+            signatureCanvas.addEventListener('mouseup', stopDrawing);
+            signatureCanvas.addEventListener('mouseout', stopDrawing);
+            
+            // Touch events
+            signatureCanvas.addEventListener('touchstart', handleTouch);
+            signatureCanvas.addEventListener('touchmove', handleTouch);
+            signatureCanvas.addEventListener('touchend', stopDrawing);
+        }
+
+        function startDrawing(e) {
+            isDrawing = true;
+            const rect = signatureCanvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            signatureCtx.beginPath();
+            signatureCtx.moveTo(x, y);
+        }
+
+        function draw(e) {
+            if (!isDrawing) return;
+            
+            const rect = signatureCanvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            signatureCtx.lineTo(x, y);
+            signatureCtx.stroke();
+        }
+
+        function stopDrawing() {
+            isDrawing = false;
+            updateSignaturePreview();
+        }
+
+        function handleTouch(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const mouseEvent = new MouseEvent(
+                e.type === 'touchstart' ? 'mousedown' : 
+                e.type === 'touchmove' ? 'mousemove' : 'mouseup',
+                {
+                    clientX: touch.clientX,
+                    clientY: touch.clientY
+                }
+            );
+            signatureCanvas.dispatchEvent(mouseEvent);
+        }
+
+        function clearSignature() {
+            signatureCtx.clearRect(0, 0, signatureCanvas.width, signatureCanvas.height);
+            const preview = document.getElementById('signaturePreview');
+            if (preview) {
+                const previewCtx = preview.getContext('2d');
+                previewCtx.clearRect(0, 0, preview.width, preview.height);
+                preview.style.display = 'none';
+            }
+        }
+
+        function handleSignatureUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            if (file.size > 1024 * 1024) {
+                showToast('Arquivo muito grande. Máximo 1MB', 'error');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    clearSignature();
+                    const scale = Math.min(
+                        signatureCanvas.width / img.width,
+                        signatureCanvas.height / img.height
+                    );
+                    const width = img.width * scale;
+                    const height = img.height * scale;
+                    const x = (signatureCanvas.width - width) / 2;
+                    const y = (signatureCanvas.height - height) / 2;
+                    
+                    signatureCtx.drawImage(img, x, y, width, height);
+                    updateSignaturePreview();
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function loadSignatureFromUrl(url) {
+            const img = new Image();
+            img.onload = () => {
+                clearSignature();
+                signatureCtx.drawImage(img, 0, 0, signatureCanvas.width, signatureCanvas.height);
+                updateSignaturePreview();
+            };
+            img.src = url;
+        }
+
+        function updateSignaturePreview() {
+            const preview = document.getElementById('signaturePreview');
+            if (preview && hasSignature()) {
+                const previewCtx = preview.getContext('2d');
+                previewCtx.clearRect(0, 0, preview.width, preview.height);
+                previewCtx.drawImage(signatureCanvas, 0, 0, preview.width, preview.height);
+                preview.style.display = 'block';
+            }
+        }
+
+        function hasSignature() {
+            const imageData = signatureCtx.getImageData(0, 0, signatureCanvas.width, signatureCanvas.height);
+            return imageData.data.some(channel => channel !== 0);
+        }
+
+        // ========================================
+        // EXPORT FUNCTIONS
+        // ========================================
+        async function generatePDF() {
+            try {
+                showToast('Gerando PDF...', 'info');
+                
+                // Hide signature canvas controls temporarily
+                const signatureControls = document.querySelector('.signature-controls');
+                if (signatureControls) signatureControls.style.display = 'none';
+                
+                // Copy signature to preview if exists
+                updateSignaturePreview();
+                
+                const element = document.getElementById('prescriptionPreview');
+                const canvas = await html2canvas(element, {
+                    scale: 2,
+                    useCORS: true,
+                    logging: false,
+                    backgroundColor: '#ffffff'
+                });
+                
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                
+                const imgData = canvas.toDataURL('image/png');
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+                
+                pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+                
+                const fileName = generateFileName('pdf');
+                pdf.save(fileName);
+                
+                // Restore controls
+                if (signatureControls) signatureControls.style.display = 'flex';
+                
+                showToast('PDF gerado com sucesso!', 'success');
+                
+            } catch (error) {
+                console.error('Error generating PDF:', error);
+                showToast('Erro ao gerar PDF', 'error');
+            }
+        }
+
+        async function generatePNG() {
+            try {
+                showToast('Gerando imagem...', 'info');
+                
+                // Hide signature canvas controls temporarily
+                const signatureControls = document.querySelector('.signature-controls');
+                if (signatureControls) signatureControls.style.display = 'none';
+                
+                // Copy signature to preview if exists
+                updateSignaturePreview();
+                
+                const element = document.getElementById('prescriptionPreview');
+                const canvas = await html2canvas(element, {
+                    scale: 2,
+                    useCORS: true,
+                    logging: false,
+                    backgroundColor: '#ffffff'
+                });
+                
+                // Create download link
+                const link = document.createElement('a');
+                link.download = generateFileName('png');
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                
+                // Restore controls
+                if (signatureControls) signatureControls.style.display = 'flex';
+                
+                showToast('Imagem gerada com sucesso!', 'success');
+                
+            } catch (error) {
                 console.error('Error generating PNG:', error);
                 showToast('Erro ao gerar imagem', 'error');
             }
         }
 
+        function printPrescription() {
+            window.print();
+        }
+
         async function savePrescription() {
             try {
                 const patientName = document.getElementById('patientName').value;
-                const content = document.getElementById('prescriptionText').value;
+                const content = document.getElementById('prescriptionTextDisplay').innerText;
                 
                 if (!patientName.trim()) {
                     showToast('Por favor, preencha o nome do paciente', 'error');
                     return;
                 }
                 
-                if (!content.trim()) {
+                if (!content.trim() || content === 'Digite aqui o conteúdo do receituário...') {
                     showToast('Por favor, preencha o conteúdo do receituário', 'error');
                     return;
                 }
@@ -807,7 +1179,8 @@ _________________________________<br><br>
                     patientName: patientName,
                     content: content,
                     template: currentTemplate,
-                    signature: signatureCanvas.toDataURL()
+                    signature: hasSignature() ? signatureCanvas.toDataURL() : null,
+                    date: document.getElementById('prescriptionDate').value
                 };
                 
                 const result = await savePrescriptionToDatabase(prescriptionData);
@@ -836,7 +1209,8 @@ _________________________________<br><br>
                         patient_name: prescriptionData.patientName,
                         content: prescriptionData.content,
                         template_type: prescriptionData.template,
-                        signature_data: prescriptionData.signature
+                        signature_data: prescriptionData.signature,
+                        prescription_date: prescriptionData.date
                     })
                     .select()
                     .single();
@@ -856,10 +1230,11 @@ _________________________________<br><br>
         // ========================================
         function generateFileName(extension) {
             const patientName = document.getElementById('patientName').value || 'Paciente';
-            const date = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+            const date = document.getElementById('prescriptionDate').value || new Date().toISOString().slice(0, 10);
             const safeName = patientName.replace(/[^a-z0-9]/gi, '_');
+            const safeDate = date.replace(/-/g, '');
             
-            return `Receituario_${safeName}_${date}.${extension}`;
+            return `Receituario_${safeName}_${safeDate}.${extension}`;
         }
 
         function showToast(message, type = 'info') {
@@ -882,9 +1257,6 @@ _________________________________<br><br>
             }
         }
 
-        // ========================================
-        // AUTH HELPER FUNCTIONS
-        // ========================================
         async function checkSession() {
             const { data: { session } } = await supabaseClient.auth.getSession();
             return session;
