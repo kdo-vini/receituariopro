@@ -524,7 +524,11 @@
                         <input type="date" id="prescriptionDate" class="form-control">
                     </div>
                 </div>
-
+                <div class="upgrade-banner" id="upgradeBanner" style="display: none;">
+        <h4>🚀 Seu período de teste acaba em <span id="trialDays">30</span> dias!</h4>
+        <p>Assine o plano Essencial para continuar usando</p>
+        <button class="btn-upgrade" onclick="upgradeNow()">Assinar Agora</button>
+    </div>
                 <!-- Template Selection -->
                 <div class="controls-section">
                     <h3>Tipo de Receituário</h3>
@@ -890,26 +894,56 @@ Atenciosamente,`,
             }
         }
 
-        async function updatePrescriptionCount() {
+        // Atualizar contador de receituários
+async function updatePrescriptionCount() {
     try {
-        if (!currentUser) return;
-
-        const result = await window.prescriptionFunctions.updatePrescriptionCount();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
         
-        prescriptionCount = result.count;
-        const limit = result.limit === Infinity ? '∞' : result.limit;
+        // Contar receituários do mês
+        const startOfMonth = new Date();
+        startOfMonth.setDate(1);
+        startOfMonth.setHours(0, 0, 0, 0);
         
-        // Update display
-        document.getElementById('countText').textContent = `${prescriptionCount}/${limit}`;
+        const { count } = await supabase
+            .from('prescriptions')
+            .select('*', { count: 'exact', head: true })
+            .eq('user_id', user.id)
+            .gte('created_at', startOfMonth.toISOString());
         
-        // Update global variables
-        currentSubscription = { plan: result.plan };
-
+        // Buscar plano do usuário
+        const { data: subscription } = await supabase
+            .from('subscriptions')
+            .select('*')
+            .eq('user_id', user.id)
+            .single();
+        
+        const countText = document.getElementById('countText');
+        
+        if (subscription?.plan === 'trial') {
+            // Mostrar limite para trial
+            countText.textContent = `${count}/30 receituários este mês`;
+            
+            // Avisar se está próximo do limite
+            if (count >= 25) {
+                countText.style.color = '#ed8936';
+            }
+            if (count >= 30) {
+                countText.style.color = '#f56565';
+                countText.textContent = `${count}/30 - Limite atingido!`;
+            }
+        } else if (subscription?.plan === 'essential') {
+            // Sem limite para essential
+            countText.textContent = `${count} receituários este mês`;
+        }
+        
     } catch (error) {
-        console.error('Error updating prescription count:', error);
-        document.getElementById('countText').textContent = '0/30';
+        console.error('Erro ao atualizar contador:', error);
     }
 }
+
+// Chamar ao carregar
+updatePrescriptionCount();
 
         // ========================================
         // EXPORT FUNCTIONS
@@ -1121,6 +1155,79 @@ Atenciosamente,`,
             });
         }
         
+        // ========================================
+// VERIFICAR E MOSTRAR BANNER DE TRIAL
+// ========================================
+async function checkTrialStatus() {
+    try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+        
+        // Buscar assinatura do usuário
+        const { data: subscription } = await supabase
+            .from('subscriptions')
+            .select('*')
+            .eq('user_id', user.id)
+            .single();
+        
+        if (!subscription) return;
+        
+        // Se está em trial, mostrar banner
+        if (subscription.plan === 'trial') {
+            const banner = document.getElementById('upgradeBanner');
+            const trialDaysSpan = document.getElementById('trialDays');
+            
+            // Calcular dias restantes
+            if (subscription.trial_ends_at) {
+                const endDate = new Date(subscription.trial_ends_at);
+                const today = new Date();
+                const daysLeft = Math.ceil((endDate - today) / (1000 * 60 * 60 * 24));
+                
+                if (daysLeft > 0) {
+                    trialDaysSpan.textContent = daysLeft;
+                    banner.style.display = 'block';
+                    
+                    // Mudar cor do banner baseado nos dias restantes
+                    if (daysLeft <= 3) {
+                        banner.style.background = 'linear-gradient(135deg, #f56565 0%, #e53e3e 100%)';
+                    } else if (daysLeft <= 7) {
+                        banner.style.background = 'linear-gradient(135deg, #ed8936 0%, #dd6b20 100%)';
+                    }
+                } else {
+                    // Trial expirado
+                    trialDaysSpan.textContent = '0';
+                    banner.innerHTML = `
+                        <h4>⚠️ Seu período de teste expirou!</h4>
+                        <p>Assine agora para continuar usando o sistema</p>
+                        <button class="btn-upgrade" onclick="upgradeNow()">Assinar Agora</button>
+                    `;
+                    banner.style.display = 'block';
+                    banner.style.background = 'linear-gradient(135deg, #f56565 0%, #e53e3e 100%)';
+                }
+            }
+        }
+        
+        // Se tem plano essential, esconder banner
+        if (subscription.plan === 'essential') {
+            document.getElementById('upgradeBanner').style.display = 'none';
+        }
+        
+    } catch (error) {
+        console.error('Erro ao verificar trial:', error);
+    }
+}
+
+// Função para fazer upgrade
+function upgradeNow() {
+    // Redirecionar para checkout do Stripe
+    window.paymentFunctions.redirectToCheckout('monthly');
+}
+
+// Chamar ao carregar a página
+document.addEventListener('DOMContentLoaded', () => {
+    checkTrialStatus();
+});
     </script>
+    
 </body>
 </html>
