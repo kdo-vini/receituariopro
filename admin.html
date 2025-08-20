@@ -40,42 +40,43 @@
             min-height: 100vh;
         }
         
-        /* Login Screen */
-        .login-container {
-            min-height: 100vh;
+        /* Loading Screen */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--gradient);
             display: flex;
             align-items: center;
             justify-content: center;
-            background: var(--gradient);
-            padding: 1rem;
+            z-index: 10000;
+            transition: opacity 0.3s;
         }
         
-        .login-card {
-            background: white;
-            padding: 2.5rem;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            max-width: 400px;
-            width: 100%;
+        .loading-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
         }
         
-        .login-header {
+        .loading-content {
             text-align: center;
-            margin-bottom: 2rem;
+            color: white;
         }
         
-        .login-header h1 {
-            font-size: 1.75rem;
-            font-weight: 800;
-            background: var(--gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 0.5rem;
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
         }
         
-        .login-header p {
-            color: var(--text-light);
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
         
         /* Dashboard */
@@ -152,60 +153,11 @@
             transform: translateY(-1px);
         }
         
-        /* Sidebar */
-        .admin-layout {
-            display: flex;
-            min-height: calc(100vh - 70px);
-        }
-        
-        .sidebar {
-            width: 250px;
-            background: white;
-            border-right: 1px solid var(--gray-lighter);
-            padding: 1.5rem 0;
-        }
-        
-        .sidebar-menu {
-            list-style: none;
-        }
-        
-        .sidebar-item {
-            margin-bottom: 0.25rem;
-        }
-        
-        .sidebar-link {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 0.75rem 1.5rem;
-            color: var(--text-dark);
-            text-decoration: none;
-            transition: all 0.3s;
-            font-weight: 500;
-        }
-        
-        .sidebar-link:hover {
-            background: var(--gray-light);
-            color: var(--primary);
-        }
-        
-        .sidebar-link.active {
-            background: linear-gradient(90deg, rgba(102, 126, 234, 0.1) 0%, transparent 100%);
-            color: var(--primary);
-            border-left: 3px solid var(--primary);
-        }
-        
-        .sidebar-icon {
-            font-size: 1.25rem;
-            width: 24px;
-            text-align: center;
-        }
-        
         /* Main Content */
         .main-content {
-            flex: 1;
             padding: 2rem;
-            overflow-y: auto;
+            max-width: 1400px;
+            margin: 0 auto;
         }
         
         .page-title {
@@ -231,6 +183,11 @@
             display: flex;
             align-items: center;
             gap: 1rem;
+            transition: transform 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
         }
         
         .stat-icon {
@@ -282,14 +239,7 @@
         .stat-change {
             font-size: 0.85rem;
             margin-top: 0.25rem;
-        }
-        
-        .stat-change.positive {
-            color: var(--success);
-        }
-        
-        .stat-change.negative {
-            color: var(--error);
+            color: var(--text-light);
         }
         
         /* Tables */
@@ -299,6 +249,7 @@
             padding: 1.5rem;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
             margin-bottom: 2rem;
+            overflow-x: auto;
         }
         
         .table-header {
@@ -306,6 +257,8 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
         }
         
         .table-title {
@@ -319,25 +272,19 @@
             gap: 1rem;
         }
         
-        .search-box {
+        .btn-refresh {
             padding: 0.5rem 1rem;
-            border: 2px solid var(--gray-lighter);
+            background: var(--primary);
+            color: white;
+            border: none;
             border-radius: 8px;
-            font-size: 0.9rem;
-            width: 250px;
-        }
-        
-        .search-box:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-        
-        .filter-select {
-            padding: 0.5rem 1rem;
-            border: 2px solid var(--gray-lighter);
-            border-radius: 8px;
-            font-size: 0.9rem;
             cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .btn-refresh:hover {
+            background: var(--primary-dark);
         }
         
         table {
@@ -382,7 +329,7 @@
             color: var(--warning);
         }
         
-        .status-badge.approved {
+        .status-badge.active {
             background: rgba(72, 187, 120, 0.1);
             color: var(--success);
         }
@@ -392,14 +339,10 @@
             color: var(--error);
         }
         
-        .status-badge.active {
-            background: rgba(72, 187, 120, 0.1);
-            color: var(--success);
-        }
-        
         .action-buttons {
             display: flex;
             gap: 0.5rem;
+            flex-wrap: wrap;
         }
         
         .btn-action {
@@ -439,61 +382,51 @@
             background: #3182ce;
         }
         
-        /* Forms */
-        .form-group {
-            margin-bottom: 1.5rem;
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-light);
         }
         
-        .form-label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: var(--text-dark);
-            font-weight: 500;
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
         }
         
-        .form-control {
-            width: 100%;
-            padding: 0.75rem;
-            border: 2px solid var(--gray-lighter);
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: all 0.3s;
-        }
-        
-        .form-control:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-        
-        .btn {
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 8px;
+        .empty-state-title {
+            font-size: 1.25rem;
             font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
         }
         
-        .btn-primary {
-            background: var(--gradient);
-            color: white;
+        /* Alert */
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
         }
         
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        .alert-success {
+            background: rgba(72, 187, 120, 0.1);
+            color: var(--success);
+            border: 1px solid rgba(72, 187, 120, 0.3);
         }
         
-        .error-message {
+        .alert-error {
+            background: rgba(245, 101, 101, 0.1);
             color: var(--error);
-            font-size: 0.85rem;
-            margin-top: 0.25rem;
-            display: none;
+            border: 1px solid rgba(245, 101, 101, 0.3);
         }
         
-        .error-message.show {
-            display: block;
+        .alert-info {
+            background: rgba(66, 153, 225, 0.1);
+            color: var(--info);
+            border: 1px solid rgba(66, 153, 225, 0.3);
         }
         
         /* Modal */
@@ -568,53 +501,36 @@
             color: var(--text-dark);
         }
         
-        /* Tabs */
-        .tabs {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 2rem;
-            border-bottom: 2px solid var(--gray-lighter);
-        }
-        
-        .tab-btn {
-            padding: 1rem;
-            background: none;
+        .btn {
+            padding: 0.75rem 1.5rem;
             border: none;
+            border-radius: 8px;
             font-weight: 600;
-            color: var(--text-light);
             cursor: pointer;
-            position: relative;
             transition: all 0.3s;
         }
         
-        .tab-btn.active {
-            color: var(--primary);
+        .btn-primary {
+            background: var(--gradient);
+            color: white;
         }
         
-        .tab-btn.active::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: var(--primary);
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
         }
         
-        .tab-content {
-            display: none;
+        .btn-secondary {
+            background: var(--gray-light);
+            color: var(--text-dark);
         }
         
-        .tab-content.active {
-            display: block;
+        .btn-secondary:hover {
+            background: var(--gray-lighter);
         }
         
         /* Responsive */
         @media (max-width: 768px) {
-            .sidebar {
-                display: none;
-            }
-            
             .main-content {
                 padding: 1rem;
             }
@@ -623,46 +539,30 @@
                 grid-template-columns: 1fr;
             }
             
-            .table-actions {
-                flex-direction: column;
-            }
-            
-            .search-box {
-                width: 100%;
+            .table-container {
+                padding: 1rem;
             }
             
             .info-grid {
                 grid-template-columns: 1fr;
             }
+            
+            .admin-header {
+                padding: 1rem;
+            }
+            
+            .admin-logo span {
+                display: none;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Login Screen -->
-    <div class="login-container" id="loginScreen">
-        <div class="login-card">
-            <div class="login-header">
-                <h1>🔒 Admin Panel</h1>
-                <p>Acesso Restrito - Receituário Pro</p>
-            </div>
-            
-            <form id="adminLoginForm">
-                <div class="form-group">
-                    <label class="form-label">E-mail</label>
-                    <input type="email" id="adminEmail" class="form-control" required>
-                    <span class="error-message">E-mail inválido</span>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Senha</label>
-                    <input type="password" id="adminPassword" class="form-control" required>
-                    <span class="error-message">Senha incorreta</span>
-                </div>
-                
-                <button type="submit" class="btn btn-primary" style="width: 100%;">
-                    Entrar
-                </button>
-            </form>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <p>Carregando painel administrativo...</p>
         </div>
     </div>
     
@@ -677,395 +577,158 @@
             
             <div class="admin-user">
                 <div class="admin-user-info">
-                    <div class="admin-user-name">Vinicius</div>
-                    <div class="admin-user-role">Administrador</div>
+                    <div class="admin-user-name">Administrador</div>
+                    <div class="admin-user-role">techne.br@gmail.com</div>
                 </div>
                 <button class="btn-logout" onclick="logout()">Sair</button>
             </div>
         </header>
         
-        <div class="admin-layout">
-            <!-- Sidebar -->
-            <aside class="sidebar">
-                <ul class="sidebar-menu">
-                    <li class="sidebar-item">
-                        <a href="#" class="sidebar-link active" data-page="overview">
-                            <span class="sidebar-icon">📊</span>
-                            <span>Visão Geral</span>
-                        </a>
-                    </li>
-                    <li class="sidebar-item">
-                        <a href="#" class="sidebar-link" data-page="validations">
-                            <span class="sidebar-icon">✅</span>
-                            <span>Validações</span>
-                        </a>
-                    </li>
-                    <li class="sidebar-item">
-                        <a href="#" class="sidebar-link" data-page="professionals">
-                            <span class="sidebar-icon">👨‍⚕️</span>
-                            <span>Profissionais</span>
-                        </a>
-                    </li>
-                    <li class="sidebar-item">
-                        <a href="#" class="sidebar-link" data-page="plans">
-                            <span class="sidebar-icon">💳</span>
-                            <span>Planos</span>
-                        </a>
-                    </li>
-                    <li class="sidebar-item">
-                        <a href="#" class="sidebar-link" data-page="reports">
-                            <span class="sidebar-icon">📈</span>
-                            <span>Relatórios</span>
-                        </a>
-                    </li>
-                    <li class="sidebar-item">
-                        <a href="#" class="sidebar-link" data-page="settings">
-                            <span class="sidebar-icon">⚙️</span>
-                            <span>Configurações</span>
-                        </a>
-                    </li>
-                </ul>
-            </aside>
+        <div class="main-content">
+            <!-- Alerts -->
+            <div id="alertContainer"></div>
             
-            <!-- Main Content -->
-            <main class="main-content">
-                <!-- Overview Page -->
-                <div id="overviewPage" class="page-content active">
-                    <h1 class="page-title">Visão Geral</h1>
-                    
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-icon blue">👥</div>
-                            <div class="stat-content">
-                                <div class="stat-label">Total de Profissionais</div>
-                                <div class="stat-value">247</div>
-                                <div class="stat-change positive">+12% este mês</div>
-                            </div>
-                        </div>
-                        
-                        <div class="stat-card">
-                            <div class="stat-icon yellow">⏳</div>
-                            <div class="stat-content">
-                                <div class="stat-label">Validações Pendentes</div>
-                                <div class="stat-value">5</div>
-                                <div class="stat-change">Aguardando aprovação</div>
-                            </div>
-                        </div>
-                        
-                        <div class="stat-card">
-                            <div class="stat-icon green">💰</div>
-                            <div class="stat-content">
-                                <div class="stat-label">Receita Mensal</div>
-                                <div class="stat-value">R$ 7.163</div>
-                                <div class="stat-change positive">+25% vs mês anterior</div>
-                            </div>
-                        </div>
-                        
-                        <div class="stat-card">
-                            <div class="stat-icon purple">📋</div>
-                            <div class="stat-content">
-                                <div class="stat-label">Receituários/Mês</div>
-                                <div class="stat-value">3.842</div>
-                                <div class="stat-change positive">+18% este mês</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Recent Activity -->
-                    <div class="table-container">
-                        <div class="table-header">
-                            <h2 class="table-title">Atividade Recente</h2>
-                        </div>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Data/Hora</th>
-                                    <th>Tipo</th>
-                                    <th>Descrição</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>18/08/2025 14:32</td>
-                                    <td>Cadastro</td>
-                                    <td>Dr. Carlos Silva - CRM/SP 98765</td>
-                                    <td><span class="status-badge pending">Pendente</span></td>
-                                </tr>
-                                <tr>
-                                    <td>18/08/2025 12:15</td>
-                                    <td>Pagamento</td>
-                                    <td>Plano Essencial - Dra. Ana Costa</td>
-                                    <td><span class="status-badge approved">Aprovado</span></td>
-                                </tr>
-                                <tr>
-                                    <td>18/08/2025 10:45</td>
-                                    <td>Validação</td>
-                                    <td>Dr. Roberto Lima aprovado</td>
-                                    <td><span class="status-badge approved">Concluído</span></td>
-                                </tr>
-                            </tbody>
-                        </table>
+            <!-- Dashboard Stats -->
+            <h1 class="page-title">Dashboard Administrativo</h1>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon blue">👥</div>
+                    <div class="stat-content">
+                        <div class="stat-label">Total de Profissionais</div>
+                        <div class="stat-value" id="totalUsers">0</div>
+                        <div class="stat-change" id="usersChange">Carregando...</div>
                     </div>
                 </div>
                 
-                <!-- Validations Page -->
-                <div id="validationsPage" class="page-content">
-                    <h1 class="page-title">Validações Pendentes</h1>
-                    
-                    <div class="table-container">
-                        <div class="table-header">
-                            <h2 class="table-title">Profissionais Aguardando Validação</h2>
-                            <div class="table-actions">
-                                <select class="filter-select">
-                                    <option>Todos</option>
-                                    <option>Pendentes</option>
-                                    <option>Aprovados</option>
-                                    <option>Rejeitados</option>
-                                </select>
-                            </div>
-                        </div>
-                        
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Data</th>
-                                    <th>Nome</th>
-                                    <th>Conselho</th>
-                                    <th>Registro</th>
-                                    <th>E-mail</th>
-                                    <th>Status</th>
-                                    <th>Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody id="validationsList">
-                                <tr>
-                                    <td>18/08/2025</td>
-                                    <td>Dr. Carlos Silva</td>
-                                    <td>CRM-SP</td>
-                                    <td>98765</td>
-                                    <td>carlos@email.com</td>
-                                    <td><span class="status-badge pending">Pendente</span></td>
-                                    <td>
-                                        <div class="action-buttons">
-                                            <button class="btn-action btn-view" onclick="viewProfessional(1)">Ver</button>
-                                            <button class="btn-action btn-approve" onclick="approveProfessional(1)">Aprovar</button>
-                                            <button class="btn-action btn-reject" onclick="rejectProfessional(1)">Rejeitar</button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>17/08/2025</td>
-                                    <td>Dra. Maria Santos</td>
-                                    <td>CRO-RJ</td>
-                                    <td>54321</td>
-                                    <td>maria@email.com</td>
-                                    <td><span class="status-badge pending">Pendente</span></td>
-                                    <td>
-                                        <div class="action-buttons">
-                                            <button class="btn-action btn-view" onclick="viewProfessional(2)">Ver</button>
-                                            <button class="btn-action btn-approve" onclick="approveProfessional(2)">Aprovar</button>
-                                            <button class="btn-action btn-reject" onclick="rejectProfessional(2)">Rejeitar</button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                <div class="stat-card">
+                    <div class="stat-icon yellow">⏳</div>
+                    <div class="stat-content">
+                        <div class="stat-label">Validações Pendentes</div>
+                        <div class="stat-value" id="pendingValidations">0</div>
+                        <div class="stat-change">Aguardando aprovação</div>
                     </div>
                 </div>
                 
-                <!-- Professionals Page -->
-                <div id="professionalsPage" class="page-content">
-                    <h1 class="page-title">Profissionais Cadastrados</h1>
-                    
-                    <div class="table-container">
-                        <div class="table-header">
-                            <h2 class="table-title">Lista de Profissionais</h2>
-                            <div class="table-actions">
-                                <input type="text" class="search-box" placeholder="Buscar profissional...">
-                                <button class="btn btn-primary">Exportar CSV</button>
-                            </div>
-                        </div>
-                        
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Nome</th>
-                                    <th>Conselho</th>
-                                    <th>Especialidade</th>
-                                    <th>Plano</th>
-                                    <th>Status</th>
-                                    <th>Cadastro</th>
-                                    <th>Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Dr. João Oliveira</td>
-                                    <td>CRM-SP 12345</td>
-                                    <td>Cardiologia</td>
-                                    <td>Essencial</td>
-                                    <td><span class="status-badge active">Ativo</span></td>
-                                    <td>15/08/2025</td>
-                                    <td>
-                                        <button class="btn-action btn-view" onclick="viewProfessional(3)">Detalhes</button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Dra. Ana Costa</td>
-                                    <td>CRM-RJ 67890</td>
-                                    <td>Pediatria</td>
-                                    <td>Essencial</td>
-                                    <td><span class="status-badge active">Ativo</span></td>
-                                    <td>10/08/2025</td>
-                                    <td>
-                                        <button class="btn-action btn-view" onclick="viewProfessional(4)">Detalhes</button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                <div class="stat-card">
+                    <div class="stat-icon green">💰</div>
+                    <div class="stat-content">
+                        <div class="stat-label">Receita Mensal</div>
+                        <div class="stat-value" id="monthlyRevenue">R$ 0</div>
+                        <div class="stat-change" id="revenueChange">Plano Essencial</div>
                     </div>
                 </div>
                 
-                <!-- Plans Page -->
-                <div id="plansPage" class="page-content">
-                    <h1 class="page-title">Planos e Assinaturas</h1>
-                    
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-icon green">🎯</div>
-                            <div class="stat-content">
-                                <div class="stat-label">Plano Freemium</div>
-                                <div class="stat-value">152</div>
-                                <div class="stat-change">Usuários ativos</div>
-                            </div>
-                        </div>
-                        
-                        <div class="stat-card">
-                            <div class="stat-icon purple">⭐</div>
-                            <div class="stat-content">
-                                <div class="stat-label">Plano Essencial</div>
-                                <div class="stat-value">95</div>
-                                <div class="stat-change">R$ 29/mês</div>
-                            </div>
-                        </div>
-                        
-                        <div class="stat-card">
-                            <div class="stat-icon blue">🚀</div>
-                            <div class="stat-content">
-                                <div class="stat-label">Plano Profissional</div>
-                                <div class="stat-value">Em breve</div>
-                                <div class="stat-change">-</div>
-                            </div>
-                        </div>
+                <div class="stat-card">
+                    <div class="stat-icon purple">📋</div>
+                    <div class="stat-content">
+                        <div class="stat-label">Receituários/Mês</div>
+                        <div class="stat-value" id="monthlyPrescriptions">0</div>
+                        <div class="stat-change" id="prescriptionsChange">Total do mês</div>
                     </div>
-                    
-                    <div class="table-container">
-                        <div class="table-header">
-                            <h2 class="table-title">Configuração de Planos</h2>
-                        </div>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Plano</th>
-                                    <th>Preço Mensal</th>
-                                    <th>Preço Anual</th>
-                                    <th>Limite Receituários</th>
-                                    <th>Status</th>
-                                    <th>Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Freemium</td>
-                                    <td>R$ 0</td>
-                                    <td>R$ 0</td>
-                                    <td>30/mês</td>
-                                    <td><span class="status-badge active">Ativo</span></td>
-                                    <td><button class="btn-action btn-view">Editar</button></td>
-                                </tr>
-                                <tr>
-                                    <td>Essencial</td>
-                                    <td>R$ 39</td>
-                                    <td>R$ 348 (R$ 29/mês)</td>
-                                    <td>Ilimitado</td>
-                                    <td><span class="status-badge active">Ativo</span></td>
-                                    <td><button class="btn-action btn-view">Editar</button></td>
-                                </tr>
-                            </tbody>
-                        </table>
+                </div>
+            </div>
+            
+            <!-- Pending Validations -->
+            <div class="table-container">
+                <div class="table-header">
+                    <h2 class="table-title">🔍 Profissionais Aguardando Validação</h2>
+                    <div class="table-actions">
+                        <button class="btn-refresh" onclick="loadPendingProfessionals()">
+                            🔄 Atualizar
+                        </button>
                     </div>
                 </div>
                 
-                <!-- Reports Page -->
-                <div id="reportsPage" class="page-content">
-                    <h1 class="page-title">Relatórios</h1>
-                    
-                    <div class="tabs">
-                        <button class="tab-btn active" data-tab="growth">Crescimento</button>
-                        <button class="tab-btn" data-tab="usage">Uso da Plataforma</button>
-                        <button class="tab-btn" data-tab="financial">Financeiro</button>
-                    </div>
-                    
-                    <div class="tab-content active" id="growthTab">
-                        <div class="stats-grid">
-                            <div class="stat-card">
-                                <div class="stat-icon blue">📈</div>
-                                <div class="stat-content">
-                                    <div class="stat-label">Novos Usuários (Mês)</div>
-                                    <div class="stat-value">32</div>
-                                    <div class="stat-change positive">+28% vs mês anterior</div>
-                                </div>
-                            </div>
-                            
-                            <div class="stat-card">
-                                <div class="stat-icon green">🔄</div>
-                                <div class="stat-content">
-                                    <div class="stat-label">Taxa de Conversão</div>
-                                    <div class="stat-value">38%</div>
-                                    <div class="stat-change positive">Freemium → Pago</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="tab-content" id="usageTab">
-                        <p>Estatísticas de uso em desenvolvimento...</p>
-                    </div>
-                    
-                    <div class="tab-content" id="financialTab">
-                        <p>Relatórios financeiros em desenvolvimento...</p>
+                <div id="pendingTableContent">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Nome</th>
+                                <th>Conselho</th>
+                                <th>Registro</th>
+                                <th>E-mail</th>
+                                <th>Especialidade</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pendingList">
+                            <tr>
+                                <td colspan="8" class="empty-state">
+                                    <div class="empty-state-icon">📭</div>
+                                    <div class="empty-state-title">Nenhuma validação pendente</div>
+                                    <p>Novos cadastros aparecerão aqui</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- All Professionals -->
+            <div class="table-container">
+                <div class="table-header">
+                    <h2 class="table-title">👨‍⚕️ Todos os Profissionais</h2>
+                    <div class="table-actions">
+                        <button class="btn-refresh" onclick="loadAllProfessionals()">
+                            🔄 Atualizar
+                        </button>
                     </div>
                 </div>
                 
-                <!-- Settings Page -->
-                <div id="settingsPage" class="page-content">
-                    <h1 class="page-title">Configurações</h1>
-                    
-                    <div class="table-container">
-                        <h2 class="table-title">Configurações do Sistema</h2>
-                        
-                        <form id="settingsForm">
-                            <div class="form-group">
-                                <label class="form-label">E-mail do Administrador</label>
-                                <input type="email" class="form-control" value="admin@receituariopro.com.br">
-                            </div>
-                            
-                            <div class="form-group">
-                                <label class="form-label">URL do Stripe</label>
-                                <input type="text" class="form-control" placeholder="https://checkout.stripe.com/...">
-                            </div>
-                            
-                            <div class="form-group">
-                                <label class="form-label">Tempo de Validação (horas)</label>
-                                <input type="number" class="form-control" value="24">
-                            </div>
-                            
-                            <button type="submit" class="btn btn-primary">Salvar Configurações</button>
-                        </form>
-                    </div>
+                <div id="allProfessionalsTableContent">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Cadastro</th>
+                                <th>Nome</th>
+                                <th>Conselho</th>
+                                <th>Especialidade</th>
+                                <th>Plano</th>
+                                <th>Receituários</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="professionalsList">
+                            <tr>
+                                <td colspan="8" class="empty-state">
+                                    <div class="empty-state-icon">👥</div>
+                                    <div class="empty-state-title">Carregando profissionais...</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
-            </main>
+            </div>
+            
+            <!-- Recent Activity -->
+            <div class="table-container">
+                <div class="table-header">
+                    <h2 class="table-title">📊 Atividade Recente</h2>
+                </div>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Data/Hora</th>
+                            <th>Tipo</th>
+                            <th>Descrição</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="activityList">
+                        <tr>
+                            <td colspan="4" class="empty-state">
+                                <div class="empty-state-icon">📈</div>
+                                <div class="empty-state-title">Monitorando atividades...</div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
     
@@ -1110,215 +773,480 @@
                         <div class="info-value" id="modalStatus">-</div>
                     </div>
                 </div>
+                
+                <div id="modalValidationNote" style="margin-top: 1.5rem; padding: 1rem; background: var(--gray-light); border-radius: 8px; display: none;">
+                    <strong>Nota de Validação:</strong>
+                    <p id="modalValidationText" style="margin-top: 0.5rem;"></p>
+                </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-primary" onclick="closeModal()">Fechar</button>
+                <button class="btn btn-secondary" onclick="closeModal()">Fechar</button>
+                <button id="modalApproveBtn" class="btn btn-approve" style="display: none;" onclick="">Aprovar</button>
+                <button id="modalRejectBtn" class="btn btn-reject" style="display: none;" onclick="">Rejeitar</button>
             </div>
         </div>
     </div>
     
-    <!-- Incluir configuração do Supabase -->
+    <!-- Include Supabase Config -->
     <script src="js/supabase-config.js"></script>
     
     <script>
         // ========================================
-        // INTEGRAÇÃO COM SUPABASE
+        // VARIÁVEIS GLOBAIS
         // ========================================
+        let currentUser = null;
+        let allProfessionals = [];
+        let pendingProfessionals = [];
         
-        // Verificar se é admin
-        async function checkAdminAccess() {
-            const session = await checkSession();
-            
-            if (!session) {
-                window.location.href = 'auth.html';
-                return;
-            }
-            
-            const { data: user } = await supabaseClient
-                .from('users')
-                .select('*')
-                .eq('id', session.user.id)
-                .single();
-            
-            if (!user || !user.is_admin) {
-                alert('Acesso negado. Área administrativa.');
-                window.location.href = 'index.html';
-                return;
-            }
-            
-            // Mostrar dashboard
-            showDashboard();
-            loadDashboardData();
-        }
+        // ========================================
+        // INICIALIZAÇÃO
+        // ========================================
+        window.addEventListener('DOMContentLoaded', async () => {
+            await initializeAdmin();
+        });
         
-        // Carregar ao iniciar
-        checkAdminAccess();
-        
-        // Login form handler CORRETO para admin
-document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    const email = document.getElementById('adminEmail').value;
-    const password = document.getElementById('adminPassword').value;
-    const button = e.target.querySelector('button[type="submit"]');
-    
-    button.disabled = true;
-    button.textContent = 'Entrando...';
-    
-    try {
-        const result = await loginUser(email, password);
-        
-        if (result.success && result.user.is_admin) {
-            showDashboard();
-            loadDashboardData();
-        } else {
-            alert(result.error || 'Acesso negado');
-            button.disabled = false;
-            button.textContent = 'Entrar';
-        }
-    } catch (error) {
-        alert('Erro ao fazer login');
-        button.disabled = false;
-        button.textContent = 'Entrar';
-    }
-});
-        
-        // Show dashboard
-        function showDashboard() {
-            document.getElementById('loginScreen').style.display = 'none';
-            document.getElementById('dashboard').classList.add('active');
-        }
-        
-        // Logout REAL
-        async function logout() {
-            await logoutUser();
-            window.location.href = 'index.html';
-        }
-        
-        // Carregar dados do dashboard
-        async function loadDashboardData() {
+        async function initializeAdmin() {
             try {
-                // Buscar estatísticas
-                const stats = await getDashboardStats();
+                // Verificar autenticação
+                const { data: { session } } = await supabaseClient.auth.getSession();
                 
-                if (stats.success) {
-                    // Atualizar cards de estatísticas
-                    document.querySelector('.stat-value').textContent = stats.data.totalUsers || '0';
-                    document.querySelectorAll('.stat-value')[1].textContent = stats.data.pendingValidations || '0';
-                    document.querySelectorAll('.stat-value')[2].textContent = 'R$ ' + (stats.data.monthlyRevenue || 0);
-                    document.querySelectorAll('.stat-value')[3].textContent = stats.data.monthlyPrescriptions || '0';
+                if (!session) {
+                    window.location.href = 'auth.html';
+                    return;
                 }
                 
-                // Carregar profissionais pendentes
-                await loadPendingProfessionals();
+                // Verificar se é admin
+                const { data: user, error } = await supabaseClient
+                    .from('users')
+                    .select('*')
+                    .eq('id', session.user.id)
+                    .single();
+                
+                if (error || !user || !user.is_admin) {
+                    showAlert('Acesso negado. Você não tem permissões administrativas.', 'error');
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 2000);
+                    return;
+                }
+                
+                currentUser = user;
+                
+                // Mostrar dashboard
+                document.getElementById('loadingScreen').classList.add('hidden');
+                document.getElementById('dashboard').classList.add('active');
+                
+                // Carregar dados
+                await loadDashboardData();
+                
+                // Configurar auto-refresh a cada 30 segundos
+                setInterval(loadDashboardData, 30000);
                 
             } catch (error) {
-                console.error('Erro ao carregar dashboard:', error);
+                console.error('Erro na inicialização:', error);
+                showAlert('Erro ao carregar painel administrativo', 'error');
             }
         }
         
-        // Carregar profissionais pendentes
+        // ========================================
+        // FUNÇÕES DE CARREGAMENTO DE DADOS
+        // ========================================
+        
+        async function loadDashboardData() {
+            try {
+                // Carregar todas as promessas em paralelo para melhor performance
+                const [stats, pending, professionals] = await Promise.all([
+                    loadStatistics(),
+                    loadPendingProfessionals(),
+                    loadAllProfessionals()
+                ]);
+                
+                // Atualizar atividades recentes
+                await loadRecentActivity();
+                
+            } catch (error) {
+                console.error('Erro ao carregar dados:', error);
+                showAlert('Erro ao atualizar dados do dashboard', 'error');
+            }
+        }
+        
+        async function loadStatistics() {
+            try {
+                // Total de profissionais (excluindo admin)
+                const { count: totalUsers, error: error1 } = await supabaseClient
+                    .from('users')
+                    .select('*', { count: 'exact', head: true })
+                    .neq('is_admin', true);
+                
+                // Validações pendentes
+                const { count: pendingCount, error: error2 } = await supabaseClient
+                    .from('users')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('status', 'pending');
+                
+                // Receituários do mês
+                const startOfMonth = new Date();
+                startOfMonth.setDate(1);
+                startOfMonth.setHours(0, 0, 0, 0);
+                
+                const { count: monthlyPrescriptions, error: error3 } = await supabaseClient
+                    .from('prescriptions')
+                    .select('*', { count: 'exact', head: true })
+                    .gte('created_at', startOfMonth.toISOString());
+                
+                // Assinaturas ativas (plano essential)
+                const { data: activeSubscriptions, error: error4 } = await supabaseClient
+                    .from('subscriptions')
+                    .select('*')
+                    .eq('plan', 'essential')
+                    .eq('status', 'active');
+                
+                // Calcular receita mensal
+                const monthlyRevenue = (activeSubscriptions?.length || 0) * 29;
+                
+                // Atualizar UI
+                document.getElementById('totalUsers').textContent = totalUsers || '0';
+                document.getElementById('pendingValidations').textContent = pendingCount || '0';
+                document.getElementById('monthlyRevenue').textContent = `R$ ${monthlyRevenue}`;
+                document.getElementById('monthlyPrescriptions').textContent = monthlyPrescriptions || '0';
+                
+                // Calcular mudanças percentuais (mock por enquanto)
+                document.getElementById('usersChange').textContent = `${totalUsers || 0} profissionais ativos`;
+                document.getElementById('revenueChange').textContent = `${activeSubscriptions?.length || 0} assinaturas ativas`;
+                document.getElementById('prescriptionsChange').textContent = `Mês ${new Date().toLocaleDateString('pt-BR', { month: 'long' })}`;
+                
+                return { totalUsers, pendingCount, monthlyPrescriptions, monthlyRevenue };
+                
+            } catch (error) {
+                console.error('Erro ao carregar estatísticas:', error);
+                throw error;
+            }
+        }
+        
         async function loadPendingProfessionals() {
             try {
-                const result = await getPendingProfessionals();
+                const { data, error } = await supabaseClient
+                    .from('users')
+                    .select('*')
+                    .eq('status', 'pending')
+                    .order('created_at', { ascending: false });
                 
-                if (result.success) {
-                    const tbody = document.getElementById('validationsList');
-                    tbody.innerHTML = '';
-                    
-                    result.data.forEach(prof => {
-                        const tr = document.createElement('tr');
-                        tr.innerHTML = `
+                if (error) throw error;
+                
+                pendingProfessionals = data || [];
+                
+                const tbody = document.getElementById('pendingList');
+                
+                if (pendingProfessionals.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="8" class="empty-state">
+                                <div class="empty-state-icon">✅</div>
+                                <div class="empty-state-title">Tudo em dia!</div>
+                                <p>Não há validações pendentes no momento</p>
+                            </td>
+                        </tr>
+                    `;
+                } else {
+                    tbody.innerHTML = pendingProfessionals.map(prof => `
+                        <tr>
                             <td>${new Date(prof.created_at).toLocaleDateString('pt-BR')}</td>
-                            <td>${prof.name}</td>
+                            <td><strong>${prof.name}</strong></td>
                             <td>${prof.council}-${prof.state}</td>
                             <td>${prof.registration_number}</td>
                             <td>${prof.email}</td>
+                            <td>${prof.specialty || '-'}</td>
                             <td><span class="status-badge pending">Pendente</span></td>
                             <td>
                                 <div class="action-buttons">
-                                    <button class="btn-action btn-view" onclick="viewProfessional('${prof.id}')">Ver</button>
-                                    <button class="btn-action btn-approve" onclick="approveProfessionalReal('${prof.id}')">Aprovar</button>
-                                    <button class="btn-action btn-reject" onclick="rejectProfessionalReal('${prof.id}')">Rejeitar</button>
+                                    <button class="btn-action btn-view" onclick="viewProfessional('${prof.id}')">
+                                        👁️ Ver
+                                    </button>
+                                    <button class="btn-action btn-approve" onclick="handleApprove('${prof.id}')">
+                                        ✅ Aprovar
+                                    </button>
+                                    <button class="btn-action btn-reject" onclick="handleReject('${prof.id}')">
+                                        ❌ Rejeitar
+                                    </button>
                                 </div>
                             </td>
-                        `;
-                        tbody.appendChild(tr);
-                    });
-                    
-                    if (result.data.length === 0) {
-                        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">Nenhuma validação pendente</td></tr>';
-                    }
+                        </tr>
+                    `).join('');
                 }
+                
+                return pendingProfessionals;
+                
             } catch (error) {
                 console.error('Erro ao carregar pendentes:', error);
+                showAlert('Erro ao carregar profissionais pendentes', 'error');
+                return [];
             }
         }
         
-        // Aprovar profissional REAL
-        async function approveProfessionalReal(userId) {
+        async function loadAllProfessionals() {
+            try {
+                const { data: professionals, error } = await supabaseClient
+                    .from('users')
+                    .select(`
+                        *,
+                        subscriptions (
+                            plan,
+                            status,
+                            prescriptions_count
+                        )
+                    `)
+                    .neq('is_admin', true)
+                    .order('created_at', { ascending: false });
+                
+                if (error) throw error;
+                
+                allProfessionals = professionals || [];
+                
+                const tbody = document.getElementById('professionalsList');
+                
+                if (allProfessionals.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="8" class="empty-state">
+                                <div class="empty-state-icon">👥</div>
+                                <div class="empty-state-title">Nenhum profissional cadastrado</div>
+                            </td>
+                        </tr>
+                    `;
+                } else {
+                    tbody.innerHTML = allProfessionals.map(prof => {
+                        const subscription = prof.subscriptions?.[0];
+                        const statusClass = prof.status === 'active' ? 'active' : 
+                                          prof.status === 'rejected' ? 'rejected' : 'pending';
+                        const statusText = prof.status === 'active' ? 'Ativo' : 
+                                         prof.status === 'rejected' ? 'Rejeitado' : 'Pendente';
+                        
+                        return `
+                            <tr>
+                                <td>${new Date(prof.created_at).toLocaleDateString('pt-BR')}</td>
+                                <td><strong>${prof.name}</strong></td>
+                                <td>${prof.council}-${prof.state} ${prof.registration_number}</td>
+                                <td>${prof.specialty || '-'}</td>
+                                <td>${subscription?.plan || 'freemium'}</td>
+                                <td>${subscription?.prescriptions_count || 0}</td>
+                                <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                                <td>
+                                    <button class="btn-action btn-view" onclick="viewProfessional('${prof.id}')">
+                                        👁️ Detalhes
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+                    }).join('');
+                }
+                
+                return allProfessionals;
+                
+            } catch (error) {
+                console.error('Erro ao carregar profissionais:', error);
+                showAlert('Erro ao carregar lista de profissionais', 'error');
+                return [];
+            }
+        }
+        
+        async function loadRecentActivity() {
+            try {
+                // Buscar últimas atividades (cadastros, aprovações, etc)
+                const { data: recentUsers, error } = await supabaseClient
+                    .from('users')
+                    .select('*')
+                    .neq('is_admin', true)
+                    .order('updated_at', { ascending: false })
+                    .limit(10);
+                
+                if (error) throw error;
+                
+                const tbody = document.getElementById('activityList');
+                
+                if (!recentUsers || recentUsers.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="4" class="empty-state">
+                                <div class="empty-state-icon">📊</div>
+                                <div class="empty-state-title">Sem atividades recentes</div>
+                            </td>
+                        </tr>
+                    `;
+                } else {
+                    tbody.innerHTML = recentUsers.map(user => {
+                        let type = 'Cadastro';
+                        let description = `${user.name} - ${user.council}/${user.state}`;
+                        let statusClass = 'pending';
+                        let statusText = 'Pendente';
+                        
+                        if (user.status === 'active') {
+                            type = 'Aprovação';
+                            statusClass = 'active';
+                            statusText = 'Aprovado';
+                        } else if (user.status === 'rejected') {
+                            type = 'Rejeição';
+                            statusClass = 'rejected';
+                            statusText = 'Rejeitado';
+                        }
+                        
+                        const date = new Date(user.updated_at);
+                        const dateStr = date.toLocaleDateString('pt-BR');
+                        const timeStr = date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+                        
+                        return `
+                            <tr>
+                                <td>${dateStr} ${timeStr}</td>
+                                <td>${type}</td>
+                                <td>${description}</td>
+                                <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                            </tr>
+                        `;
+                    }).join('');
+                }
+                
+            } catch (error) {
+                console.error('Erro ao carregar atividades:', error);
+            }
+        }
+        
+        // ========================================
+        // FUNÇÕES DE AÇÃO
+        // ========================================
+        
+        async function handleApprove(userId) {
             if (!confirm('Aprovar este profissional?')) return;
             
             try {
-                const result = await approveProfessional(userId);
+                showAlert('Processando aprovação...', 'info');
                 
-                if (result.success) {
-                    alert('Profissional aprovado com sucesso!');
-                    loadPendingProfessionals();
-                    loadDashboardData();
-                } else {
-                    alert('Erro ao aprovar profissional');
-                }
-            } catch (error) {
-                console.error('Erro:', error);
-                alert('Erro ao processar aprovação');
-            }
-        }
-        
-        // Rejeitar profissional REAL
-        async function rejectProfessionalReal(userId) {
-            const reason = prompt('Motivo da rejeição:');
-            if (!reason) return;
-            
-            try {
-                const result = await rejectProfessional(userId, reason);
+                // Atualizar status para active
+                const { error } = await supabaseClient
+                    .from('users')
+                    .update({ 
+                        status: 'active',
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('id', userId);
                 
-                if (result.success) {
-                    alert('Profissional rejeitado.');
-                    loadPendingProfessionals();
-                    loadDashboardData();
-                } else {
-                    alert('Erro ao rejeitar profissional');
-                }
-            } catch (error) {
-                console.error('Erro:', error);
-                alert('Erro ao processar rejeição');
-            }
-        }
-        
-        // Ver detalhes do profissional
-        async function viewProfessional(userId) {
-            try {
-                const { data: prof } = await supabaseClient
+                if (error) throw error;
+                
+                // Buscar dados do usuário para enviar email
+                const { data: user } = await supabaseClient
                     .from('users')
                     .select('*')
                     .eq('id', userId)
                     .single();
                 
-                if (prof) {
-                    document.getElementById('modalName').textContent = prof.name || '-';
-                    document.getElementById('modalEmail').textContent = prof.email || '-';
-                    document.getElementById('modalCouncil').textContent = `${prof.council}-${prof.state}` || '-';
-                    document.getElementById('modalRegister').textContent = prof.registration_number || '-';
-                    document.getElementById('modalSpecialty').textContent = prof.specialty || '-';
-                    document.getElementById('modalPhone').textContent = prof.phone || '-';
-                    document.getElementById('modalDate').textContent = new Date(prof.created_at).toLocaleDateString('pt-BR');
-                    document.getElementById('modalStatus').textContent = prof.status || '-';
+                // Enviar notificação (implementar depois com SendGrid/Resend)
+                await sendApprovalNotification(user);
+                
+                showAlert('✅ Profissional aprovado com sucesso!', 'success');
+                
+                // Recarregar dados
+                await loadDashboardData();
+                
+            } catch (error) {
+                console.error('Erro ao aprovar:', error);
+                showAlert('Erro ao aprovar profissional', 'error');
+            }
+        }
+        
+        async function handleReject(userId) {
+            const reason = prompt('Motivo da rejeição:');
+            if (!reason) return;
+            
+            try {
+                showAlert('Processando rejeição...', 'info');
+                
+                // Atualizar status para rejected
+                const { error } = await supabaseClient
+                    .from('users')
+                    .update({ 
+                        status: 'rejected',
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('id', userId);
+                
+                if (error) throw error;
+                
+                // Buscar dados do usuário
+                const { data: user } = await supabaseClient
+                    .from('users')
+                    .select('*')
+                    .eq('id', userId)
+                    .single();
+                
+                // Enviar notificação (implementar depois)
+                await sendRejectionNotification(user, reason);
+                
+                showAlert('❌ Profissional rejeitado', 'success');
+                
+                // Recarregar dados
+                await loadDashboardData();
+                
+            } catch (error) {
+                console.error('Erro ao rejeitar:', error);
+                showAlert('Erro ao rejeitar profissional', 'error');
+            }
+        }
+        
+        async function viewProfessional(userId) {
+            try {
+                const { data: prof, error } = await supabaseClient
+                    .from('users')
+                    .select(`
+                        *,
+                        subscriptions (
+                            plan,
+                            status,
+                            prescriptions_count,
+                            created_at
+                        )
+                    `)
+                    .eq('id', userId)
+                    .single();
+                
+                if (error) throw error;
+                
+                // Preencher modal
+                document.getElementById('modalName').textContent = prof.name || '-';
+                document.getElementById('modalEmail').textContent = prof.email || '-';
+                document.getElementById('modalCouncil').textContent = `${prof.council}-${prof.state}` || '-';
+                document.getElementById('modalRegister').textContent = prof.registration_number || '-';
+                document.getElementById('modalSpecialty').textContent = prof.specialty || 'Não informada';
+                document.getElementById('modalPhone').textContent = prof.phone || 'Não informado';
+                document.getElementById('modalDate').textContent = new Date(prof.created_at).toLocaleDateString('pt-BR');
+                document.getElementById('modalStatus').textContent = 
+                    prof.status === 'active' ? 'Ativo' :
+                    prof.status === 'rejected' ? 'Rejeitado' : 'Pendente';
+                
+                // Mostrar botões de ação se pendente
+                const approveBtn = document.getElementById('modalApproveBtn');
+                const rejectBtn = document.getElementById('modalRejectBtn');
+                
+                if (prof.status === 'pending') {
+                    approveBtn.style.display = 'inline-block';
+                    approveBtn.onclick = () => {
+                        closeModal();
+                        handleApprove(userId);
+                    };
                     
-                    document.getElementById('professionalModal').classList.add('show');
+                    rejectBtn.style.display = 'inline-block';
+                    rejectBtn.onclick = () => {
+                        closeModal();
+                        handleReject(userId);
+                    };
+                } else {
+                    approveBtn.style.display = 'none';
+                    rejectBtn.style.display = 'none';
                 }
+                
+                // Mostrar modal
+                document.getElementById('professionalModal').classList.add('show');
+                
             } catch (error) {
                 console.error('Erro ao buscar profissional:', error);
+                showAlert('Erro ao carregar detalhes', 'error');
             }
         }
         
@@ -1326,149 +1254,99 @@ document.getElementById('adminLoginForm').addEventListener('submit', async (e) =
             document.getElementById('professionalModal').classList.remove('show');
         }
         
-        // Sidebar navigation
-        document.querySelectorAll('.sidebar-link').forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                
-                // Update active link
-                document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
-                link.classList.add('active');
-                
-                // Show corresponding page
-                const page = link.dataset.page;
-                document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
-                document.getElementById(page + 'Page').classList.add('active');
-                
-                // Carregar dados específicos da página
-                if (page === 'validations') {
-                    loadPendingProfessionals();
-                } else if (page === 'professionals') {
-                    loadAllProfessionals();
-                }
-            });
-        });
+        // ========================================
+        // FUNÇÕES DE NOTIFICAÇÃO (PLACEHOLDER)
+        // ========================================
         
-        // Carregar todos os profissionais
-        async function loadAllProfessionals() {
-            try {
-                const { data } = await supabaseClient
-                    .from('users')
-                    .select('*')
-                    .neq('is_admin', true)
-                    .order('created_at', { ascending: false });
+        async function sendApprovalNotification(user) {
+            // TODO: Implementar com SendGrid/Resend
+            console.log('Email de aprovação para:', user.email);
+            console.log(`
+                Assunto: ✅ Cadastro Aprovado - Receituário Pro
                 
-                // Atualizar tabela de profissionais
-                // Implementar renderização da tabela
-                console.log('Profissionais:', data);
+                Olá ${user.name},
+                
+                Seu cadastro foi aprovado! Você já pode acessar o sistema.
+                
+                Acesse: https://receituariopro.com.br/auth.html
+                
+                Atenciosamente,
+                Equipe Receituário Pro
+            `);
+        }
+        
+        async function sendRejectionNotification(user, reason) {
+            // TODO: Implementar com SendGrid/Resend
+            console.log('Email de rejeição para:', user.email);
+            console.log(`
+                Assunto: Cadastro não aprovado - Receituário Pro
+                
+                Olá ${user.name},
+                
+                Infelizmente não foi possível aprovar seu cadastro.
+                
+                Motivo: ${reason}
+                
+                Entre em contato conosco para mais informações.
+                
+                Atenciosamente,
+                Equipe Receituário Pro
+            `);
+        }
+        
+        // ========================================
+        // FUNÇÕES AUXILIARES
+        // ========================================
+        
+        function showAlert(message, type = 'info') {
+            const container = document.getElementById('alertContainer');
+            const alertId = 'alert-' + Date.now();
+            
+            const alertHtml = `
+                <div id="${alertId}" class="alert alert-${type}">
+                    <span>${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}</span>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            container.innerHTML = alertHtml;
+            
+            // Auto-hide após 5 segundos
+            setTimeout(() => {
+                const alert = document.getElementById(alertId);
+                if (alert) alert.remove();
+            }, 5000);
+        }
+        
+        async function logout() {
+            if (!confirm('Deseja sair do painel administrativo?')) return;
+            
+            try {
+                const { error } = await supabaseClient.auth.signOut();
+                if (error) throw error;
+                
+                window.location.href = 'index.html';
             } catch (error) {
-                console.error('Erro ao carregar profissionais:', error);
+                console.error('Erro ao fazer logout:', error);
+                showAlert('Erro ao sair', 'error');
             }
         }
         
-        // Tab navigation
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const tab = btn.dataset.tab;
-                
-                // Update active tab button
-                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                
-                // Show corresponding tab content
-                document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-                const tabContent = document.getElementById(tab + 'Tab');
-                if (tabContent) tabContent.classList.add('active');
-            });
-        });
+        // ========================================
+        // EVENT LISTENERS
+        // ========================================
         
-        // Settings form
-        document.getElementById('settingsForm')?.addEventListener('submit', (e) => {
-            e.preventDefault();
-            alert('Configurações salvas com sucesso!');
-        });
-        
-        // Close modal on outside click
+        // Fechar modal ao clicar fora
         window.addEventListener('click', (e) => {
             if (e.target.classList.contains('modal')) {
                 e.target.classList.remove('show');
             }
         });
-                // ========================================
-        // INTEGRAÇÃO REAL COM SUPABASE
-        // ========================================
         
-        // Verificar se já está logado
-        document.addEventListener('DOMContentLoaded', async () => {
-            await checkExistingSession();
-        });
-        
-        async function checkExistingSession() {
-            const sessionData = await checkSessionOrRedirect();
-            if (sessionData) {
-                const { user } = sessionData;
-                
-                if (user.is_admin) {
-                    window.location.href = 'admin.html';
-                } else if (user.status === 'active') {
-                    window.location.href = 'app.html';
-                }
+        // Atualização automática quando a aba volta ao foco
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                loadDashboardData();
             }
-        }
-         // ========================================
-        // INTEGRAÇÃO COM SUPABASE
-        // ========================================
-        
-        document.addEventListener('DOMContentLoaded', async () => {
-    await checkAdminAccess();
-});
-
-async function checkAdminAccess() {
-    try {
-        const { data: { session } } = await supabase.auth.getSession();
-        
-        if (!session) {
-            // Mostrar tela de login admin
-            document.getElementById('loginScreen').style.display = 'flex';
-            document.getElementById('dashboard').style.display = 'none';
-            return;
-        }
-        
-        // Verificar se usuário existe e é admin
-        const { data: user, error } = await supabase
-            .from('users')
-            .select('*')
-            .eq('id', session.user.id)
-            .single();
-            
-        if (error || !user) {
-            await supabase.auth.signOut();
-            window.location.href = 'index.html';
-            return;
-        }
-        
-        if (!user.is_admin) {
-            await supabase.auth.signOut();
-            alert('Acesso negado. Área administrativa.');
-            window.location.href = 'index.html';
-            return;
-        }
-        
-        // Se chegou aqui, é admin válido
-        showDashboard();
-        loadDashboardData();
-        
-    } catch (error) {
-        console.error('Erro na verificação admin:', error);
-        document.getElementById('loginScreen').style.display = 'flex';
-        document.getElementById('dashboard').style.display = 'none';
-    }
-}
-
-function showDashboard() {
-    document.getElementById('loginScreen').style.display = 'none';
-    document.getElementById('dashboard').style.display = 'block';
-}
+        });
     </script>
-</body>
-</html>
