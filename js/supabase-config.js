@@ -374,7 +374,82 @@ async function updatePrescriptionCount() {
         return { count: 0, limit: 30, plan: 'freemium' };
     }
 }
+// ========================================
+// FUNÇÕES DE TRIAL E ASSINATURA
+// ========================================
 
+/**
+ * Verificar status do trial/plano do usuário
+ */
+async function checkTrialStatus(userId) {
+    try {
+        const { data, error } = await supabaseClient.rpc('check_trial_status', {
+            p_user_id: userId
+        });
+
+        if (error) throw error;
+        return { success: true, data };
+
+    } catch (error) {
+        console.error('Check trial status error:', error);
+        return { success: false, error: error.message };
+    }
+}
+
+/**
+ * Log de segurança para ações de receituário
+ */
+async function logPrescriptionAction(actionData) {
+    try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        // Obter IP do usuário
+        const userIP = await getUserIP();
+        
+        const { error } = await supabaseClient
+            .from('prescription_logs')
+            .insert({
+                prescription_id: actionData.prescriptionId || null,
+                user_id: user.id,
+                action_type: actionData.actionType, // 'exported_pdf', 'exported_png', 'created'
+                user_ip: userIP,
+                user_agent: navigator.userAgent,
+                file_hash: actionData.fileHash || null,
+                file_size: actionData.fileSize || null,
+                export_format: actionData.exportFormat || null,
+                patient_name_hash: actionData.patientNameHash || null
+            });
+
+        if (error) throw error;
+        return { success: true };
+
+    } catch (error) {
+        console.error('Log action error:', error);
+        return { success: false, error: error.message };
+    }
+}
+
+/**
+ * Gerar hash SHA-256 de um arquivo
+ */
+async function generateFileHash(file) {
+    const arrayBuffer = await file.arrayBuffer();
+    const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+/**
+ * Gerar hash SHA-256 de texto
+ */
+async function generateTextHash(text) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(text);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
 /**
  * Login de usuário
  */
