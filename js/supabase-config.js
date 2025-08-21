@@ -29,16 +29,19 @@ const STRIPE_LINKS = {
 // FUNÇÕES DE AUTENTICAÇÃO
 // ========================================
 
+// Adicione estas funções ao seu supabase-config.js
+
 /**
- * Registrar novo profissional
+ * Registrar novo profissional COM EMAIL CUSTOMIZADO
  */
-async function registerProfessional(userData) {
+async function registerProfessionalWithCustomEmail(userData) {
     try {
-        // 1. Criar auth user
+        // 1. Criar auth user SEM enviar email automático do Supabase
         const { data: authData, error: authError } = await supabase.auth.signUp({
             email: userData.email,
             password: userData.password,
             options: {
+                emailRedirectTo: `${window.location.origin}/confirm.html`,
                 data: {
                     name: userData.name
                 }
@@ -59,7 +62,7 @@ async function registerProfessional(userData) {
                 registration_number: userData.registrationNumber,
                 specialty: userData.specialty || null,
                 phone: userData.phone || null,
-                status: 'active', // Agora aprovação automática para trial
+                status: 'active',
                 is_admin: false
             })
             .select()
@@ -82,6 +85,12 @@ async function registerProfessional(userData) {
 
         if (subError) throw subError;
 
+        // 4. Enviar email de boas-vindas via Resend
+        await sendCustomEmail('welcome', userData.email, {
+            name: userData.name,
+            confirmLink: `${window.location.origin}/confirm.html#type=signup&access_token=${authData.session?.access_token}&refresh_token=${authData.session?.refresh_token}`
+        });
+
         return { success: true, user };
 
     } catch (error) {
@@ -89,6 +98,117 @@ async function registerProfessional(userData) {
         return { success: false, error: error.message };
     }
 }
+
+/**
+ * Reset de senha COM EMAIL CUSTOMIZADO
+ */
+async function resetPasswordWithCustomEmail(email) {
+    try {
+        // Gerar link de reset
+        const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+            redirectTo: `${window.location.origin}/confirm.html`
+        });
+
+        if (error) throw error;
+
+        // Enviar email customizado via Resend
+        await sendCustomEmail('reset', email, {
+            resetLink: `${window.location.origin}/confirm.html#type=recovery`
+        });
+
+        return { success: true };
+
+    } catch (error) {
+        console.error('Reset password error:', error);
+        return { success: false, error: error.message };
+    }
+}
+
+/**
+ * Enviar email customizado via Edge Function
+ */
+async function sendCustomEmail(type, to, data) {
+    try {
+        const response = await fetch(`${SUPABASE_URL}/functions/v1/send-email`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+            },
+            body: JSON.stringify({
+                type,
+                to,
+                data
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to send email');
+        }
+
+        return await response.json();
+
+    } catch (error) {
+        console.error('Email send error:', error);
+        // Fallback para email padrão do Supabase se falhar
+        return null;
+    }
+}
+
+/**
+ * Verificar e notificar trials expirando
+ */
+async function checkExpiringTrials() {
+    try {
+        // Buscar trials que expiram em 3 dias
+        const threeDaysFromNow = new Date();
+        threeDaysFromNow.setDate(threeDaysFromNow.getDate() + 3);
+        
+        const { data: expiringTrials, error } = await supabase
+            .from('subscriptions')
+            .select('*, users!inner(*)')
+            .eq('plan', 'trial')
+            .eq('status', 'active')
+            .lte('trial_ends_at', threeDaysFromNow.toISOString())
+            .gte('trial_ends_at', new Date().toISOString());
+
+        if (error) throw error;
+
+        // Enviar emails para cada usuário
+        for (const subscription of expiringTrials) {
+            await sendCustomEmail('trial_ending', subscription.users.email, {
+                name: subscription.users.name,
+                daysLeft: Math.ceil((new Date(subscription.trial_ends_at) - new Date()) / (1000 * 60 * 60 * 24))
+            });
+        }
+
+    } catch (error) {
+        console.error('Check expiring trials error:', error);
+    }
+}
+
+// Configuração do Stripe Checkout com metadados
+function redirectToStripeCheckout(plan, userId, email) {
+    const link = plan === 'yearly' 
+        ? STRIPE_LINKS.essential_yearly 
+        : STRIPE_LINKS.essential_monthly;
+
+    // Adicionar parâmetros para identificar o usuário
+    const checkoutUrl = `${link}?prefilled_email=${encodeURIComponent(email)}&client_reference_id=${userId}`;
+    
+    window.location.href = checkoutUrl;
+}
+
+// Atualizar as funções exportadas
+window.authFunctions = {
+    registerProfessional: registerProfessionalWithCustomEmail, // Usar a versão com email customizado
+    loginUser,
+    logoutUser,
+    resetPassword: resetPasswordWithCustomEmail, // Usar a versão com email customizado
+    loginAdmin,
+    sendCustomEmail,
+    checkExpiringTrials
+};
 
 /**
  * Login de usuário
@@ -502,6 +622,7 @@ supabase.auth.onAuthStateChange((event, session) => {
             window.location.href = '/auth.html';
         }
     }
+    
 });
 
 // Exportar para uso global

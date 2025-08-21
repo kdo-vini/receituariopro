@@ -623,6 +623,52 @@
     <!-- Toast Notification -->
     <div class="toast" id="toast"></div>
 
+    <!-- Trial Expired Modal -->
+    <div id="trialExpiredModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; display: flex; align-items: center; justify-content: center;">
+        <div style="background: white; border-radius: 20px; padding: 40px; max-width: 500px; width: 90%; text-align: center; animation: slideUp 0.5s;">
+            <div style="width: 80px; height: 80px; margin: 0 auto 20px; background: linear-gradient(135deg, rgba(237, 137, 54, 0.1) 0%, rgba(237, 137, 54, 0.2) 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 40px;">
+                ⏰
+            </div>
+            <h2 style="color: var(--text-dark); margin-bottom: 15px;">Seu Trial Expirou!</h2>
+            <p style="color: var(--text-light); margin-bottom: 25px; line-height: 1.6;">
+                Seu período de teste gratuito de 30 dias terminou. 
+                Para continuar criando receituários ilimitados, faça upgrade para o Plano Essencial.
+            </p>
+            
+            <div style="background: var(--gray-light); border-radius: 15px; padding: 20px; margin-bottom: 25px;">
+                <h3 style="color: var(--primary); margin-bottom: 10px;">🎁 Oferta Especial</h3>
+                <div style="display: flex; gap: 15px; justify-content: center; margin-top: 15px;">
+                    <div style="flex: 1; padding: 15px; background: white; border-radius: 10px; border: 2px solid var(--primary);">
+                        <strong style="color: var(--text-dark);">Mensal</strong><br>
+                        <span style="font-size: 24px; color: var(--primary); font-weight: bold;">R$ 39</span><br>
+                        <small style="color: var(--text-light);">por mês</small>
+                    </div>
+                    <div style="flex: 1; padding: 15px; background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%); border-radius: 10px; border: 2px solid var(--primary); position: relative;">
+                        <div style="position: absolute; top: -10px; right: 10px; background: var(--success); color: white; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: bold;">-25%</div>
+                        <strong style="color: var(--text-dark);">Anual</strong><br>
+                        <span style="font-size: 24px; color: var(--primary); font-weight: bold;">R$ 29</span><br>
+                        <small style="color: var(--text-light);">por mês</small>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="display: flex; gap: 10px;">
+                <button onclick="window.location.href='profile.html#upgrade'" 
+                        style="flex: 1; background: var(--gradient); color: white; padding: 12px 20px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 16px;">
+                    💳 Fazer Upgrade Agora
+                </button>
+                <button onclick="closeTrialModal()" 
+                        style="padding: 12px 20px; background: var(--gray-light); color: var(--text-dark); border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
+                    Fechar
+                </button>
+            </div>
+            
+            <p style="margin-top: 15px; font-size: 12px; color: var(--text-light);">
+                Cancele a qualquer momento • Sem fidelidade
+            </p>
+        </div>
+    </div>
+
     <script>
         // ========================================
         // GLOBAL VARIABLES
@@ -784,6 +830,9 @@ _________________________________`
                 // Load user data
                 await loadUserData(session.user.id);
                 
+                // Check subscription status
+                await checkSubscriptionStatus(session.user.id);
+                
                 // Initialize components
                 initializeDate();
                 initializeSignature();
@@ -795,6 +844,81 @@ _________________________________`
                 console.error('Initialization error:', error);
                 showToast('Erro ao inicializar sistema', 'error');
             }
+        }
+
+        // ========================================
+        // SUBSCRIPTION CHECK
+        // ========================================
+        async function checkSubscriptionStatus(userId) {
+            try {
+                const { data: subscription, error } = await supabaseClient
+                    .from('subscriptions')
+                    .select('*')
+                    .eq('user_id', userId)
+                    .single();
+
+                if (error) {
+                    console.error('Subscription check error:', error);
+                    return;
+                }
+
+                currentSubscription = subscription;
+                
+                // Check if trial expired
+                if (subscription.plan === 'trial' && subscription.trial_ends_at) {
+                    const trialEnd = new Date(subscription.trial_ends_at);
+                    const now = new Date();
+                    
+                    if (now > trialEnd) {
+                        // Show trial expired modal
+                        showTrialExpiredModal();
+                        return;
+                    }
+                    
+                    // Check if trial is ending soon (3 days)
+                    const daysLeft = Math.ceil((trialEnd - now) / (1000 * 60 * 60 * 24));
+                    if (daysLeft <= 3) {
+                        showToast(`⚠️ Seu trial expira em ${daysLeft} dias! Faça upgrade para não perder acesso.`, 'warning');
+                    }
+                }
+                
+                // Check if subscription is past due or canceled
+                if (subscription.status === 'past_due' || subscription.status === 'canceled') {
+                    showTrialExpiredModal();
+                }
+                
+            } catch (error) {
+                console.error('Subscription status error:', error);
+            }
+        }
+
+        function showTrialExpiredModal() {
+            const modal = document.getElementById('trialExpiredModal');
+            if (modal) {
+                modal.style.display = 'flex';
+            }
+        }
+
+        function closeTrialModal() {
+            const modal = document.getElementById('trialExpiredModal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+            // Still allow limited access - view only mode
+            showToast('Modo de visualização. Faça upgrade para exportar e salvar.', 'warning');
+            
+            // Disable export buttons
+            document.querySelectorAll('.btn-primary').forEach(btn => {
+                if (btn.textContent.includes('Gerar') || btn.textContent.includes('Salvar')) {
+                    btn.disabled = true;
+                    btn.style.opacity = '0.5';
+                    btn.style.cursor = 'not-allowed';
+                    btn.onclick = () => {
+                        showToast('Recurso disponível apenas para assinantes', 'error');
+                        showTrialExpiredModal();
+                    };
+                }
+            });
         }
 
         // ========================================
