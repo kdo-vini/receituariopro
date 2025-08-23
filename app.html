@@ -624,50 +624,122 @@
     <div class="toast" id="toast"></div>
 
     <!-- Trial Expired Modal -->
-    <div id="trialExpiredModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; display: flex; align-items: center; justify-content: center;">
-        <div style="background: white; border-radius: 20px; padding: 40px; max-width: 500px; width: 90%; text-align: center; animation: slideUp 0.5s;">
-            <div style="width: 80px; height: 80px; margin: 0 auto 20px; background: linear-gradient(135deg, rgba(237, 137, 54, 0.1) 0%, rgba(237, 137, 54, 0.2) 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 40px;">
-                ⏰
-            </div>
-            <h2 style="color: var(--text-dark); margin-bottom: 15px;">Seu Trial Expirou!</h2>
-            <p style="color: var(--text-light); margin-bottom: 25px; line-height: 1.6;">
-                Seu período de teste gratuito de 30 dias terminou. 
-                Para continuar criando receituários ilimitados, faça upgrade para o Plano Essencial.
-            </p>
-            
-            <div style="background: var(--gray-light); border-radius: 15px; padding: 20px; margin-bottom: 25px;">
-                <h3 style="color: var(--primary); margin-bottom: 10px;">🎁 Oferta Especial</h3>
-                <div style="display: flex; gap: 15px; justify-content: center; margin-top: 15px;">
-                    <div style="flex: 1; padding: 15px; background: white; border-radius: 10px; border: 2px solid var(--primary);">
-                        <strong style="color: var(--text-dark);">Mensal</strong><br>
-                        <span style="font-size: 24px; color: var(--primary); font-weight: bold;">R$ 39</span><br>
-                        <small style="color: var(--text-light);">por mês</small>
-                    </div>
-                    <div style="flex: 1; padding: 15px; background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%); border-radius: 10px; border: 2px solid var(--primary); position: relative;">
-                        <div style="position: absolute; top: -10px; right: 10px; background: var(--success); color: white; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: bold;">-25%</div>
-                        <strong style="color: var(--text-dark);">Anual</strong><br>
-                        <span style="font-size: 24px; color: var(--primary); font-weight: bold;">R$ 29</span><br>
-                        <small style="color: var(--text-light);">por mês</small>
-                    </div>
+<div id="trialExpiredModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; align-items: center; justify-content: center;">
+    <div style="background: white; border-radius: 20px; padding: 40px; max-width: 500px; width: 90%; text-align: center; animation: slideUp 0.5s;">
+        <div style="width: 80px; height: 80px; margin: 0 auto 20px; background: linear-gradient(135deg, rgba(237, 137, 54, 0.1) 0%, rgba(237, 137, 54, 0.2) 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 40px;">
+            ⏰
+        </div>
+        <h2 style="color: #1a202c; margin-bottom: 15px;">Seu Trial Expirou!</h2>
+        <p style="color: #718096; margin-bottom: 25px; line-height: 1.6;">
+            Seu período de teste gratuito de 30 dias terminou. 
+            Para continuar criando receituários ilimitados, faça upgrade para o Plano Essencial.
+        </p>
+        
+        <div style="background: #f7fafc; border-radius: 15px; padding: 20px; margin-bottom: 25px;">
+            <h3 style="color: #667eea; margin-bottom: 10px;">🎁 Oferta Especial</h3>
+            <div style="display: flex; gap: 15px; justify-content: center; margin-top: 15px;">
+                <div style="flex: 1; padding: 15px; background: white; border-radius: 10px; border: 2px solid #667eea;">
+                    <strong style="color: #1a202c;">Mensal</strong><br>
+                    <span style="font-size: 24px; color: #667eea; font-weight: bold;">R$ 39</span><br>
+                    <small style="color: #718096;">por mês</small>
+                </div>
+                <div style="flex: 1; padding: 15px; background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%); border-radius: 10px; border: 2px solid #667eea; position: relative;">
+                    <div style="position: absolute; top: -10px; right: 10px; background: #48bb78; color: white; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: bold;">-25%</div>
+                    <strong style="color: #1a202c;">Anual</strong><br>
+                    <span style="font-size: 24px; color: #667eea; font-weight: bold;">R$ 29</span><br>
+                    <small style="color: #718096;">por mês</small>
                 </div>
             </div>
-            
-            <div style="display: flex; gap: 10px;">
-                <button onclick="window.location.href='profile.html#upgrade'" 
-                        style="flex: 1; background: var(--gradient); color: white; padding: 12px 20px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 16px;">
-                    💳 Fazer Upgrade Agora
-                </button>
-                <button onclick="closeTrialModal()" 
-                        style="padding: 12px 20px; background: var(--gray-light); color: var(--text-dark); border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
-                    Fechar
+        </div>
+        
+        <div style="display: flex; gap: 10px;">
+            <button onclick="showUpgradeModal()" 
+                    style="flex: 1; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px 20px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 16px;">
+                💳 Fazer Upgrade Agora
+            </button>
+            <button onclick="closeTrialModal()" 
+                    style="padding: 12px 20px; background: #f7fafc; color: #1a202c; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
+                Fechar
+            </button>
+        </div>
+        
+        <p style="margin-top: 15px; font-size: 12px; color: #718096;">
+            Cancele a qualquer momento • Sem fidelidade
+        </p>
+    </div>
+</div>
+
+<!-- Modal de Escolha de Plano -->
+<div id="planChoiceModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10001; align-items: center; justify-content: center;">
+    <div style="background: white; border-radius: 20px; padding: 40px; max-width: 700px; width: 90%; max-height: 90vh; overflow-y: auto;">
+        <h2 style="text-align: center; color: #1a202c; margin-bottom: 10px;">
+            🚀 Escolha seu Plano
+        </h2>
+        <p style="text-align: center; color: #718096; margin-bottom: 30px;">
+            Desbloqueie todo o potencial do Receituário Pro
+        </p>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+            <!-- Plano Mensal -->
+            <div style="border: 2px solid #e2e8f0; border-radius: 15px; padding: 25px; text-align: center; transition: all 0.3s; cursor: pointer;"
+                 onclick="goToStripeCheckout('monthly')"
+                 onmouseover="this.style.borderColor='#667eea'; this.style.transform='translateY(-5px)'"
+                 onmouseout="this.style.borderColor='#e2e8f0'; this.style.transform='translateY(0)'">
+                <h3 style="color: #1a202c; margin-bottom: 10px;">Mensal</h3>
+                <div style="margin: 20px 0;">
+                    <span style="font-size: 36px; font-weight: bold; color: #667eea;">R$ 39</span>
+                    <span style="color: #718096;">/mês</span>
+                </div>
+                <ul style="list-style: none; padding: 0; margin: 20px 0; text-align: left; font-size: 14px;">
+                    <li style="padding: 8px 0;">✅ Receituários ilimitados</li>
+                    <li style="padding: 8px 0;">✅ Todos os templates</li>
+                    <li style="padding: 8px 0;">✅ Suporte prioritário</li>
+                    <li style="padding: 8px 0;">✅ Cancele quando quiser</li>
+                </ul>
+                <button style="width: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 16px;">
+                    Escolher Mensal
                 </button>
             </div>
             
-            <p style="margin-top: 15px; font-size: 12px; color: var(--text-light);">
-                Cancele a qualquer momento • Sem fidelidade
-            </p>
+            <!-- Plano Anual -->
+            <div style="border: 2px solid #667eea; border-radius: 15px; padding: 25px; text-align: center; background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%); position: relative; transform: scale(1.05);"
+                 onclick="goToStripeCheckout('yearly')"
+                 style="cursor: pointer;">
+                <div style="position: absolute; top: -12px; right: 20px; background: #48bb78; color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold;">
+                    ECONOMIA DE 25%
+                </div>
+                <h3 style="color: #1a202c; margin-bottom: 10px;">Anual</h3>
+                <div style="margin: 20px 0;">
+                    <span style="font-size: 36px; font-weight: bold; color: #667eea;">R$ 29</span>
+                    <span style="color: #718096;">/mês</span>
+                </div>
+                <p style="color: #48bb78; font-size: 14px; margin: -10px 0 20px;">
+                    Economize R$ 120/ano!
+                </p>
+                <ul style="list-style: none; padding: 0; margin: 20px 0; text-align: left; font-size: 14px;">
+                    <li style="padding: 8px 0;">✅ Tudo do plano mensal</li>
+                    <li style="padding: 8px 0;">🎁 3 meses grátis</li>
+                    <li style="padding: 8px 0;">💰 Melhor custo-benefício</li>
+                    <li style="padding: 8px 0;">🔒 Preço garantido por 1 ano</li>
+                </ul>
+                <button style="width: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 16px;">
+                    Escolher Anual
+                </button>
+            </div>
         </div>
+        
+        <div style="text-align: center;">
+            <button onclick="closePlanModal()" 
+                    style="background: #f7fafc; color: #1a202c; padding: 10px 30px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
+                Fechar
+            </button>
+        </div>
+        
+        <p style="text-align: center; margin-top: 20px; font-size: 12px; color: #718096;">
+            🔒 Pagamento seguro via Stripe • Cancele quando quiser
+        </p>
     </div>
+</div>
 
     <script>
         // ========================================
@@ -849,12 +921,16 @@ _________________________________`
         // ========================================
         // SUBSCRIPTION CHECK
         // ========================================
-        async function checkSubscriptionStatus(userId) {
+       async function checkSubscriptionStatus(userId) {
     try {
+        console.log('=== CHECKING SUBSCRIPTION STATUS ===');
+        console.log('User ID:', userId);
+        
         const { data: subscriptions, error } = await supabaseClient
             .from('subscriptions')
             .select('*')
             .eq('user_id', userId)
+            .eq('status', 'active') // IMPORTANTE: Só pegar subscriptions ativas
             .order('created_at', { ascending: false })
             .limit(1);
             
@@ -863,47 +939,139 @@ _________________________________`
             return;
         }
         
-        // Pegar a subscription mais recente
+        console.log('Subscriptions found:', subscriptions);
+        
+        // Pegar a subscription mais recente ATIVA
         const subscription = subscriptions?.[0];
         
         if (!subscription) {
-            console.log('No subscription found');
+            console.log('No active subscription found - creating trial or showing upgrade modal');
+            // Se não tem subscription, pode ser um usuário novo sem trial criado
+            // Vamos criar um trial ou mostrar modal de upgrade
+            await createTrialIfNeeded(userId);
             return;
         }
         
         currentSubscription = subscription;
+        console.log('Current subscription:', subscription);
         
         // Check if trial expired
         if (subscription.plan === 'trial' && subscription.trial_ends_at) {
-            const trialEnd = new Date(subscription.trial_ends_at);
+            const trialEndString = subscription.trial_ends_at;
+            console.log('Trial end string from DB:', trialEndString);
+            
+            // Parse the date properly
+            const trialEnd = new Date(trialEndString);
             const now = new Date();
             
-            console.log('Trial ends at:', trialEnd);
-            console.log('Current time:', now);
-            console.log('Days left:', Math.ceil((trialEnd - now) / (1000 * 60 * 60 * 24)));
+            console.log('Trial end date:', trialEnd.toISOString());
+            console.log('Current date:', now.toISOString());
+            console.log('Trial end timestamp:', trialEnd.getTime());
+            console.log('Current timestamp:', now.getTime());
             
-            if (now > trialEnd) {
+            const timeDiff = trialEnd.getTime() - now.getTime();
+            const daysLeft = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+            
+            console.log('Time difference (ms):', timeDiff);
+            console.log('Days left:', daysLeft);
+            
+            if (daysLeft < 0) {
                 // Trial realmente expirou
-                console.log('Trial expired!');
+                console.log('TRIAL EXPIRED! Days overdue:', Math.abs(daysLeft));
                 showTrialExpiredModal();
                 return;
-            }
-            
-            // Check if trial is ending soon (3 days)
-            const daysLeft = Math.ceil((trialEnd - now) / (1000 * 60 * 60 * 24));
-            if (daysLeft <= 3 && daysLeft > 0) {
+            } else if (daysLeft === 0) {
+                // Expira hoje
+                console.log('TRIAL EXPIRES TODAY!');
+                showToast('⚠️ Seu trial expira HOJE! Faça upgrade agora para não perder acesso.', 'warning');
+            } else if (daysLeft <= 3) {
+                // Expira em breve
+                console.log('TRIAL EXPIRING SOON!');
                 showToast(`⚠️ Seu trial expira em ${daysLeft} dia${daysLeft > 1 ? 's' : ''}! Faça upgrade para não perder acesso.`, 'warning');
+            } else {
+                console.log('Trial still valid for', daysLeft, 'days');
             }
+        } else if (subscription.plan === 'essential') {
+            console.log('User has essential plan - all good!');
         }
         
         // Check if subscription is past due or canceled
-        if (subscription.status === 'past_due' || subscription.status === 'canceled') {
+        if (subscription.status === 'past_due') {
+            console.log('Subscription is PAST DUE');
+            showTrialExpiredModal();
+        } else if (subscription.status === 'canceled') {
+            console.log('Subscription is CANCELED');
             showTrialExpiredModal();
         }
         
     } catch (error) {
         console.error('Subscription status error:', error);
     }
+}
+
+// Função auxiliar para criar trial se necessário
+async function createTrialIfNeeded(userId) {
+    try {
+        // Verificar se já existe alguma subscription (mesmo inativa)
+        const { data: allSubs } = await supabaseClient
+            .from('subscriptions')
+            .select('*')
+            .eq('user_id', userId);
+        
+        if (!allSubs || allSubs.length === 0) {
+            console.log('No subscription found at all - creating trial');
+            
+            // Criar trial de 30 dias
+            const trialEndDate = new Date();
+            trialEndDate.setDate(trialEndDate.getDate() + 30);
+            
+            const { error } = await supabaseClient
+                .from('subscriptions')
+                .insert({
+                    user_id: userId,
+                    plan: 'trial',
+                    status: 'active',
+                    trial_ends_at: trialEndDate.toISOString()
+                });
+            
+            if (error) {
+                console.error('Error creating trial:', error);
+            } else {
+                console.log('Trial created successfully');
+                // Recarregar para pegar o novo trial
+                await checkSubscriptionStatus(userId);
+            }
+        } else {
+            console.log('User has inactive subscriptions - showing upgrade modal');
+            showTrialExpiredModal();
+        }
+    } catch (error) {
+        console.error('Error in createTrialIfNeeded:', error);
+    }
+}
+
+// Corrigir a função closeTrialModal que está faltando
+function closeTrialModal() {
+    const modal = document.getElementById('trialExpiredModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+    // Still allow limited access - view only mode
+    showToast('Modo de visualização. Faça upgrade para exportar e salvar.', 'warning');
+    
+    // Disable export buttons
+    document.querySelectorAll('.btn-primary').forEach(btn => {
+        if (btn.textContent.includes('Gerar') || btn.textContent.includes('Salvar')) {
+            btn.disabled = true;
+            btn.style.opacity = '0.5';
+            btn.style.cursor = 'not-allowed';
+            btn.onclick = () => {
+                showToast('Recurso disponível apenas para assinantes', 'error');
+                showTrialExpiredModal();
+                return false;
+            };
+        }
+    });
 }
 
         function showTrialExpiredModal() {
@@ -1399,6 +1567,34 @@ _________________________________`
             const { data: { session } } = await supabaseClient.auth.getSession();
             return session;
         }
+    function showUpgradeModal() {
+    // Fechar modal de trial expirado
+    document.getElementById('trialExpiredModal').style.display = 'none';
+    // Abrir modal de escolha de plano
+    document.getElementById('planChoiceModal').style.display = 'flex';
+}
+
+function closePlanModal() {
+    document.getElementById('planChoiceModal').style.display = 'none';
+}
+
+function goToStripeCheckout(plan) {
+    // Links do Stripe
+    const STRIPE_LINKS = {
+        monthly: 'https://buy.stripe.com/bJeaEYaht4mV5zC8pJ00000',
+        yearly: 'https://buy.stripe.com/7sY8wQcpBcTrbY0cFZ00001'
+    };
+    
+    const link = plan === 'yearly' ? STRIPE_LINKS.yearly : STRIPE_LINKS.monthly;
+    
+    // Adicionar email e user_id se disponível
+    if (currentUser) {
+        const checkoutUrl = `${link}?prefilled_email=${encodeURIComponent(currentUser.email)}&client_reference_id=${currentUser.id}`;
+        window.location.href = checkoutUrl;
+    } else {
+        window.location.href = link;
+    }
+}
     </script>
 </body>
 </html>

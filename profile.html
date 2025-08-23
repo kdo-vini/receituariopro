@@ -1041,5 +1041,133 @@ function redirectToCheckout(plan) {
     window.location.href = checkoutUrl;
 }
     </script>
+ <!-- Adicione este código antes do </body> no profile.html -->
+
+<!-- Modal de Upgrade -->
+<div id="upgradeModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; align-items: center; justify-content: center;">
+    <div style="background: white; border-radius: 20px; padding: 40px; max-width: 700px; width: 90%; max-height: 90vh; overflow-y: auto;">
+        <h2 style="text-align: center; color: var(--text-dark); margin-bottom: 10px;">
+            🚀 Escolha seu Plano
+        </h2>
+        <p style="text-align: center; color: var(--text-light); margin-bottom: 30px;">
+            Desbloqueie todo o potencial do Receituário Pro
+        </p>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+            <!-- Plano Mensal -->
+            <div style="border: 2px solid #e2e8f0; border-radius: 15px; padding: 25px; text-align: center; transition: all 0.3s; cursor: pointer;"
+                 onclick="redirectToCheckout('monthly')"
+                 onmouseover="this.style.borderColor='var(--primary)'; this.style.transform='translateY(-5px)'"
+                 onmouseout="this.style.borderColor='#e2e8f0'; this.style.transform='translateY(0)'">
+                <h3 style="color: var(--text-dark); margin-bottom: 10px;">Mensal</h3>
+                <div style="margin: 20px 0;">
+                    <span style="font-size: 36px; font-weight: bold; color: var(--primary);">R$ 39</span>
+                    <span style="color: var(--text-light);">/mês</span>
+                </div>
+                <ul style="list-style: none; padding: 0; margin: 20px 0; text-align: left;">
+                    <li style="padding: 8px 0;">✅ Receituários ilimitados</li>
+                    <li style="padding: 8px 0;">✅ Todos os templates</li>
+                    <li style="padding: 8px 0;">✅ Suporte prioritário</li>
+                    <li style="padding: 8px 0;">✅ Cancele quando quiser</li>
+                </ul>
+                <button style="width: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 16px;">
+                    Escolher Mensal
+                </button>
+            </div>
+            
+            <!-- Plano Anual -->
+            <div style="border: 2px solid var(--primary); border-radius: 15px; padding: 25px; text-align: center; background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%); position: relative; transform: scale(1.05); cursor: pointer;"
+                 onclick="redirectToCheckout('yearly')">
+                <div style="position: absolute; top: -12px; right: 20px; background: var(--success); color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold;">
+                    ECONOMIA DE 25%
+                </div>
+                <h3 style="color: var(--text-dark); margin-bottom: 10px;">Anual</h3>
+                <div style="margin: 20px 0;">
+                    <span style="font-size: 36px; font-weight: bold; color: var(--primary);">R$ 29</span>
+                    <span style="color: var(--text-light);">/mês</span>
+                </div>
+                <p style="color: var(--success); font-size: 14px; margin: -10px 0 20px;">
+                    Economize R$ 120/ano!
+                </p>
+                <ul style="list-style: none; padding: 0; margin: 20px 0; text-align: left;">
+                    <li style="padding: 8px 0;">✅ Tudo do plano mensal</li>
+                    <li style="padding: 8px 0;">🎁 3 meses grátis</li>
+                    <li style="padding: 8px 0;">💰 Melhor custo-benefício</li>
+                    <li style="padding: 8px 0;">🔒 Preço garantido por 1 ano</li>
+                </ul>
+                <button style="width: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 16px;">
+                    Escolher Anual
+                </button>
+            </div>
+        </div>
+        
+        <div style="text-align: center;">
+            <button onclick="closeUpgradeModal()" 
+                    style="background: var(--gray-light); color: var(--text-dark); padding: 10px 30px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
+                Fechar
+            </button>
+        </div>
+        
+        <p style="text-align: center; margin-top: 20px; font-size: 12px; color: var(--text-light);">
+            🔒 Pagamento seguro via Stripe • Cancele quando quiser
+        </p>
+    </div>
+</div>
+
+<script>
+// Adicione estas funções no final do script do profile.html:
+
+function upgradePlan() {
+    const modal = document.getElementById('upgradeModal');
+    if (modal) {
+        modal.style.display = 'flex';
+    } else {
+        console.error('Modal de upgrade não encontrado!');
+    }
+}
+
+function closeUpgradeModal() {
+    const modal = document.getElementById('upgradeModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+async function redirectToCheckout(plan) {
+    try {
+        // Verificar se tem usuário logado
+        const { data: { user } } = await supabaseClient.auth.getUser();
+        if (!user) {
+            showToast('Faça login primeiro', 'error');
+            return;
+        }
+        
+        // Links do Stripe
+        const STRIPE_LINKS = {
+            monthly: 'https://buy.stripe.com/bJeaEYaht4mV5zC8pJ00000',
+            yearly: 'https://buy.stripe.com/7sY8wQcpBcTrbY0cFZ00001'
+        };
+        
+        const link = plan === 'yearly' ? STRIPE_LINKS.yearly : STRIPE_LINKS.monthly;
+        
+        // Adicionar email e user_id como parâmetros
+        const checkoutUrl = `${link}?prefilled_email=${encodeURIComponent(currentUser.email)}&client_reference_id=${currentUser.id}`;
+        
+        window.location.href = checkoutUrl;
+    } catch (error) {
+        console.error('Erro ao redirecionar para checkout:', error);
+        showToast('Erro ao redirecionar para pagamento', 'error');
+    }
+}
+
+// Se vier do app.html com #upgrade na URL, abrir o modal automaticamente
+window.addEventListener('DOMContentLoaded', () => {
+    if (window.location.hash === '#upgrade') {
+        setTimeout(() => {
+            upgradePlan();
+        }, 500);
+    }
+});
+</script>   
 </body>
 </html>
