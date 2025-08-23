@@ -611,10 +611,10 @@
                         <button class="btn btn-primary" onclick="savePrescription()">
                             💾 Salvar no Histórico
                         </button>
-                  <!--      <button class="btn btn-primary" onclick="printPrescription()">
+                        <button class="btn btn-primary" onclick="printPrescription()">
                             🖨️ Imprimir
-                        </button> -->
-                    </div> 
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -851,14 +851,23 @@ _________________________________`
         // ========================================
         async function checkSubscriptionStatus(userId) {
             try {
-                const { data: subscription, error } = await supabaseClient
+                const { data: subscriptions, error } = await supabaseClient
                     .from('subscriptions')
                     .select('*')
                     .eq('user_id', userId)
-                    .single();
+                    .order('created_at', { ascending: false })
+                    .limit(1);
 
                 if (error) {
                     console.error('Subscription check error:', error);
+                    return;
+                }
+
+                // Pegar a subscription mais recente
+                const subscription = subscriptions?.[0];
+                
+                if (!subscription) {
+                    console.log('No subscription found');
                     return;
                 }
 
@@ -868,6 +877,34 @@ _________________________________`
                 if (subscription.plan === 'trial' && subscription.trial_ends_at) {
                     const trialEnd = new Date(subscription.trial_ends_at);
                     const now = new Date();
+                    
+                    console.log('Trial ends at:', trialEnd);
+                    console.log('Current time:', now);
+                    console.log('Days left:', Math.ceil((trialEnd - now) / (1000 * 60 * 60 * 24)));
+                    
+                    if (now > trialEnd) {
+                        // Trial realmente expirou
+                        console.log('Trial expired!');
+                        showTrialExpiredModal();
+                        return;
+                    }
+                    
+                    // Check if trial is ending soon (3 days)
+                    const daysLeft = Math.ceil((trialEnd - now) / (1000 * 60 * 60 * 24));
+                    if (daysLeft <= 3 && daysLeft > 0) {
+                        showToast(`⚠️ Seu trial expira em ${daysLeft} dia${daysLeft > 1 ? 's' : ''}! Faça upgrade para não perder acesso.`, 'warning');
+                    }
+                }
+                
+                // Check if subscription is past due or canceled
+                if (subscription.status === 'past_due' || subscription.status === 'canceled') {
+                    showTrialExpiredModal();
+                }
+                
+            } catch (error) {
+                console.error('Subscription status error:', error);
+            }
+        } new Date();
                     
                     if (now > trialEnd) {
                         // Show trial expired modal
