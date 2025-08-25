@@ -833,172 +833,219 @@
         let signatureCanvas = null;
         let signatureCtx = null;
         let isDrawing = false;
+        let cidData = [];
+        let currentCidInput = null;
+        // ========================================
+// TEMPLATES MELHORADOS - Substituir no app.html
+// ========================================
 
-        // Templates
-        const templates = {
-            medicacao: {
-                title: 'Receituário de Medicação',
-                content: `USO INTERNO
+const templates = {
+    medicacao: {
+        title: 'Receituário de Medicação',
+        content: `<strong>USO INTERNO</strong><br><br>
 
-1. _________________________________
-   Posologia: _____________________
-   Quantidade: ____________________
+<strong>1.</strong> <input type="text" placeholder="Nome do medicamento + dosagem" style="width: 300px; border: none; border-bottom: 1px solid #333; background: transparent; font-family: inherit;"><br>
+&nbsp;&nbsp;&nbsp;<em>Posologia:</em> <input type="text" placeholder="Ex: 1 comprimido de 8/8 horas" style="width: 250px; border: none; border-bottom: 1px solid #333; background: transparent; font-family: inherit;"><br>
+&nbsp;&nbsp;&nbsp;<em>Quantidade:</em> <input type="text" placeholder="Ex: 30 comprimidos" style="width: 200px; border: none; border-bottom: 1px solid #333; background: transparent; font-family: inherit;"><br><br>
 
-2. _________________________________
-   Posologia: _____________________
-   Quantidade: ____________________
+<strong>2.</strong> <input type="text" placeholder="Nome do medicamento + dosagem" style="width: 300px; border: none; border-bottom: 1px solid #333; background: transparent; font-family: inherit;"><br>
+&nbsp;&nbsp;&nbsp;<em>Posologia:</em> <input type="text" placeholder="Ex: 1 cápsula pela manhã em jejum" style="width: 250px; border: none; border-bottom: 1px solid #333; background: transparent; font-family: inherit;"><br>
+&nbsp;&nbsp;&nbsp;<em>Quantidade:</em> <input type="text" placeholder="Ex: 30 cápsulas" style="width: 200px; border: none; border-bottom: 1px solid #333; background: transparent; font-family: inherit;"><br><br>
 
-3. _________________________________
-   Posologia: _____________________
-   Quantidade: ____________________
+<strong>3.</strong> <input type="text" placeholder="Nome do medicamento + dosagem" style="width: 300px; border: none; border-bottom: 1px solid #333; background: transparent; font-family: inherit;"><br>
+&nbsp;&nbsp;&nbsp;<em>Posologia:</em> <input type="text" placeholder="Posologia" style="width: 250px; border: none; border-bottom: 1px solid #333; background: transparent; font-family: inherit;"><br>
+&nbsp;&nbsp;&nbsp;<em>Quantidade:</em> <input type="text" placeholder="Quantidade" style="width: 200px; border: none; border-bottom: 1px solid #333; background: transparent; font-family: inherit;"><br><br>
 
-Orientações:
-_________________________________
-_________________________________`
-            },
-            
-            exames: {
-                title: 'Solicitação de Exames',
-                content: `SOLICITO OS SEGUINTES EXAMES:
+<strong>Orientações:</strong><br>
+<textarea placeholder="Digite as orientações gerais para o paciente..." style="width: 100%; min-height: 80px; border: 1px solid #ccc; border-radius: 4px; padding: 8px; font-family: inherit; resize: vertical;"></textarea>`
+    },
+    
+    exames: {
+        title: 'Solicitação de Exames',
+        content: `<strong>SOLICITO OS SEGUINTES EXAMES:</strong><br><br>
 
-□ Hemograma completo
-□ Glicemia de jejum
-□ Colesterol total e frações
-□ Triglicerídeos
-□ TGO/TGP
-□ TSH e T4 livre
-□ Urina tipo I
-□ Creatinina
-□ Ureia
-□ _______________________________
-□ _______________________________
+<strong>EXAMES LABORATORIAIS:</strong><br>
+☐ Hemograma completo com plaquetas<br>
+☐ Glicemia de jejum<br>
+☐ Hemoglobina glicada (HbA1c)<br>
+☐ Colesterol total e frações (HDL, LDL)<br>
+☐ Triglicerídeos<br>
+☐ TGO/TGP (transaminases)<br>
+☐ Ureia e creatinina<br>
+☐ Ácido úrico<br>
+☐ TSH e T4 livre<br>
+☐ Vitamina D (25-OH)<br>
+☐ Vitamina B12<br>
+☐ Ferritina<br>
+☐ PCR (proteína C reativa)<br>
+☐ VHS (velocidade de hemossedimentação)<br>
+☐ Urina tipo I (EAS)<br><br>
 
-Observações clínicas:
-_________________________________
+<strong>EXAMES DE IMAGEM:</strong><br>
+☐ Raio-X de tórax<br>
+☐ Ultrassom de abdome total<br>
+☐ Ecocardiograma<br>
+☐ <input type="text" placeholder="Outro exame" style="width: 300px; border: none; border-bottom: 1px solid #333; background: transparent; font-family: inherit;"><br><br>
 
-Hipótese diagnóstica:
-_________________________________`
-            },
-            
-            procedimento: {
-                title: 'Encaminhamento Médico',
-                content: `ENCAMINHAMENTO MÉDICO
+<strong>Observações clínicas:</strong><br>
+<textarea placeholder="Informações clínicas relevantes para o laboratório..." style="width: 100%; min-height: 60px; border: 1px solid #ccc; border-radius: 4px; padding: 8px; font-family: inherit; resize: vertical;"></textarea><br>
 
-Prezado(a) Colega,
+<strong>Hipótese diagnóstica/CID:</strong><br>
+<input type="text" placeholder="Digite o CID ou descrição" data-cid="true" style="width: 400px; border: none; border-bottom: 1px solid #333; background: transparent; font-family: inherit;">`
+    },
+    
+    procedimento: {
+        title: 'Encaminhamento Médico',
+        content: `<strong>ENCAMINHAMENTO MÉDICO</strong><br><br>
 
-Encaminho o(a) paciente para:
-_________________________________
-_________________________________
+<strong>Prezado(a) Colega,</strong><br><br>
 
-Motivo do encaminhamento:
-_________________________________
-_________________________________
+Encaminho o(a) paciente acima identificado(a) para:<br>
+☐ Cardiologia &nbsp;&nbsp;&nbsp; ☐ Endocrinologia &nbsp;&nbsp;&nbsp; ☐ Gastroenterologia<br>
+☐ Neurologia &nbsp;&nbsp;&nbsp; ☐ Ortopedia &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ☐ Dermatologia<br>
+☐ Ginecologia &nbsp;&nbsp;&nbsp; ☐ Urologia &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ☐ Pneumologia<br>
+☐ Oftalmologia &nbsp;&nbsp;&nbsp; ☐ Otorrinolaringologia<br>
+☐ Outros: <input type="text" placeholder="Especificar especialidade" style="width: 250px; border: none; border-bottom: 1px solid #333; background: transparent; font-family: inherit;"><br><br>
 
-Diagnóstico / CID:
-_________________________________
+<strong>Motivo do encaminhamento:</strong><br>
+<textarea placeholder="Descreva o motivo do encaminhamento..." style="width: 100%; min-height: 80px; border: 1px solid #ccc; border-radius: 4px; padding: 8px; font-family: inherit; resize: vertical;"></textarea><br>
 
-História clínica resumida:
-_________________________________
-_________________________________
+<strong>Diagnóstico principal/CID:</strong><br>
+<input type="text" placeholder="Digite o CID ou descrição" data-cid="true" style="width: 400px; border: none; border-bottom: 1px solid #333; background: transparent; font-family: inherit;"><br><br>
 
-Exames realizados:
-_________________________________
+<strong>História clínica resumida:</strong><br>
+<textarea placeholder="Resumo da história clínica do paciente..." style="width: 100%; min-height: 80px; border: 1px solid #ccc; border-radius: 4px; padding: 8px; font-family: inherit; resize: vertical;"></textarea><br>
 
-Medicações em uso:
-_________________________________
+<strong>Exames já realizados:</strong><br>
+<textarea placeholder="Liste os exames já realizados e seus resultados..." style="width: 100%; min-height: 60px; border: 1px solid #ccc; border-radius: 4px; padding: 8px; font-family: inherit; resize: vertical;"></textarea><br>
+
+<strong>Medicações em uso:</strong><br>
+<textarea placeholder="Liste as medicações atuais do paciente..." style="width: 100%; min-height: 60px; border: 1px solid #ccc; border-radius: 4px; padding: 8px; font-family: inherit; resize: vertical;"></textarea><br>
 
 Atenciosamente,`
-            },
-            
-            atestado: {
-                title: 'Atestado Médico',
-                content: `ATESTADO MÉDICO
+    },
+    
+    atestado: {
+        title: 'Atestado Médico',
+        content: `<center><strong>ATESTADO MÉDICO</strong></center><br><br>
 
-Atesto para os devidos fins que o(a) paciente acima identificado(a) esteve sob meus cuidados médicos no dia de hoje.
+Atesto para os devidos fins que o(a) paciente acima identificado(a) esteve sob meus cuidados médicos e <strong>necessita se afastar de suas atividades</strong> por motivo de:<br><br>
 
-Necessita de _____ dia(s) de afastamento de suas atividades.
+☐ Doença &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ☐ Repouso médico<br>
+☐ Procedimento médico &nbsp;&nbsp;&nbsp;&nbsp; ☐ Acompanhar familiar<br>
+☐ Outros: <input type="text" placeholder="Especificar motivo" style="width: 200px; border: none; border-bottom: 1px solid #333; background: transparent; font-family: inherit;"><br><br>
 
-Período: de ___/___/____ até ___/___/____
+<strong>Descrição:</strong><br>
+<textarea placeholder="Descreva brevemente o quadro clínico..." style="width: 100%; min-height: 80px; border: 1px solid #ccc; border-radius: 4px; padding: 8px; font-family: inherit; resize: vertical;"></textarea><br>
 
-CID: _____________
+<strong>Período de afastamento:</strong><br>
+De: <input type="date" style="border: none; border-bottom: 1px solid #333; background: transparent; font-family: inherit; padding: 2px 4px;"> 
+até <input type="date" style="border: none; border-bottom: 1px solid #333; background: transparent; font-family: inherit; padding: 2px 4px;"><br><br>
 
-Observações:
-_________________________________
-_________________________________`
-            },
-            
-            laudo: {
-                title: 'Laudo Médico',
-                content: `LAUDO MÉDICO
+<strong>CID-10:</strong> <input type="text" placeholder="Digite o CID ou descrição" data-cid="true" id="cidField" style="width: 350px; border: none; border-bottom: 1px solid #333; background: transparent; font-family: inherit;"><br><br>
 
-Exame realizado: _________________
-Data: ___/___/____
+<strong>Observações:</strong><br>
+☐ Deve evitar esforços físicos<br>
+☐ Deve permanecer em repouso domiciliar<br>
+☐ Apto para atividades leves<br>
+☐ Outras: <input type="text" placeholder="Outras observações" style="width: 250px; border: none; border-bottom: 1px solid #333; background: transparent; font-family: inherit;"><br><br>
 
-Indicação clínica:
-_________________________________
+Por ser verdade, firmo o presente.`
+    },
+    
+    laudo: {
+        title: 'Laudo Médico',
+        content: `<center><strong>LAUDO MÉDICO</strong></center><br><br>
 
-Técnica:
-_________________________________
+<strong>Data do Exame:</strong> <input type="date" style="border: none; border-bottom: 1px solid #333; background: transparent; font-family: inherit; padding: 2px 4px;"><br><br>
 
-Achados:
-_________________________________
-_________________________________
-_________________________________
+<strong>EXAME REALIZADO:</strong><br>
+☐ Consulta clínica &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ☐ Avaliação cardiológica<br>
+☐ Exame físico geral &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ☐ Avaliação neurológica<br>
+☐ Outros: <input type="text" placeholder="Especificar exame" style="width: 200px; border: none; border-bottom: 1px solid #333; background: transparent; font-family: inherit;"><br><br>
 
-Conclusão:
-_________________________________
-_________________________________
+<strong>INDICAÇÃO CLÍNICA:</strong><br>
+<textarea placeholder="Motivo da solicitação do exame..." style="width: 100%; min-height: 80px; border: 1px solid #ccc; border-radius: 4px; padding: 8px; font-family: inherit; resize: vertical;"></textarea><br>
 
-Observações:
-_________________________________`
-            },
-            
-            livre: {
-                title: 'Receituário Livre',
-                content: ''
-            }
-        };
+<strong>MÉTODO/TÉCNICA:</strong><br>
+<input type="text" placeholder="Método utilizado para o exame" style="width: 400px; border: none; border-bottom: 1px solid #333; background: transparent; font-family: inherit;"><br><br>
+
+<strong>ACHADOS DO EXAME:</strong><br>
+<strong>• Exame físico geral:</strong><br>
+&nbsp;&nbsp;- Estado geral: <input type="text" placeholder="Bom, regular, etc." style="width: 150px; border: none; border-bottom: 1px solid #333; background: transparent; font-family: inherit;"><br>
+&nbsp;&nbsp;- Pressão arterial: <input type="text" placeholder="120" style="width: 50px; border: none; border-bottom: 1px solid #333; background: transparent; font-family: inherit;"> x <input type="text" placeholder="80" style="width: 50px; border: none; border-bottom: 1px solid #333; background: transparent; font-family: inherit;"> mmHg<br>
+&nbsp;&nbsp;- Frequência cardíaca: <input type="text" placeholder="72" style="width: 50px; border: none; border-bottom: 1px solid #333; background: transparent; font-family: inherit;"> bpm<br>
+&nbsp;&nbsp;- Temperatura: <input type="text" placeholder="36.5" style="width: 50px; border: none; border-bottom: 1px solid #333; background: transparent; font-family: inherit;"> °C<br>
+&nbsp;&nbsp;- Peso: <input type="text" placeholder="70" style="width: 50px; border: none; border-bottom: 1px solid #333; background: transparent; font-family: inherit;"> kg &nbsp;&nbsp;&nbsp; 
+Altura: <input type="text" placeholder="170" style="width: 50px; border: none; border-bottom: 1px solid #333; background: transparent; font-family: inherit;"> cm<br><br>
+
+<strong>• Sistemas específicos:</strong><br>
+&nbsp;&nbsp;- Cardiovascular: <input type="text" placeholder="Normal, sem alterações..." style="width: 300px; border: none; border-bottom: 1px solid #333; background: transparent; font-family: inherit;"><br>
+&nbsp;&nbsp;- Respiratório: <input type="text" placeholder="Normal, sem alterações..." style="width: 300px; border: none; border-bottom: 1px solid #333; background: transparent; font-family: inherit;"><br>
+&nbsp;&nbsp;- Abdome: <input type="text" placeholder="Plano, indolor..." style="width: 300px; border: none; border-bottom: 1px solid #333; background: transparent; font-family: inherit;"><br>
+&nbsp;&nbsp;- Neurológico: <input type="text" placeholder="Sem déficits..." style="width: 300px; border: none; border-bottom: 1px solid #333; background: transparent; font-family: inherit;"><br><br>
+
+<strong>CONCLUSÃO:</strong><br>
+<textarea placeholder="Conclusão do exame e diagnóstico..." style="width: 100%; min-height: 100px; border: 1px solid #ccc; border-radius: 4px; padding: 8px; font-family: inherit; resize: vertical;"></textarea><br>
+
+<strong>CID-10:</strong> <input type="text" placeholder="Digite o CID ou descrição" data-cid="true" style="width: 350px; border: none; border-bottom: 1px solid #333; background: transparent; font-family: inherit;"><br><br>
+
+<strong>RECOMENDAÇÕES:</strong><br>
+☐ Manter acompanhamento médico regular<br>
+☐ Retornar em <input type="text" placeholder="15" style="width: 30px; border: none; border-bottom: 1px solid #333; background: transparent; font-family: inherit;"> dias<br>
+☐ Solicitar exames complementares<br>
+☐ Outras: <input type="text" placeholder="Outras recomendações" style="width: 250px; border: none; border-bottom: 1px solid #333; background: transparent; font-family: inherit;"><br><br>
+
+<strong>Próxima consulta:</strong> <input type="date" style="border: none; border-bottom: 1px solid #333; background: transparent; font-family: inherit; padding: 2px 4px;">`
+    },
+    
+    livre: {
+        title: 'Receituário Livre',
+        content: ''
+    }
+};
 
         // ========================================
         // INITIALIZATION
         // ========================================
         document.addEventListener('DOMContentLoaded', async () => {
             await initializeApp();
+            await initializeCidSystem();
         });
 
         async function initializeApp() {
-            try {
-                // Check authentication
-                const session = await checkSession();
-                if (!session) {
-                    window.location.href = 'auth.html';
-                    return;
-                }
+    // Check authentication and redirect admin
+    const session = await checkSession();
+    if (!session) {
+        window.location.href = 'auth.html';
+        return;
+    }
 
-                // Check if admin
-                if (session.user.email === 'techne.br@gmail.com') {
-                    window.location.href = 'admin.html';
-                    return;
-                }
+    // Check if admin
+    if (session.user.email === 'techne.br@gmail.com') {
+        window.location.href = 'admin.html';
+        return;
+    }
 
-                // Load user data
-                await loadUserData(session.user.id);
-                
-                // Check subscription status
-                await checkSubscriptionStatus(session.user.id);
-                
-                // Initialize components
-                initializeDate();
-                initializeSignature();
-                
-                // Load default template
-                loadTemplate('medicacao');
-                
-            } catch (error) {
-                console.error('Initialization error:', error);
-                showToast('Erro ao inicializar sistema', 'error');
-            }
-        }
+    // Load user data
+    await loadUserData(session.user.id);
+    
+    // Initialize components
+    initializeDate();
+    initializeSignature();
+    
+    // ✅ INICIALIZAR SISTEMA CID-10
+    await initializeCidSystem();
+    
+    // ✅ ADICIONAR ESTILOS DE IMPRESSÃO
+    addPrescriptionStyles();
+    
+    // Load default template
+    loadTemplate('medicacao');
+    
+    // Set up auto-population for patient name
+    setupAutoPopulation();
+}
 
         // ========================================
         // SUBSCRIPTION CHECK
@@ -1306,27 +1353,64 @@ function closeTrialModal() {
         // TEMPLATE MANAGEMENT
         // ========================================
         function selectTemplate(templateName) {
-            // Update active state
-            document.querySelectorAll('.template-card').forEach(card => {
-                card.classList.remove('active');
-            });
-            
-            const selectedCard = document.querySelector(`[data-template="${templateName}"]`);
-            if (selectedCard) {
-                selectedCard.classList.add('active');
-            }
-            
-            // Load template
-            currentTemplate = templateName;
-            loadTemplate(templateName);
+    loadTemplate(templateName);
+    
+    // Save preference
+    if (window.localStorage) {
+        localStorage.setItem('lastTemplate', templateName);
+    }
+}
+        function syncTextareaFromDiv() {
+    const contentDisplay = document.getElementById('prescriptionDisplay');
+    const textarea = document.getElementById('prescriptionText');
+    
+    // Extrair texto dos inputs e textareas para sincronizar
+    let content = contentDisplay.innerHTML;
+    
+    // Capturar valores dos inputs
+    const inputs = contentDisplay.querySelectorAll('input');
+    inputs.forEach(input => {
+        if (input.value) {
+            content = content.replace(input.outerHTML, input.value);
         }
+    });
+    
+    // Capturar valores dos textareas
+    const textareas = contentDisplay.querySelectorAll('textarea');
+    textareas.forEach(textarea => {
+        if (textarea.value) {
+            content = content.replace(textarea.outerHTML, textarea.value);
+        }
+    });
+    
+    textarea.value = content;
+}
+function syncTextareaFromDiv() {
+    const contentDisplay = document.getElementById('prescriptionDisplay');
+    const textarea = document.getElementById('prescriptionText');
+    
+    // Extrair texto dos inputs e textareas para sincronizar
+    let content = contentDisplay.innerHTML;
+    
+    // Capturar valores dos inputs
+    const inputs = contentDisplay.querySelectorAll('input');
+    inputs.forEach(input => {
+        if (input.value) {
+            content = content.replace(input.outerHTML, input.value);
+        }
+    });
+    
+    // Capturar valores dos textareas
+    const textareas = contentDisplay.querySelectorAll('textarea');
+    textareas.forEach(textarea => {
+        if (textarea.value) {
+            content = content.replace(textarea.outerHTML, textarea.value);
+        }
+    });
+    
+    textarea.value = content;
+}
 
-        function loadTemplate(templateName) {
-            const template = templates[templateName];
-            if (template) {
-                document.getElementById('prescriptionTextDisplay').innerText = template.content;
-            }
-        }
 
         // ========================================
         // FORM UPDATES
@@ -1490,156 +1574,176 @@ function closeTrialModal() {
         // ========================================
         // EXPORT FUNCTIONS
         // ========================================
-        async function generatePDF() {
-            try {
-                showToast('Gerando PDF...', 'info');
-                
-                // Preparar assinatura para visualização
-                const signaturePreview = document.getElementById('signaturePreview');
-                const signatureSection = document.querySelector('.signature-section');
-                
-                // Se tem assinatura, garantir que está visível
-                if (hasSignature()) {
-                    if (!signaturePreview) {
-                        // Criar canvas de preview se não existir
-                        const canvas = document.createElement('canvas');
-                        canvas.id = 'signaturePreview';
-                        canvas.width = 300;
-                        canvas.height = 100;
-                        canvas.style.border = 'none';
-                        canvas.style.margin = '20px auto';
-                        canvas.style.display = 'block';
-                        
-                        const signatureLine = signatureSection.querySelector('.signature-line');
-                        signatureSection.insertBefore(canvas, signatureLine);
-                    }
-                    
-                    // Copiar assinatura para o preview
-                    const previewCanvas = document.getElementById('signaturePreview');
-                    const previewCtx = previewCanvas.getContext('2d');
-                    previewCtx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
-                    previewCtx.drawImage(signatureCanvas, 0, 0, previewCanvas.width, previewCanvas.height);
-                    previewCanvas.style.display = 'block';
-                }
-                
-                // Esconder elementos que não devem aparecer no PDF
-                const elementsToHide = [
-                    document.querySelector('.signature-controls'),
-                    document.getElementById('signatureCanvas')
-                ];
-                
-                elementsToHide.forEach(el => {
-                    if (el) el.style.display = 'none';
-                });
-                
-                // Garantir que o conteúdo editável não tenha borda
-                const contentDisplay = document.getElementById('prescriptionTextDisplay');
-                const originalBorder = contentDisplay.style.border;
-                contentDisplay.style.border = 'none';
-                contentDisplay.style.boxShadow = 'none';
-                
-                // Gerar o canvas com html2canvas
-                const element = document.getElementById('prescriptionPreview');
-                const canvas = await html2canvas(element, {
-                    scale: 2,
-                    useCORS: true,
-                    logging: false,
-                    backgroundColor: '#ffffff',
-                    windowWidth: element.scrollWidth,
-                    windowHeight: element.scrollHeight,
-                    onclone: (clonedDoc) => {
-                        // Ajustar estilos no documento clonado
-                        const clonedElement = clonedDoc.getElementById('prescriptionPreview');
-                        if (clonedElement) {
-                            clonedElement.style.boxShadow = 'none';
-                            clonedElement.style.border = 'none';
-                        }
-                    }
-                });
-                
-                // Criar PDF com jsPDF
-                const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF('p', 'mm', 'a4');
-                
-                const imgData = canvas.toDataURL('image/png', 1.0);
-                const pdfWidth = pdf.internal.pageSize.getWidth();
-                const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-                
-                // Adicionar imagem ao PDF
-                pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-                
-                // Se o conteúdo for maior que uma página, adicionar páginas extras
-                if (pdfHeight > pdf.internal.pageSize.getHeight()) {
-                    let heightLeft = pdfHeight - pdf.internal.pageSize.getHeight();
-                    let position = -pdf.internal.pageSize.getHeight();
-                    
-                    while (heightLeft > 0) {
-                        pdf.addPage();
-                        pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
-                        heightLeft -= pdf.internal.pageSize.getHeight();
-                        position -= pdf.internal.pageSize.getHeight();
-                    }
-                }
-                
-                const fileName = generateFileName('pdf');
-                pdf.save(fileName);
-                
-                // Restaurar elementos escondidos
-                elementsToHide.forEach(el => {
-                    if (el) el.style.display = '';
-                });
-                
-                // Restaurar borda do conteúdo
-                contentDisplay.style.border = originalBorder;
-                
-                // Esconder preview da assinatura novamente
-                if (document.getElementById('signaturePreview')) {
-                    document.getElementById('signaturePreview').style.display = 'none';
-                }
-                
-                showToast('PDF gerado com sucesso!', 'success');
-                
-            } catch (error) {
-                console.error('Error generating PDF:', error);
-                showToast('Erro ao gerar PDF', 'error');
-            }
-        }
+        // ========================================
+// CORREÇÃO DA FUNÇÃO generatePDF() NO APP.HTML
+// ========================================
 
-        async function generatePNG() {
-            try {
-                showToast('Gerando imagem...', 'info');
-                
-                // Hide signature canvas controls temporarily
-                const signatureControls = document.querySelector('.signature-controls');
-                if (signatureControls) signatureControls.style.display = 'none';
-                
-                // Copy signature to preview if exists
-                updateSignaturePreview();
-                
-                const element = document.getElementById('prescriptionPreview');
-                const canvas = await html2canvas(element, {
-                    scale: 2,
-                    useCORS: true,
-                    logging: false,
-                    backgroundColor: '#ffffff'
-                });
-                
-                // Create download link
-                const link = document.createElement('a');
-                link.download = generateFileName('png');
-                link.href = canvas.toDataURL('image/png');
-                link.click();
-                
-                // Restore controls
-                if (signatureControls) signatureControls.style.display = 'flex';
-                
-                showToast('Imagem gerada com sucesso!', 'success');
-                
-            } catch (error) {
-                console.error('Error generating PNG:', error);
-                showToast('Erro ao gerar imagem', 'error');
-            }
+async function generatePDF() {
+    try {
+        showToast('Gerando PDF...', 'info');
+        
+        const element = document.getElementById('prescriptionPreview');
+        
+        // Configurações otimizadas para PDF
+        const canvas = await html2canvas(element, {
+            scale: 1.5, // ✅ Reduzido de 2 para 1.5
+            useCORS: true,
+            logging: false,
+            backgroundColor: '#ffffff',
+            width: element.offsetWidth,
+            height: element.offsetHeight,
+            scrollX: 0,
+            scrollY: 0
+        });
+        
+        // Criar PDF em formato A4
+        const pdf = new window.jspdf.jsPDF({
+            orientation: 'portrait',
+            unit: 'mm',
+            format: 'a4'
+        });
+        
+        // Dimensões A4 em mm
+        const pageWidth = 210;
+        const pageHeight = 297;
+        const margin = 10; // Margens de 10mm
+        
+        // Calcular dimensões da imagem
+        const imgWidth = pageWidth - (margin * 2); // 190mm
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        
+        // ✅ VERIFICAR SE CABE NA PÁGINA E AJUSTAR SE NECESSÁRIO
+        const maxHeight = pageHeight - (margin * 2); // 277mm
+        
+        let finalWidth = imgWidth;
+        let finalHeight = imgHeight;
+        
+        if (imgHeight > maxHeight) {
+            // Se a altura for maior que o máximo, reduzir proporcionalmente
+            finalHeight = maxHeight;
+            finalWidth = (canvas.width * finalHeight) / canvas.height;
         }
+        
+        // Centralizar na página
+        const xPos = (pageWidth - finalWidth) / 2;
+        const yPos = margin;
+        
+        // Converter canvas para imagem e adicionar ao PDF
+        const imgData = canvas.toDataURL('image/png', 0.95);
+        pdf.addImage(imgData, 'PNG', xPos, yPos, finalWidth, finalHeight);
+        
+        // Salvar PDF
+        const fileName = generateFileName('pdf');
+        pdf.save(fileName);
+        
+        showToast('PDF gerado com sucesso!', 'success');
+        
+    } catch (error) {
+        console.error('Error generating PDF:', error);
+        showToast('Erro ao gerar PDF', 'error');
+    }
+}
+
+// ========================================
+// FUNÇÃO MELHORADA PARA generatePNG()
+// ========================================
+
+async function generatePNG() {
+    try {
+        showToast('Gerando imagem...', 'info');
+        
+        const element = document.getElementById('prescriptionPreview');
+        
+        const canvas = await html2canvas(element, {
+            scale: 2, // Manter qualidade alta para PNG
+            useCORS: true,
+            logging: false,
+            backgroundColor: '#ffffff'
+        });
+        
+        // Criar link de download
+        const link = document.createElement('a');
+        link.download = generateFileName('png');
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        
+        showToast('Imagem gerada com sucesso!', 'success');
+        
+    } catch (error) {
+        console.error('Error generating PNG:', error);
+        showToast('Erro ao gerar imagem', 'error');
+    }
+}
+
+// ========================================
+// CSS ADICIONAL PARA MELHORAR IMPRESSÃO
+// ========================================
+
+const additionalPrintCSS = `
+<style id="prescription-print-styles">
+    @media print, screen {
+        .prescription-preview {
+            width: 210mm !important;
+            min-height: auto !important;
+            max-height: 297mm !important;
+            padding: 20mm !important;
+            margin: 0 !important;
+            box-shadow: none !important;
+            font-size: 12px !important;
+            line-height: 1.4 !important;
+            overflow: hidden !important;
+        }
+        
+        .prescription-preview input {
+            border: none !important;
+            border-bottom: 1px solid #333 !important;
+            background: transparent !important;
+            font-size: 11px !important;
+            padding: 2px 0 !important;
+        }
+        
+        .prescription-preview textarea {
+            border: 1px solid #666 !important;
+            font-size: 11px !important;
+            padding: 4px !important;
+            min-height: auto !important;
+        }
+        
+        .prescription-header {
+            margin-bottom: 15px !important;
+            padding: 15px !important;
+        }
+        
+        .patient-info {
+            margin-bottom: 15px !important;
+            padding: 10px !important;
+        }
+        
+        .prescription-content {
+            min-height: auto !important;
+            margin-bottom: 20px !important;
+        }
+        
+        .signature-section {
+            margin-top: 30px !important;
+        }
+        
+        .signature-canvas {
+            border: 1px solid #333 !important;
+        }
+    }
+</style>
+`;
+
+// ========================================
+// ADICIONAR CSS QUANDO A PÁGINA CARREGA
+// ========================================
+
+function addPrescriptionStyles() {
+    if (!document.getElementById('prescription-print-styles')) {
+        document.head.insertAdjacentHTML('beforeend', additionalPrintCSS);
+    }
+}
 
         async function savePrescription() {
             try {
@@ -1896,6 +2000,210 @@ function goToStripeCheckout(plan) {
                 }
             }
         }
+        async function loadCidData() {
+    try {
+        console.log('Carregando dados CID-10...');
+        
+        const { data, error } = await supabaseClient
+            .from('cid10_subcategorias')
+            .select('SUBCAT, DESCRICAO, DESCRABREV')
+            .order('SUBCAT')
+            .limit(1000); // Carregar primeiros 1000 para performance
+            
+        if (error) {
+            console.error('Erro ao carregar CID-10:', error);
+            return;
+        }
+        
+        cidData = data.map(item => ({
+            code: item.SUBCAT || '',
+            description: item.DESCRICAO || '',
+            shortDesc: item.DESCRABREV || ''
+        })).filter(item => item.code && item.description);
+        
+        console.log(`${cidData.length} códigos CID-10 carregados`);
+        
+    } catch (error) {
+        console.error('Erro ao carregar dados CID-10:', error);
+    }
+}
+function createCidAutocomplete(inputElement) {
+    const container = document.createElement('div');
+    container.style.position = 'relative';
+    container.style.display = 'inline-block';
+    container.style.width = '100%';
+    
+    // Substituir input original
+    inputElement.parentNode.insertBefore(container, inputElement);
+    container.appendChild(inputElement);
+    
+    // Criar lista de sugestões
+    const suggestionsList = document.createElement('div');
+    suggestionsList.className = 'cid-suggestions';
+    suggestionsList.style.cssText = `
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        max-height: 200px;
+        overflow-y: auto;
+        z-index: 1000;
+        display: none;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    `;
+    
+    container.appendChild(suggestionsList);
+    
+    // Event listeners
+    inputElement.addEventListener('input', (e) => handleCidInput(e, suggestionsList));
+    inputElement.addEventListener('focus', (e) => handleCidInput(e, suggestionsList));
+    inputElement.addEventListener('blur', () => {
+        // Delay para permitir clique nas sugestões
+        setTimeout(() => {
+            suggestionsList.style.display = 'none';
+        }, 200);
+    });
+    
+    return container;
+}
+
+function handleCidInput(event, suggestionsList) {
+    const query = event.target.value.trim();
+    currentCidInput = event.target;
+    
+    if (query.length < 2) {
+        suggestionsList.style.display = 'none';
+        return;
+    }
+    
+    // Buscar CIDs que correspondem
+    const matches = cidData.filter(cid => {
+        const lowerQuery = query.toLowerCase();
+        return cid.code.toLowerCase().includes(lowerQuery) ||
+               cid.description.toLowerCase().includes(lowerQuery) ||
+               cid.shortDesc.toLowerCase().includes(lowerQuery);
+    }).slice(0, 8); // Mostrar máximo 8 resultados
+    
+    if (matches.length === 0) {
+        suggestionsList.style.display = 'none';
+        return;
+    }
+    
+    // Renderizar sugestões
+    suggestionsList.innerHTML = matches.map(cid => `
+        <div class="cid-suggestion" onclick="selectCid('${cid.code}', '${cid.description.replace(/'/g, "\\'")}')">
+            <strong>${cid.code}</strong>
+            <br>
+            <small>${cid.description}</small>
+        </div>
+    `).join('');
+    
+    suggestionsList.style.display = 'block';
+}
+
+function selectCid(code, description) {
+    if (currentCidInput) {
+        // Preencher o campo atual
+        currentCidInput.value = `${code} - ${description}`;
+        
+        // Auto-popular outros campos CID no template
+        populateAllCidFields(code, description);
+    }
+    
+    // Fechar sugestões
+    document.querySelectorAll('.cid-suggestions').forEach(list => {
+        list.style.display = 'none';
+    });
+}
+
+function populateAllCidFields(code, description) {
+    // Encontrar todos os campos que podem ter CID
+    const cidFields = document.querySelectorAll('input[placeholder*="CID"], input[id*="cid"], input[name*="cid"]');
+    
+    cidFields.forEach(field => {
+        if (field !== currentCidInput) {
+            field.value = `${code} - ${description}`;
+        }
+    });
+    
+    // Para templates específicos, popular campos específicos
+    const currentTemplate = getCurrentTemplate();
+    if (currentTemplate === 'atestado') {
+        const cidField = document.querySelector('#cidField, input[placeholder*="CID-10"]');
+        if (cidField && cidField !== currentCidInput) {
+            cidField.value = code;
+        }
+    }
+}
+// ========================================
+// CSS PARA SUGESTÕES CID
+// ========================================
+
+function addCidStyles() {
+    const style = document.createElement('style');
+    style.textContent = `
+        .cid-suggestion {
+            padding: 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #f1f5f9;
+            transition: background-color 0.2s;
+        }
+        
+        .cid-suggestion:hover {
+            background-color: #f8fafc;
+        }
+        
+        .cid-suggestion:last-child {
+            border-bottom: none;
+        }
+        
+        .cid-suggestion strong {
+            color: var(--primary);
+            font-size: 14px;
+        }
+        
+        .cid-suggestion small {
+            color: var(--text-light);
+            font-size: 12px;
+            line-height: 1.4;
+            display: block;
+            margin-top: 4px;
+        }
+        
+        .cid-suggestions {
+            font-family: inherit;
+        }
+    `;
+    
+    document.head.appendChild(style);
+}
+
+// ========================================
+// INICIALIZAR SISTEMA CID-10
+// ========================================
+
+async function initializeCidSystem() {
+    // Carregar dados CID-10
+    await loadCidData();
+    
+    // Adicionar estilos
+    addCidStyles();
+    
+    // Procurar campos CID existentes e adicionar autocomplete
+    setTimeout(() => {
+        const cidInputs = document.querySelectorAll('input[placeholder*="CID"], [data-cid="true"]');
+        cidInputs.forEach(input => {
+            createCidAutocomplete(input);
+        });
+    }, 1000);
+}
+
+function getCurrentTemplate() {
+    return currentTemplate || 'livre';
+}
     </script>
 </body>
 </html>
