@@ -566,53 +566,126 @@
         }
 
         async function loadSubscriptionData(userId) {
-            try {
-                const { data: subscription, error } = await supabaseClient
-                    .from('subscriptions')
-                    .select('*')
-                    .eq('user_id', userId)
-                    .eq('status', 'active')
-                    .single();
+    try {
+        const { data: subscription, error } = await supabaseClient
+            .from('subscriptions')
+            .select('*')
+            .eq('user_id', userId)
+            .eq('status', 'active')
+            .single();
 
-                if (error) throw error;
+        const planCard = document.getElementById('planCard');
+        const planStatus = document.getElementById('planStatus');
+        const trialInfo = document.getElementById('trialInfo');
+        const upgradeBtn = document.getElementById('upgradeBtn');
 
-                currentSubscription = subscription;
-                
-                // Update plan display
-                if (subscription.plan === 'trial' && subscription.trial_ends_at) {
-                    const trialEnd = new Date(subscription.trial_ends_at);
-                    const now = new Date();
-                    const daysLeft = Math.ceil((trialEnd - now) / (1000 * 60 * 60 * 24));
-                    
-                    document.getElementById('planStatus').textContent = 'Plano Essencial - Trial';
-                    document.getElementById('trialInfo').innerHTML = `
-                        <strong>${daysLeft} dias restantes</strong><br>
-                        Termina em: ${trialEnd.toLocaleDateString('pt-BR')}<br>
-                        <small>Receituários ilimitados durante o trial</small>
-                    `;
-                    
-                    if (daysLeft <= 3) {
-                        document.getElementById('planCard').style.borderColor = 'var(--error)';
-                        document.getElementById('planCard').style.background = 'rgba(245, 101, 101, 0.05)';
-                    }
-                } else if (subscription.plan === 'essential') {
-                    document.getElementById('planStatus').textContent = 'Plano Essencial - Ativo';
-                    document.getElementById('trialInfo').innerHTML = `
-                        <strong>Plano Ativo</strong><br>
-                        Renovação: ${new Date(subscription.current_period_end).toLocaleDateString('pt-BR')}<br>
-                        <small>Receituários ilimitados</small>
-                    `;
-                    document.getElementById('upgradeBtn').textContent = 'Gerenciar Plano';
-                    document.getElementById('planCard').classList.remove('trial');
-                    document.getElementById('planCard').style.borderColor = 'var(--success)';
-                    document.getElementById('planCard').style.background = 'rgba(72, 187, 120, 0.05)';
-                }
-
-            } catch (error) {
-                console.error('Error loading subscription data:', error);
-                document.getElementById('trialInfo').textContent = 'Erro ao carregar informações do plano';
-            }
+        if (error || !subscription) {
+            planStatus.textContent = 'Erro ao carregar plano';
+            trialInfo.innerHTML = '<p style="color: var(--error);">Não foi possível carregar as informações do plano</p>';
+            return;
         }
+
+        currentSubscription = subscription;
+        
+        if (subscription.plan === 'trial' && subscription.trial_ends_at) {
+            const trialEnd = new Date(subscription.trial_ends_at);
+            const now = new Date();
+            const daysLeft = Math.ceil((trialEnd - now) / (1000 * 60 * 60 * 24));
+            
+            planStatus.textContent = 'Plano Essencial - Trial';
+            
+            if (daysLeft > 0) {
+                trialInfo.innerHTML = `
+                    <p><strong>${daysLeft} dias restantes</strong></p>
+                    <p>Termina em: ${trialEnd.toLocaleDateString('pt-BR')}</p>
+                    <p><small>✅ Receituários ilimitados durante o trial</small></p>
+                    <p><small>🎁 Testando todos os recursos gratuitamente</small></p>
+                `;
+                
+                upgradeBtn.textContent = '🚀 Fazer Upgrade';
+                upgradeBtn.style.display = 'block';
+                
+                // Mudar cor do card baseado nos dias restantes
+                if (daysLeft <= 3) {
+                    planCard.style.borderColor = 'var(--error)';
+                    planCard.style.background = 'rgba(245, 101, 101, 0.05)';
+                    planCard.classList.remove('trial');
+                    upgradeBtn.innerHTML = '⚠️ Trial Expirando - Upgrade Agora';
+                    upgradeBtn.style.background = 'var(--error)';
+                } else if (daysLeft <= 7) {
+                    planCard.style.borderColor = 'var(--warning)';
+                    planCard.style.background = 'rgba(237, 137, 54, 0.05)';
+                    upgradeBtn.innerHTML = '⏰ Poucos dias restantes - Upgrade';
+                    upgradeBtn.style.background = 'var(--warning)';
+                } else {
+                    planCard.style.borderColor = 'var(--warning)';
+                    planCard.style.background = 'rgba(237, 137, 54, 0.05)';
+                }
+                
+            } else {
+                // Trial expirado
+                planStatus.textContent = 'Trial Expirado';
+                trialInfo.innerHTML = `
+                    <p style="color: var(--error);"><strong>⚠️ Seu trial de 30 dias expirou</strong></p>
+                    <p>Expirou em: ${trialEnd.toLocaleDateString('pt-BR')}</p>
+                    <p><small>Faça upgrade para continuar usando o sistema</small></p>
+                `;
+                
+                planCard.style.borderColor = 'var(--error)';
+                planCard.style.background = 'rgba(245, 101, 101, 0.05)';
+                planCard.classList.remove('trial');
+                
+                upgradeBtn.textContent = '🚨 Upgrade Necessário';
+                upgradeBtn.style.background = 'var(--error)';
+                upgradeBtn.style.display = 'block';
+            }
+            
+        } else if (subscription.plan === 'essential') {
+            // Plano pago ativo
+            planStatus.textContent = 'Plano Essencial - Ativo ✅';
+            
+            let renewalText = 'Renovação automática ativa';
+            if (subscription.current_period_end) {
+                const renewalDate = new Date(subscription.current_period_end);
+                renewalText = `Próxima cobrança: ${renewalDate.toLocaleDateString('pt-BR')}`;
+            }
+            
+            trialInfo.innerHTML = `
+                <p><strong>🎉 Plano Ativo e Funcionando</strong></p>
+                <p>${renewalText}</p>
+                <p><small>✅ Receituários ilimitados</small></p>
+                <p><small>✅ Todos os recursos liberados</small></p>
+                <p><small>✅ Suporte prioritário</small></p>
+            `;
+            
+            planCard.classList.remove('trial');
+            planCard.style.borderColor = 'var(--success)';
+            planCard.style.background = 'rgba(72, 187, 120, 0.05)';
+            
+            upgradeBtn.textContent = '⚙️ Gerenciar Assinatura';
+            upgradeBtn.style.background = 'var(--primary)';
+            upgradeBtn.style.display = 'block';
+            
+        } else {
+            // Plano desconhecido
+            planStatus.textContent = 'Plano Não Identificado';
+            trialInfo.innerHTML = `
+                <p style="color: var(--error);">Plano: ${subscription.plan || 'desconhecido'}</p>
+                <p><small>Entre em contato com o suporte</small></p>
+            `;
+            
+            planCard.style.borderColor = 'var(--error)';
+            planCard.style.background = 'rgba(245, 101, 101, 0.05)';
+            upgradeBtn.textContent = '📞 Contatar Suporte';
+            upgradeBtn.style.display = 'block';
+        }
+
+    } catch (error) {
+        console.error('Error loading subscription data:', error);
+        document.getElementById('planStatus').textContent = 'Erro ao carregar plano';
+        document.getElementById('trialInfo').innerHTML = '<p style="color: var(--error);">Erro ao carregar informações do plano</p>';
+    }
+}
 
         // ========================================
         // SIGNATURE MANAGEMENT

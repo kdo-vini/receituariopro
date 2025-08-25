@@ -458,7 +458,48 @@
                 border: none;
             }
         }
-    </style>
+
+        .cid-result-item {
+            padding: 10px;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background 0.2s;
+        }
+
+        .cid-result-item:hover {
+            background: var(--gray-light);
+        }
+
+        .cid-result-item:last-child {
+            border-bottom: none;
+        }
+
+        .cid-result-code {
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 13px;
+        }
+
+        .cid-result-desc {
+            color: var(--text-dark);
+            font-size: 12px;
+            margin-top: 2px;
+        }
+
+        .cid-loading {
+            padding: 15px;
+            text-align: center;
+            color: var(--text-light);
+            font-size: 13px;
+        }
+
+        .cid-no-results {
+            padding: 15px;
+            text-align: center;
+            color: var(--text-light);
+            font-size: 13px;
+        }
+            </style>
 </head>
 <body>
     <!-- Include Supabase Config -->
@@ -536,6 +577,51 @@
                     <input type="date" id="prescriptionDate" class="form-control" 
                            onchange="updateDateDisplay()">
                 </div>
+                <!-- CID-10 Search Section -->
+<div class="form-section" style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
+    <label style="display: flex; align-items: center; gap: 5px;">
+        🔍 Buscar CID-10
+        <span style="font-size: 11px; color: var(--text-light); font-weight: normal;">
+            (código ou descrição)
+        </span>
+    </label>
+    <div style="position: relative;">
+        <input type="text" 
+               id="cidSearch" 
+               class="form-control" 
+               placeholder="Ex: J00 ou gripe"
+               autocomplete="off">
+        
+        <!-- Resultados da busca -->
+        <div id="cidResults" 
+             style="display: none; position: absolute; top: 100%; left: 0; right: 0; 
+                    max-height: 300px; overflow-y: auto; background: white; 
+                    border: 2px solid var(--primary); border-radius: 8px; 
+                    margin-top: 5px; z-index: 1000; box-shadow: 0 5px 20px rgba(0,0,0,0.1);">
+        </div>
+    </div>
+    
+    <!-- CID Selecionado -->
+    <div id="selectedCid" 
+         style="display: none; margin-top: 10px; padding: 10px; 
+                background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); 
+                border-radius: 8px; border-left: 3px solid var(--primary);">
+        <div style="display: flex; justify-content: space-between; align-items: start;">
+            <div style="flex: 1;">
+                <strong style="color: var(--primary); font-size: 14px;" id="selectedCidCode">-</strong>
+                <p style="margin: 5px 0 0 0; font-size: 13px; color: var(--text-dark); line-height: 1.4;" 
+                   id="selectedCidDesc">-</p>
+            </div>
+            <button onclick="clearSelectedCid()" 
+                    style="background: none; border: none; color: var(--error); 
+                           cursor: pointer; padding: 0; font-size: 18px;">
+                ×
+            </button>
+        </div>
+    </div>
+</div>
+
+
 
                 <!-- Signature Section -->
                 <div class="form-section">
@@ -611,11 +697,7 @@
                         <button class="btn btn-primary" onclick="savePrescription()">
                             💾 Salvar no Histórico
                         </button>
-                        <button class="btn btn-primary" onclick="printPrescription()">
-                            🖨️ Imprimir
-                        </button>
                     </div>
-                </div>
             </div>
         </div>
     </div>
@@ -1050,7 +1132,6 @@ async function createTrialIfNeeded(userId) {
     }
 }
 
-// Corrigir a função closeTrialModal que está faltando
 function closeTrialModal() {
     const modal = document.getElementById('trialExpiredModal');
     if (modal) {
@@ -1059,14 +1140,23 @@ function closeTrialModal() {
     // Still allow limited access - view only mode
     showToast('Modo de visualização. Faça upgrade para exportar e salvar.', 'warning');
     
-    // Disable export buttons
+    // Disable ALL export and print buttons
     document.querySelectorAll('.btn-primary').forEach(btn => {
-        if (btn.textContent.includes('Gerar') || btn.textContent.includes('Salvar')) {
+        const btnText = btn.textContent.toLowerCase();
+        if (btnText.includes('gerar') || 
+            btnText.includes('salvar') || 
+            btnText.includes('imprimir') || 
+            btnText.includes('exportar')) {
+            
             btn.disabled = true;
             btn.style.opacity = '0.5';
             btn.style.cursor = 'not-allowed';
-            btn.onclick = () => {
-                showToast('Recurso disponível apenas para assinantes', 'error');
+            
+            // Remove onclick antigo e adiciona novo
+            btn.onclick = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                showToast('⚠️ Recurso disponível apenas para assinantes', 'error');
                 showTrialExpiredModal();
                 return false;
             };
@@ -1156,43 +1246,61 @@ function closeTrialModal() {
         }
 
         async function loadSubscriptionData(userId) {
-            try {
-                const { data: subscription, error } = await supabaseClient
-                    .from('subscriptions')
-                    .select('*')
-                    .eq('user_id', userId)
-                    .eq('status', 'active')
-                    .single();
+    try {
+        const { data: subscription, error } = await supabaseClient
+            .from('subscriptions')
+            .select('*')
+            .eq('user_id', userId)
+            .eq('status', 'active')
+            .single();
 
-                if (error) throw error;
-
-                currentSubscription = subscription;
-                
-                // Update trial display
-                if (subscription.plan === 'trial' && subscription.trial_ends_at) {
-                    const trialEnd = new Date(subscription.trial_ends_at);
-                    const now = new Date();
-                    const daysLeft = Math.ceil((trialEnd - now) / (1000 * 60 * 60 * 24));
-                    
-                    document.getElementById('trialText').textContent = 
-                        daysLeft > 0 ? `Trial - ${daysLeft} dias` : 'Trial Expirado';
-                    
-                    if (daysLeft <= 3) {
-                        document.getElementById('trialInfo').style.background = 'rgba(237, 137, 54, 0.3)';
-                    }
-                    
-                    if (daysLeft <= 0) {
-                        showToast('Seu período de trial expirou. Faça upgrade para continuar usando.', 'warning');
-                    }
-                } else if (subscription.plan === 'essential') {
-                    document.getElementById('trialText').textContent = 'Plano Essencial';
-                    document.getElementById('trialInfo').style.background = 'rgba(72, 187, 120, 0.3)';
-                }
-
-            } catch (error) {
-                console.error('Error loading subscription:', error);
-            }
+        const trialText = document.getElementById('trialText');
+        
+        if (error || !subscription) {
+            trialText.textContent = 'Erro ao carregar plano';
+            console.error('Subscription error:', error);
+            return;
         }
+
+        currentSubscription = subscription;
+        
+        if (subscription.plan === 'trial' && subscription.trial_ends_at) {
+            const trialEnd = new Date(subscription.trial_ends_at);
+            const now = new Date();
+            const daysLeft = Math.ceil((trialEnd - now) / (1000 * 60 * 60 * 24));
+            
+            if (daysLeft > 0) {
+                trialText.textContent = `Teste: ${daysLeft}/30 dias restantes`;
+                trialText.style.background = 'rgba(237, 137, 54, 0.2)';
+                trialText.style.color = '#ed8936';
+                
+                // Avisar se restam poucos dias
+                if (daysLeft <= 3) {
+                    trialText.style.background = 'rgba(245, 101, 101, 0.2)';
+                    trialText.style.color = '#f56565';
+                }
+            } else {
+                trialText.textContent = 'Trial Expirado';
+                trialText.style.background = 'rgba(245, 101, 101, 0.2)';
+                trialText.style.color = '#f56565';
+            }
+            
+        } else if (subscription.plan === 'essential') {
+            trialText.textContent = 'Plano: Essencial';
+            trialText.style.background = 'rgba(72, 187, 120, 0.2)';
+            trialText.style.color = '#48bb78';
+            
+        } else {
+            trialText.textContent = 'Plano não identificado';
+            trialText.style.background = 'rgba(156, 163, 175, 0.2)';
+            trialText.style.color = '#6b7280';
+        }
+
+    } catch (error) {
+        console.error('Error loading subscription data:', error);
+        document.getElementById('trialText').textContent = 'Erro ao carregar plano';
+    }
+}
 
         // ========================================
         // TEMPLATE MANAGEMENT
@@ -1386,35 +1494,108 @@ function closeTrialModal() {
             try {
                 showToast('Gerando PDF...', 'info');
                 
-                // Hide signature canvas controls temporarily
-                const signatureControls = document.querySelector('.signature-controls');
-                if (signatureControls) signatureControls.style.display = 'none';
+                // Preparar assinatura para visualização
+                const signaturePreview = document.getElementById('signaturePreview');
+                const signatureSection = document.querySelector('.signature-section');
                 
-                // Copy signature to preview if exists
-                updateSignaturePreview();
+                // Se tem assinatura, garantir que está visível
+                if (hasSignature()) {
+                    if (!signaturePreview) {
+                        // Criar canvas de preview se não existir
+                        const canvas = document.createElement('canvas');
+                        canvas.id = 'signaturePreview';
+                        canvas.width = 300;
+                        canvas.height = 100;
+                        canvas.style.border = 'none';
+                        canvas.style.margin = '20px auto';
+                        canvas.style.display = 'block';
+                        
+                        const signatureLine = signatureSection.querySelector('.signature-line');
+                        signatureSection.insertBefore(canvas, signatureLine);
+                    }
+                    
+                    // Copiar assinatura para o preview
+                    const previewCanvas = document.getElementById('signaturePreview');
+                    const previewCtx = previewCanvas.getContext('2d');
+                    previewCtx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
+                    previewCtx.drawImage(signatureCanvas, 0, 0, previewCanvas.width, previewCanvas.height);
+                    previewCanvas.style.display = 'block';
+                }
                 
+                // Esconder elementos que não devem aparecer no PDF
+                const elementsToHide = [
+                    document.querySelector('.signature-controls'),
+                    document.getElementById('signatureCanvas')
+                ];
+                
+                elementsToHide.forEach(el => {
+                    if (el) el.style.display = 'none';
+                });
+                
+                // Garantir que o conteúdo editável não tenha borda
+                const contentDisplay = document.getElementById('prescriptionTextDisplay');
+                const originalBorder = contentDisplay.style.border;
+                contentDisplay.style.border = 'none';
+                contentDisplay.style.boxShadow = 'none';
+                
+                // Gerar o canvas com html2canvas
                 const element = document.getElementById('prescriptionPreview');
                 const canvas = await html2canvas(element, {
                     scale: 2,
                     useCORS: true,
                     logging: false,
-                    backgroundColor: '#ffffff'
+                    backgroundColor: '#ffffff',
+                    windowWidth: element.scrollWidth,
+                    windowHeight: element.scrollHeight,
+                    onclone: (clonedDoc) => {
+                        // Ajustar estilos no documento clonado
+                        const clonedElement = clonedDoc.getElementById('prescriptionPreview');
+                        if (clonedElement) {
+                            clonedElement.style.boxShadow = 'none';
+                            clonedElement.style.border = 'none';
+                        }
+                    }
                 });
                 
+                // Criar PDF com jsPDF
                 const { jsPDF } = window.jspdf;
                 const pdf = new jsPDF('p', 'mm', 'a4');
                 
-                const imgData = canvas.toDataURL('image/png');
+                const imgData = canvas.toDataURL('image/png', 1.0);
                 const pdfWidth = pdf.internal.pageSize.getWidth();
                 const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
                 
+                // Adicionar imagem ao PDF
                 pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+                
+                // Se o conteúdo for maior que uma página, adicionar páginas extras
+                if (pdfHeight > pdf.internal.pageSize.getHeight()) {
+                    let heightLeft = pdfHeight - pdf.internal.pageSize.getHeight();
+                    let position = -pdf.internal.pageSize.getHeight();
+                    
+                    while (heightLeft > 0) {
+                        pdf.addPage();
+                        pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
+                        heightLeft -= pdf.internal.pageSize.getHeight();
+                        position -= pdf.internal.pageSize.getHeight();
+                    }
+                }
                 
                 const fileName = generateFileName('pdf');
                 pdf.save(fileName);
                 
-                // Restore controls
-                if (signatureControls) signatureControls.style.display = 'flex';
+                // Restaurar elementos escondidos
+                elementsToHide.forEach(el => {
+                    if (el) el.style.display = '';
+                });
+                
+                // Restaurar borda do conteúdo
+                contentDisplay.style.border = originalBorder;
+                
+                // Esconder preview da assinatura novamente
+                if (document.getElementById('signaturePreview')) {
+                    document.getElementById('signaturePreview').style.display = 'none';
+                }
                 
                 showToast('PDF gerado com sucesso!', 'success');
                 
@@ -1458,10 +1639,6 @@ function closeTrialModal() {
                 console.error('Error generating PNG:', error);
                 showToast('Erro ao gerar imagem', 'error');
             }
-        }
-
-        function printPrescription() {
-            window.print();
         }
 
         async function savePrescription() {
@@ -1595,6 +1772,130 @@ function goToStripeCheckout(plan) {
         window.location.href = link;
     }
 }
+    async function searchCID10(searchTerm) {
+            try {
+                // Limpar e formatar o termo de busca
+                const cleanTerm = searchTerm.trim().toUpperCase().replace(/\./g, '');
+                
+                // Usar a função SQL que criamos
+                const { data, error } = await supabaseClient
+                    .rpc('search_cid10', { search_term: searchTerm });
+                
+                if (error) throw error;
+                
+                const resultsDiv = document.getElementById('cidResults');
+                
+                if (!data || data.length === 0) {
+                    // Tentar busca direta se a função não retornar resultados
+                    const { data: directData, error: directError } = await supabaseClient
+                        .from('cid10_subcategorias')
+                        .select('subcat, descricao, descrabrev')
+                        .or(`subcat.ilike.${cleanTerm}%,descricao.ilike.%${searchTerm}%,descrabrev.ilike.%${searchTerm}%`)
+                        .not('subcat', 'is', null)
+                        .neq('subcat', '')
+                        .limit(20);
+                    
+                    if (!directData || directData.length === 0) {
+                        resultsDiv.innerHTML = '<div class="cid-no-results">Nenhum resultado encontrado</div>';
+                        return;
+                    }
+                    
+                    // Formatar e mostrar resultados da busca direta
+                    resultsDiv.innerHTML = directData.map(item => {
+                        // Formatar código com ponto (A00.0)
+                        let formattedCode = item.subcat;
+                        if (item.subcat.length === 4) {
+                            formattedCode = item.subcat.substring(0, 3) + '.' + item.subcat.substring(3);
+                        }
+                        
+                        const description = item.descricao || item.descrabrev || 'Sem descrição';
+                        
+                        return `
+                            <div class="cid-result-item" onclick="selectCID('${formattedCode}', '${description.replace(/'/g, "\\'")}')">
+                                <div class="cid-result-code">${formattedCode}</div>
+                                <div class="cid-result-desc">${description}</div>
+                            </div>
+                        `;
+                    }).join('');
+                    
+                } else {
+                    // Mostrar resultados da função RPC
+                    resultsDiv.innerHTML = data.map(item => `
+                        <div class="cid-result-item" onclick="selectCID('${item.codigo}', '${item.descricao.replace(/'/g, "\\'")}')">
+                            <div class="cid-result-code">${item.codigo}</div>
+                            <div class="cid-result-desc">${item.descricao}</div>
+                        </div>
+                    `).join('');
+                }
+                
+            } catch (error) {
+                console.error('Erro ao buscar CID-10:', error);
+                
+                // Busca de fallback mais simples
+                try {
+                    const resultsDiv = document.getElementById('cidResults');
+                    
+                    // Tentar busca básica
+                    const searchTermUpper = searchTerm.toUpperCase().replace(/\./g, '');
+                    
+                    const { data, error: fallbackError } = await supabaseClient
+                        .from('cid10_view') // Usar a view se existir
+                        .select('codigo, descricao')
+                        .or(`codigo.ilike.${searchTerm}%,descricao.ilike.%${searchTerm}%`)
+                        .limit(20);
+                    
+                    if (fallbackError) {
+                        // Se a view não existir, usar a tabela diretamente
+                        const { data: tableData, error: tableError } = await supabaseClient
+                            .from('cid10_subcategorias')
+                            .select('subcat, descricao')
+                            .or(`subcat.ilike.${searchTermUpper}%,descricao.ilike.%${searchTerm}%`)
+                            .not('subcat', 'is', null)
+                            .neq('subcat', '')
+                            .limit(20);
+                        
+                        if (tableError) throw tableError;
+                        
+                        if (!tableData || tableData.length === 0) {
+                            resultsDiv.innerHTML = '<div class="cid-no-results">Nenhum resultado encontrado</div>';
+                            return;
+                        }
+                        
+                        resultsDiv.innerHTML = tableData.map(item => {
+                            let formattedCode = item.subcat;
+                            if (item.subcat.length === 4) {
+                                formattedCode = item.subcat.substring(0, 3) + '.' + item.subcat.substring(3);
+                            }
+                            
+                            return `
+                                <div class="cid-result-item" onclick="selectCID('${formattedCode}', '${(item.descricao || '').replace(/'/g, "\\'")}')">
+                                    <div class="cid-result-code">${formattedCode}</div>
+                                    <div class="cid-result-desc">${item.descricao || 'Sem descrição'}</div>
+                                </div>
+                            `;
+                        }).join('');
+                        
+                    } else {
+                        if (!data || data.length === 0) {
+                            resultsDiv.innerHTML = '<div class="cid-no-results">Nenhum resultado encontrado</div>';
+                            return;
+                        }
+                        
+                        resultsDiv.innerHTML = data.map(item => `
+                            <div class="cid-result-item" onclick="selectCID('${item.codigo}', '${(item.descricao || '').replace(/'/g, "\\'")}')">
+                                <div class="cid-result-code">${item.codigo}</div>
+                                <div class="cid-result-desc">${item.descricao}</div>
+                            </div>
+                        `).join('');
+                    }
+                    
+                } catch (fallbackError) {
+                    console.error('Erro na busca alternativa:', fallbackError);
+                    document.getElementById('cidResults').innerHTML = 
+                        '<div class="cid-no-results">Erro ao buscar. Verifique se os dados foram importados.</div>';
+                }
+            }
+        }
     </script>
 </body>
 </html>
