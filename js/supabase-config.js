@@ -6,18 +6,17 @@
 // ========================================
 // CONFIGURAÇÕES DO SUPABASE
 // ========================================
+const SUPABASE_URL = "https://kqumjmacwlpaxfuziooy.supabase.co"; // pública
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtxdW1qbWFjd2xwYXhmdXppb295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU1NDI3NDUsImV4cCI6MjA3MTExODc0NX0.gwCdzsL5YjfNx_Krav5l12PtuReHxibOQBLc80b-4UE"; // ANON KEY pública
 
-const SUPABASE_URL = window.ENV?.SUPABASE_URL;
-const SUPABASE_ANON_KEY = window.ENV?.SUPABASE_ANON_KEY;
-
-// Inicializar cliente Supabase
+// Cria client global
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ========================================
 // CONFIGURAÇÕES DO STRIPE
 // ========================================
 
-const STRIPE_PUBLIC_KEY = window.ENV?.STRIPE_PUBLIC_KEY;
+const STRIPE_PUBLIC_KEY = 'pk_live_51RxYCmLUJWyE4PkYzYnJstmaICs14Lcmz8kSerkExOzCOdfdhH8m5gZuf65KUJMLAHcq9R7kh2VYeApsMLPtdIkU00u3IFh6E6';
 
 // Links de pagamento do Stripe
 const STRIPE_LINKS = {
@@ -36,8 +35,6 @@ const RESEND_CONFIG = {
     // Templates de email
     TEMPLATES: {
         WELCOME: 'welcome',
-        APPROVAL: 'professional_approved',
-        REJECTION: 'professional_rejected',
         TRIAL_EXPIRING: 'trial_expiring',
         PASSWORD_RESET: 'password_reset'
     }
