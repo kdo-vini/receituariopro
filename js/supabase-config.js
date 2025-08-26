@@ -152,7 +152,7 @@ async function sendPlanExpiredEmail(user) {
 async function sendPasswordResetEmail(email) {
     try {
         const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-            redirectTo: 'https://www.receituariopro.com.br/confirm.html?type=recovery'
+            redirectTo: 'https://www.receituariopro.com.br/update-password.html'
         });
 
         if (error) throw error;
@@ -537,6 +537,29 @@ async function resetPassword(email) {
         return { success: true };
     } catch (error) {
         console.error('Reset password error:', error);
+        return { success: false, error: error.message };
+    }
+}
+
+/**
+ * Atualizar senha após recuperação
+ */
+async function updatePassword(newPassword) {
+    try {
+        const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+        if (!passwordRegex.test(newPassword)) {
+            return {
+                success: false,
+                error: 'A senha deve ter ao menos 8 caracteres, incluindo letras e números.'
+            };
+        }
+
+        const { error } = await supabaseClient.auth.updateUser({ password: newPassword });
+        if (error) throw error;
+
+        return { success: true };
+    } catch (error) {
+        console.error('Update password error:', error);
         return { success: false, error: error.message };
     }
 }
@@ -1203,6 +1226,7 @@ window.authFunctions = {
     loginUser,
     logoutUser,
     resetPassword,
+    updatePassword,
     checkTrialStatus,
     loginAdmin
 };
