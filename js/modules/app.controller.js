@@ -19,8 +19,7 @@ async initialize() {
         const subscriptionStatus = await window.SubscriptionModule.loadSubscription(user.id);        // 4. Configurar UI com dados do usuário
         this.setupUserInterface(professionalInfo, subscriptionStatus);        // 5. Inicializar módulos
         await this.initializeModules();        // 6. Configurar event listeners
-        this.setupEventListeners();        // 7. Carregar rascunho se existir
-        this.loadDraftIfExists();        // 8. Verificar status da assinatura
+        this.setupEventListeners();        // 7. Verificar status da assinatura
         if (!subscriptionStatus.hasAccess) {
             this.handleExpiredTrial();
         }        // Marcar como inicializado
@@ -134,20 +133,9 @@ initializeDate() {
         dateInput.valueAsDate = new Date();
         window.UIModule.updateDateDisplay();
     }
-}/**
- * Carregar rascunho se existir
- */
-loadDraftIfExists() {
-    const draft = window.PrescriptionsModule.loadDraft();
-    if (draft) {
-        // Perguntar se quer recuperar
-        if (confirm('Há um rascunho salvo. Deseja recuperá-lo?')) {
-            document.getElementById('patientName').value = draft.patientName || '';
-            document.getElementById('prescriptionTextArea').innerHTML = draft.content || '';            window.UIModule.updatePatientDisplay();
-            window.UIModule.showToast('Rascunho recuperado', 'success');
-        }
-    }
-}/**
+}
+
+/**
  * Lidar com trial expirado
  */
 handleExpiredTrial() {

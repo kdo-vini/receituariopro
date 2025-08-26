@@ -82,8 +82,41 @@ hideModal(modalId) {
  */
 async confirm(message, title = 'Confirmação') {
     return new Promise((resolve) => {
-        const result = window.confirm(message);
-        resolve(result);
+        const container = document.getElementById('modalsContainer');
+
+        if (!container) {
+            resolve(window.confirm(message));
+            return;
+        }
+
+        container.innerHTML = `
+            <div class="modal" id="confirmModal">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <p>${message}</p>
+                    </div>
+                    <div class="modal-actions">
+                        <button id="confirmCancel" class="btn btn-secondary">Cancelar</button>
+                        <button id="confirmOk" class="btn btn-primary">Confirmar</button>
+                    </div>
+                </div>
+            </div>`;
+
+        const modal = document.getElementById('confirmModal');
+        modal.classList.add('show');
+
+        const cleanup = (result) => {
+            modal.classList.remove('show');
+            container.innerHTML = '';
+            resolve(result);
+        };
+
+        document.getElementById('confirmCancel').onclick = () => cleanup(false);
+        document.getElementById('confirmOk').onclick = () => cleanup(true);
+
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) cleanup(false);
+        });
     });
 }
 

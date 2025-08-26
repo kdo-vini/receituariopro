@@ -109,7 +109,7 @@ renderTemplateGrid() {
 }/**
  * Selecionar template
  */
-selectTemplate(templateId) {
+async selectTemplate(templateId) {
     // Validar template
     if (!this.templates[templateId]) return;    const textArea = document.getElementById('prescriptionTextArea');
     if (!textArea) return;    // Verificar se o conteúdo atual é de um template ou foi editado
@@ -119,19 +119,16 @@ selectTemplate(templateId) {
     if (isEmpty || isTemplateContent || templateId === 'livre') {
         // Perguntar confirmação se houver conteúdo personalizado
         if (!isEmpty && !isTemplateContent && templateId !== 'livre') {
-            if (!confirm('Você tem conteúdo personalizado. Deseja substituir pelo template?')) {
-                // Manter o template atual selecionado visualmente
+            if (!(await window.UIModule.confirm('Deseja descartar as alterações na receita?'))) {
                 this.updateTemplateUI(this.currentTemplate);
                 return;
             }
-        }        // Carregar novo template
+        }
         this.loadTemplateContent(templateId);
     } else if (!isTemplateContent && templateId !== this.currentTemplate) {
-        // Tem conteúdo editado e está mudando de template
-        if (confirm('Deseja substituir o conteúdo atual pelo template?')) {
+        if (await window.UIModule.confirm('Deseja descartar as alterações na receita?')) {
             this.loadTemplateContent(templateId);
         } else {
-            // Manter o template atual selecionado visualmente
             this.updateTemplateUI(this.currentTemplate);
             return;
         }
