@@ -7,6 +7,12 @@ const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
 const RESET_REDIRECT_URL = Deno.env.get("RESET_REDIRECT_URL") ??
   "https://receituariopro.com.br/auth.html?reset=true";
 
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
+};
+
 interface EmailRequest {
   to: string;
   template: string;
@@ -64,6 +70,11 @@ async function generateResetLink(email: string): Promise<string> {
 }
 
 serve(async (req) => {
+  if (req.method === "OPTIONS") {
+    return new Response("ok", {
+      headers: { ...corsHeaders, "Access-Control-Allow-Methods": "POST" },
+    });
+  }
   try {
     const { to, template, data = {} } = await req.json() as EmailRequest;
 
@@ -103,14 +114,14 @@ serve(async (req) => {
     }
 
     return new Response(JSON.stringify({ success: true, id: result.id }), {
-      headers: { "Content-Type": "application/json" },
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
     });
   } catch (error) {
     console.error("Templated email error:", error);
     return new Response(
       JSON.stringify({ error: (error as Error).message }),
-      { status: 400 },
+      { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   }
 });

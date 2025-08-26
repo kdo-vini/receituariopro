@@ -150,9 +150,18 @@ async function sendPlanExpiredEmail(user) {
  * Email para reset de senha
  */
 async function sendPasswordResetEmail(email) {
-    return await sendEmailTemplate(RESEND_CONFIG.TEMPLATES.PASSWORD_RESET, email, {
-        support_email: RESEND_CONFIG.SUPPORT_EMAIL
-    });
+    try {
+        const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+            redirectTo: 'https://www.receituariopro.com.br/confirm.html?type=recovery'
+        });
+
+        if (error) throw error;
+
+        return { success: true };
+    } catch (error) {
+        console.error('Erro ao solicitar reset de senha:', error);
+        return { success: false, error: error.message };
+    }
 }
 
 // ========================================
