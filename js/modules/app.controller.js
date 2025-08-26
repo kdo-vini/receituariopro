@@ -73,11 +73,15 @@ updateClinicLogo(logoUrl) {
  */
 async initializeModules() {
     // Templates
+    if (window.CIDModule) {
+        await window.CIDModule.initialize();
+    }
     if (window.TemplatesModule) {
         window.TemplatesModule.initialize();
     }    // Assinatura
     if (window.SignatureModule) {
-        window.SignatureModule.initialize();        // Carregar assinatura salva se existir
+        window.SignatureModule.initialize();        
+        // Carregar assinatura salva se existir
         const professionalInfo = window.AuthModule.getProfessionalInfo();
         if (professionalInfo.signatureUrl) {
             await window.SignatureModule.loadFromUrl(professionalInfo.signatureUrl);
@@ -207,47 +211,117 @@ async handleClear() {
         localStorage.removeItem('prescriptionDraft');        window.UIModule.showToast(APP_CONSTANTS.MESSAGES.SUCCESS.FORM_CLEARED, 'success');
     }
 }/**
- * Handler: Mostrar histórico
- */
-async handleShowHistory() {
-    const history = await window.PrescriptionsModule.loadHistory();    if (history.length === 0) {
+/**
+     * Handler: Mostrar histórico
+     */
+    async handleShowHistory() {
+        const history = await window.PrescriptionsModule.loadHistory();
+    if (history.length === 0) {
         window.UIModule.showToast('Nenhum receituário no histórico', 'info');
         return;
-    }    // Criar modal de histórico (simplificado)
+    }
+
+    // Criar modal de histórico melhorado
     this.showHistoryModal(history);
-}/**
- * Mostrar modal de histórico
+}
+
+/**
+ * Mostrar modal de histórico melhorado
  */
 showHistoryModal(history) {
-    // Criar HTML do modal
+    // Criar HTML do modal com busca
     const modalHTML = `
         <div class="modal" id="historyModal">
-            <div class="modal-content">
+            <div class="modal-content" style="max-width: 800px;">
                 <div class="modal-header">
                     <h2>Histórico de Receituários</h2>
                     <button onclick="window.UIModule.hideModal('historyModal')" class="modal-close">×</button>
                 </div>
                 <div class="modal-body">
-                    <div class="history-list">
-                        ${history.map((item, index) => `
-                            <div class="history-item" onclick="window.AppController.loadHistoryItem(${index})">
-                                <div class="history-patient">${item.patient_name}</div>
-                                <div class="history-date">${new Date(item.created_at).toLocaleDateString('pt-BR')}</div>
-                                <div class="history-type">${item.template_type || 'livre'}</div>
-                            </div>
-                        `).join('')}
+                    <!-- Barra de busca -->
+                    <div class="history-search" style="margin-bottom: 20px;">
+                        <input type="text" 
+                               id="historySearchInput" 
+                               class="form-control" 
+                               placeholder="Buscar por nome do paciente..."
+                               oninput="window.AppController.filterHistory(this.value)">
+                    </div>
+                    
+                    <!-- Estatísticas -->
+                    <div style="padding: 10px; background: #f5f5f5; border-radius: 8px; margin-bottom: 20px;">
+                        <small>Total: ${history.length} receituários</small>
+                    </div>
+                    
+                    <!-- Lista de histórico -->
+                    <div class="history-list" id="historyList">
+                        ${this.renderHistoryItems(history)}
                     </div>
                 </div>
             </div>
         </div>
-    `;    // Adicionar ao DOM
+    `;
+
+    // Adicionar ao DOM
     const modalsContainer = document.getElementById('modalsContainer');
     if (modalsContainer) {
         modalsContainer.innerHTML = modalHTML;
         window.UIModule.showModal('historyModal');
-    }    // Guardar histórico para acesso
+    }
+
+    // Guardar histórico para acesso
     this.historyCache = history;
-}/**
+}
+
+/**
+ * Renderizar itens do histórico
+ */
+renderHistoryItems(items) {
+    if (items.length === 0) {
+        return '<div style="text-align: center; padding: 20px; color: #999;">Nenhum resultado encontrado</div>';
+    }
+
+    return items.map((item, index) => {
+        const date = new Date(item.created_at);
+        const dateStr = date.toLocaleDateString('pt-BR');
+        const timeStr = date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+        
+        // Extrair CIDs se houver
+        const cids = item.cid_codes ? `<span style="color: #667eea; font-size: 12px;">CID: ${item.cid_codes}</span>` : '';
+        
+        return `
+            <div class="history-item" onclick="window.AppController.loadHistoryItem(${index})">
+                <div style="flex: 1;">
+                    <div class="history-patient">${item.patient_name}</div>
+                    <div class="history-meta" style="font-size: 12px; color: #999; margin-top: 5px;">
+                        ${dateStr} às ${timeStr} ${cids}
+                    </div>
+                </div>
+                <div class="history-type">${item.template_type || 'livre'}</div>
+            </div>
+        `;
+    }).join('');
+}
+
+/**
+ * Filtrar histórico
+ */
+filterHistory(searchTerm) {
+    if (!this.historyCache) return;
+    
+    const filtered = searchTerm 
+        ? this.historyCache.filter(item => 
+            item.patient_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (item.cid_codes && item.cid_codes.toLowerCase().includes(searchTerm.toLowerCase()))
+          )
+        : this.historyCache;
+    
+    const historyList = document.getElementById('historyList');
+    if (historyList) {
+        historyList.innerHTML = this.renderHistoryItems(filtered);
+    }
+}
+
+/**
  * Carregar item do histórico
  */
 loadHistoryItem(index) {

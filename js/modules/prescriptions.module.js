@@ -75,12 +75,16 @@ collectPrescriptionData() {
     const date = document.getElementById('prescriptionDate').value;
     const template = window.TemplatesModule?.currentTemplate || 'livre';
 
+    // Coletar CIDs selecionados
+    const cids = window.CIDModule ? window.CIDModule.getSelectedCIDs() : [];
+
     return {
         patientName: patientName.trim(),
         content: content,
         date: date,
         template: template,
-        signature: window.SignatureModule?.getSignatureData() || null
+        signature: window.SignatureModule?.getSignatureData() || null,
+        cids: cids
     };
 }
 
@@ -115,10 +119,9 @@ async savePrescription() {
             window.UIModule.showToast(APP_CONSTANTS.MESSAGES.ERROR.TRIAL_EXPIRED, 'error');
             return false;
         }
-
-        // Coletar dados
-        const data = this.collectPrescriptionData();
-
+        
+            // Coletar dados
+            const data = this.collectPrescriptionData();
         // Validar
         const validation = this.validatePrescriptionData(data);
         if (!validation.isValid) {
@@ -129,17 +132,28 @@ async savePrescription() {
         // Mostrar loading
         window.UIModule.showLoading(APP_CONSTANTS.MESSAGES.INFO.SAVING);
 
+        // Preparar dados para salvar
+        const prescriptionRecord = {
+            user_id: window.AuthModule.getUser().id,
+            patient_name: data.patientName,
+            content: data.content,
+            template_type: data.template,
+            signature_data: data.signature,
+            created_at: new Date().toISOString()
+        };
+
+        // Adicionar CIDs se houver
+        if (data.cids && data.cids.length > 0) {
+            prescriptionRecord.cid_codes = data.cids.map(c => c.codigo).join(', ');
+            prescriptionRecord.metadata = {
+                cids: data.cids
+            };
+        }
+
         // Salvar no banco
         const { data: savedData, error } = await supabaseClient
             .from('prescriptions')
-            .insert({
-                user_id: window.AuthModule.getUser().id,
-                patient_name: data.patientName,
-                content: data.content,
-                template_type: data.template,
-                signature_data: data.signature,
-                created_at: new Date().toISOString()
-            })
+            .insert(prescriptionRecord)
             .select()
             .single();
 
@@ -207,9 +221,62 @@ loadFromHistory(prescription) {
         window.SignatureModule.loadSignature(prescription.signature_data);
     }
 
+    // Re-inicializar campos CID se existirem
+    if (prescription.content && prescription.content.includes('cid-field')) {
+        setTimeout(() => {
+            if (window.CIDModule) {
+                window.CIDModule.initializeCIDFields();
+            }
+        }, 100);
+    }
+
     // Atualizar displays
     window.UIModule.updatePatientDisplay();
     window.UIModule.showToast('Receituário carregado do histórico', 'success');
+}
+
+/**
+ * Buscar receituários por paciente
+ */
+async searchByPatient(patientName) {
+    try {
+        const { data, error } = await supabaseClient
+            .from('prescriptions')
+            .select('*')
+            .eq('user_id', window.AuthModule.getUser().id)
+            .ilike('patient_name', `%${patientName}%`)
+            .order('created_at', { ascending: false })
+            .limit(50);
+
+        if (error) throw error;
+        return data || [];
+
+    } catch (error) {
+        console.error('Search error:', error);
+        return [];
+    }
+}
+
+/**
+ * Buscar receituários por CID
+ */
+async searchByCID(cidCode) {
+    try {
+        const { data, error } = await supabaseClient
+            .from('prescriptions')
+            .select('*')
+            .eq('user_id', window.AuthModule.getUser().id)
+            .contains('cid_codes', cidCode)
+            .order('created_at', { ascending: false })
+            .limit(50);
+
+        if (error) throw error;
+        return data || [];
+
+    } catch (error) {
+        console.error('Search by CID error:', error);
+        return [];
+    }
 }
 }
 // Exportar instância única
