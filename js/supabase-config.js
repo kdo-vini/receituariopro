@@ -7,8 +7,8 @@
 // CONFIGURAÇÕES DO SUPABASE
 // ========================================
 
-const SUPABASE_URL = 'https://kqumjmacwlpaxfuziooy.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtxdW1qbWFjd2xwYXhmdXppb295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU1NDI3NDUsImV4cCI6MjA3MTExODc0NX0.gwCdzsL5YjfNx_Krav5l12PtuReHxibOQBLc80b-4UE';
+const SUPABASE_URL = window.ENV?.SUPABASE_URL;
+const SUPABASE_ANON_KEY = window.ENV?.SUPABASE_ANON_KEY;
 
 // Inicializar cliente Supabase
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -17,7 +17,7 @@ const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_
 // CONFIGURAÇÕES DO STRIPE
 // ========================================
 
-const STRIPE_PUBLIC_KEY = 'pk_live_51RxYCmLUJWyE4PkYzYnJstmaICs14Lcmz8kSerkExOzCOdfdhH8m5gZuf65KUJMLAHcq9R7kh2VYeApsMLPtdIkU00u3IFh6E6';
+const STRIPE_PUBLIC_KEY = window.ENV?.STRIPE_PUBLIC_KEY;
 
 // Links de pagamento do Stripe
 const STRIPE_LINKS = {
@@ -30,10 +30,8 @@ const STRIPE_LINKS = {
 // ========================================
 
 const RESEND_CONFIG = {
-    // Substitua pela sua chave do Resend
-    API_KEY: 're_Au8CPo8L_JtwbhNpAU9nzNzQ8L4is2tiG',
-    FROM_EMAIL: 'noreply@receituariopro.com.br', // Seu domínio verificado
-    SUPPORT_EMAIL: 'suporte@receituariopro.com.br',
+    FROM_EMAIL: window.ENV?.FROM_EMAIL,
+    SUPPORT_EMAIL: window.ENV?.SUPPORT_EMAIL,
     
     // Templates de email
     TEMPLATES: {
@@ -52,34 +50,14 @@ const RESEND_CONFIG = {
 /**
  * Enviar email usando Resend API
  */
-async function sendEmail(to, subject, htmlContent, templateData = null) {
+async function sendEmail(to, subject, htmlContent) {
     try {
-        const emailData = {
-            from: RESEND_CONFIG.FROM_EMAIL,
-            to: [to],
-            subject: subject,
-            html: htmlContent
-        };
-
-        // Se tiver template data, pode usar templates do Resend
-        if (templateData) {
-            emailData.template = templateData.template;
-            emailData.template_data = templateData.data;
-        }
-
-        const response = await fetch('https://api.resend.com/emails', {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${RESEND_CONFIG.API_KEY}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(emailData)
+        const { data: result, error } = await supabaseClient.functions.invoke('send-email', {
+            body: { to, subject, html: htmlContent }
         });
 
-        const result = await response.json();
-
-        if (!response.ok) {
-            throw new Error(`Resend API error: ${result.message || 'Unknown error'}`);
+        if (error) {
+            throw error;
         }
 
         console.log('Email enviado com sucesso:', result.id);
@@ -1419,9 +1397,6 @@ console.log('🛡️ Sistema de autenticação completo');
 console.log('📊 Sistema administrativo completo');
 
 // Verificar se todas as configurações estão presentes
-if (!RESEND_CONFIG.API_KEY || RESEND_CONFIG.API_KEY.includes('YOUR_')) {
-    console.warn('⚠️ Configure sua chave do Resend em RESEND_CONFIG.API_KEY');
-}
 
 if (!STRIPE_PUBLIC_KEY || STRIPE_PUBLIC_KEY.includes('YOUR_')) {
     console.warn('⚠️ Configure sua chave do Stripe em STRIPE_PUBLIC_KEY');
