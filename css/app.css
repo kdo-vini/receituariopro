@@ -423,7 +423,15 @@ cursor: pointer;
 color: var(--text-light);
 }
 .modal-body {
-padding: 20px;
+    padding: 20px;
+}
+
+.modal-actions {
+    padding: 20px;
+    border-top: 1px solid var(--gray-lighter);
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
 }
 /* History List */
 .history-list {

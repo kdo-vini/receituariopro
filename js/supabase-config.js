@@ -152,7 +152,7 @@ async function sendPlanExpiredEmail(user) {
 async function sendPasswordResetEmail(email) {
     try {
         const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-            redirectTo: 'https://www.receituariopro.com.br/update-password.html'
+            redirectTo: 'https://receituariopro.com.br/update-password.html'
         });
 
         if (error) throw error;

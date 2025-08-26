@@ -9,8 +9,20 @@ this.jsPDF = window.jspdf?.jsPDF;
  */
 prepareForExport() {
     const preview = document.getElementById('prescriptionPreview');
-    if (!preview) return null;    // Criar clone para não afetar o original
-    const clone = preview.cloneNode(true);    // Remover elementos não exportáveis
+    if (!preview) return null;
+
+    // Criar clone para não afetar o original
+    const clone = preview.cloneNode(true);
+
+    // Copiar conteúdo da assinatura
+    const originalCanvas = preview.querySelector('#signatureCanvas');
+    const cloneCanvas = clone.querySelector('#signatureCanvas');
+    if (originalCanvas && cloneCanvas) {
+        const ctx = cloneCanvas.getContext('2d');
+        ctx.drawImage(originalCanvas, 0, 0);
+    }
+
+    // Remover elementos não exportáveis
     const editableElements = clone.querySelectorAll('[contenteditable]');
     editableElements.forEach(el => {
         el.removeAttribute('contenteditable');
