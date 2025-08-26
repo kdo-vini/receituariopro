@@ -293,7 +293,27 @@ line-height: 1.8;
 outline: none;
 }
 .prescription-text-area:focus {
-border-color: var(--primary);
+    border-color: var(--primary);
+}
+
+/* Dynamic blank lines and placeholders */
+.blank-line {
+    display: inline-block;
+    min-width: 200px;
+    border-bottom: 1px solid #000;
+}
+
+.blank-line.short {
+    min-width: 60px;
+}
+
+.blank-line:empty::before {
+    content: '\00a0';
+}
+
+.placeholder:empty::before {
+    content: attr(data-placeholder);
+    color: var(--text-light);
 }
 /* Signature Section */
 .signature-section {
