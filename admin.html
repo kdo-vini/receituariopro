@@ -40,11 +40,8 @@
 
         /* Loading */
         .loading-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
             background: var(--gradient);
             display: flex;
             align-items: center;
@@ -53,7 +50,6 @@
             z-index: 1000;
             transition: opacity 0.3s;
         }
-
         .loading-screen.hidden { opacity: 0; pointer-events: none; }
 
         .dashboard { display: none; }
@@ -93,14 +89,16 @@
         .chart-card h2 { font-size: 1.1rem; margin-bottom: 1rem; color: var(--text-dark); }
 
         /* Users table */
+        .user-section h2 { margin-top: 0.5rem; margin-bottom: 0.75rem; color: var(--text-dark); }
         .filters { display: flex; gap: 1rem; margin: 1rem 0; flex-wrap: wrap; }
-        .filters input, .filters select { padding: 0.5rem; border: 1px solid #cbd5e0; border-radius: 8px; }
+        .filters input, .filters select { padding: 0.5rem; border: 1px solid #cbd5e0; border-radius: 8px; background: #fff; }
         .filters button { padding: 0.5rem 1rem; border: none; background: var(--primary); color: white; border-radius: 8px; cursor: pointer; }
 
-        table { width: 100%; border-collapse: collapse; }
+        table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
         th, td { padding: 0.75rem; border-bottom: 1px solid #e2e8f0; text-align: left; }
+        thead th { background: #f1f5f9; font-weight: 600; color: var(--text-dark); }
 
-        .status-badge { padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; color: white; }
+        .status-badge { padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; color: white; display: inline-block; }
         .status-active { background: var(--success); }
         .status-trial { background: var(--warning); color: black; }
         .status-canceled { background: var(--danger); }
@@ -350,6 +348,7 @@
             const prevYearlyCount = prevPlanCounts['yearly'] || prevPlanCounts['anual'] || 0;
             const prevActiveCount = prevActiveSubs.length;
 
+            // MRR com valores (exemplo): Mensal R$29, Anual R$348/ano
             const mrr = monthlyCount * 29 + yearlyCount * (348/12);
             const mrrPrev = prevMonthlyCount * 29 + prevYearlyCount * (348/12);
             const monthsRemaining = 12 - now.getMonth();
@@ -382,7 +381,7 @@
             document.getElementById('cac').textContent = `R$ ${cac.toFixed(2)}`;
             document.getElementById('conversionRate').textContent = `${conversionRate.toFixed(1)}%`;
 
-            // Users per month cumulative line
+            // Usuários por mês (acumulado)
             const usersPerMonth = new Array(12).fill(0);
             usersYear.forEach(u => { usersPerMonth[new Date(u.created_at).getMonth()]++; });
             let cumulative = 0;
@@ -396,7 +395,7 @@
                 options: { scales: { y: { beginAtZero: true } } }
             });
 
-            // Plan distribution chart (horizontal bar)
+            // Distribuição de planos (barra horizontal)
             if (usersCharts.plan) usersCharts.plan.destroy();
             const ctxPlan = document.getElementById('planChart').getContext('2d');
             usersCharts.plan = new Chart(ctxPlan, {
@@ -405,7 +404,7 @@
                 options: { indexAxis: 'y', scales: { x: { beginAtZero: true } } }
             });
 
-            // Revenue chart (realized vs projected)
+            // Receita: realizado x projetado
             const realized = new Array(12).fill(0);
             paymentsYear.forEach(p => { realized[new Date(p.paid_at).getMonth()] += p.amount; });
             const projectedArr = [...realized];
@@ -457,10 +456,12 @@
             tbody.innerHTML = '';
 
             usersData
-                .filter(u => (!search || (u.name + u.email).toLowerCase().includes(search)) &&
-                              (!statusFilter || (u.subscriptions?.status === statusFilter)) &&
-                              (!planFilter || (u.subscriptions?.plan === planFilter)) &&
-                              (!specialtyFilter || u.specialty === specialtyFilter))
+                .filter(u =>
+                    (!search || ( (u.name||'') + (u.email||'') ).toLowerCase().includes(search)) &&
+                    (!statusFilter || (u.subscriptions?.status === statusFilter)) &&
+                    (!planFilter || (u.subscriptions?.plan === planFilter)) &&
+                    (!specialtyFilter || u.specialty === specialtyFilter)
+                )
                 .forEach(u => {
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
@@ -487,7 +488,7 @@
                 u.specialty || '',
                 u.last_login || ''
             ]));
-            const csv = rows.map(r => r.map(v => `"${v}"`).join(',')).join('\n');
+            const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
@@ -562,4 +563,3 @@
     </script>
 </body>
 </html>
-
