@@ -22,9 +22,15 @@
             --gray-light: #f7fafc;
             --white: #ffffff;
             --success: #48bb78;
+            --warning: #ecc94b;
+            --danger: #e53e3e;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -37,8 +43,11 @@
             position: fixed; top: 0; left: 0;
             width: 100%; height: 100%;
             background: var(--gradient);
-            display: flex; align-items: center; justify-content: center;
-            color: white; z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            z-index: 1000;
             transition: opacity 0.3s;
         }
         .loading-screen.hidden { opacity: 0; pointer-events: none; }
@@ -50,7 +59,9 @@
         .admin-header {
             background: white;
             padding: 1rem 2rem;
-            display: flex; justify-content: space-between; align-items: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
 
@@ -66,14 +77,44 @@
 
         /* Stats */
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px,1fr)); gap: 1.5rem; margin-bottom: 2rem; }
-        .stat-card { background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        .stat-title { font-size: 0.9rem; color: var(--text-light); margin-bottom: 0.5rem; }
+        .stat-card { background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: relative; }
+        .stat-title { font-size: 0.9rem; color: var(--text-light); margin-bottom: 0.25rem; }
         .stat-value { font-size: 1.8rem; font-weight: 700; color: var(--text-dark); }
+        .stat-icon { position: absolute; top: 1rem; right: 1rem; font-size: 1.5rem; opacity: 0.2; }
+        .stat-change { font-size: 0.8rem; color: var(--text-light); }
 
         /* Charts */
-        .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px,1fr)); gap: 2rem; }
+        .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px,1fr)); gap: 2rem; margin-bottom: 2rem; }
         .chart-card { background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
         .chart-card h2 { font-size: 1.1rem; margin-bottom: 1rem; color: var(--text-dark); }
+
+        /* Users table */
+        .user-section h2 { margin-top: 0.5rem; margin-bottom: 0.75rem; color: var(--text-dark); }
+        .filters { display: flex; gap: 1rem; margin: 1rem 0; flex-wrap: wrap; }
+        .filters input, .filters select { padding: 0.5rem; border: 1px solid #cbd5e0; border-radius: 8px; background: #fff; }
+        .filters button { padding: 0.5rem 1rem; border: none; background: var(--primary); color: white; border-radius: 8px; cursor: pointer; }
+
+        table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        th, td { padding: 0.75rem; border-bottom: 1px solid #e2e8f0; text-align: left; }
+        thead th { background: #f1f5f9; font-weight: 600; color: var(--text-dark); }
+
+        .status-badge { padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; color: white; display: inline-block; }
+        .status-active { background: var(--success); }
+        .status-trial { background: var(--warning); color: black; }
+        .status-canceled { background: var(--danger); }
+
+        /* Modal */
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 1001; }
+        .modal-content { background: white; padding: 2rem; border-radius: 12px; width: 300px; display: flex; flex-direction: column; gap: 1rem; }
+        .modal.hidden { display: none; }
+        .modal-content button { padding: 0.5rem 1rem; border: none; background: var(--primary); color: white; border-radius: 8px; cursor: pointer; }
+
+        /* Toast */
+        #toastContainer { position: fixed; bottom: 1rem; right: 1rem; z-index: 1100; }
+        .toast { background: var(--secondary); color: white; padding: 1rem; border-radius: 8px; margin-top: 0.5rem; opacity: 0; transform: translateY(20px); transition: all 0.3s; }
+        .toast.show { opacity: 1; transform: translateY(0); }
+
+        body.refreshing .stat-value { opacity: 0.5; }
     </style>
 </head>
 <body>
@@ -84,7 +125,7 @@
     <div class="dashboard" id="dashboard">
         <header class="admin-header">
             <div class="admin-logo">
-                <img src="img/saas-logo.png" alt="Logo">
+                <img src="img/logo.png" alt="Logo">
                 <span>Receituário Pro</span>
             </div>
             <div class="admin-user">
@@ -98,26 +139,56 @@
 
             <div class="stats-grid">
                 <div class="stat-card">
+                    <span class="stat-icon">👥</span>
                     <div class="stat-title">Novos usuários (mês)</div>
                     <div class="stat-value" id="newUsers">0</div>
+                    <div class="stat-change" id="newUsersChange">0%</div>
                 </div>
                 <div class="stat-card">
+                    <span class="stat-icon">🧪</span>
                     <div class="stat-title">Trials ativos</div>
                     <div class="stat-value" id="trialUsers">0</div>
+                    <div class="stat-change" id="trialUsersChange">0%</div>
                 </div>
                 <div class="stat-card">
+                    <span class="stat-icon">✅</span>
                     <div class="stat-title">Assinaturas ativas</div>
                     <div class="stat-value" id="activeUsers">0</div>
+                    <div class="stat-change" id="activeUsersChange">0%</div>
                 </div>
                 <div class="stat-card">
+                    <span class="stat-icon">📅</span>
                     <div class="stat-title">Mensal / Anual</div>
                     <div class="stat-value"><span id="monthlySubs">0</span> / <span id="yearlySubs">0</span></div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-title">Receita mensal</div>
-                    <div class="stat-value" id="monthlyRevenue">R$ 0,00</div>
+                    <span class="stat-icon">🔁</span>
+                    <div class="stat-title">Churn rate</div>
+                    <div class="stat-value" id="churnRate">0%</div>
                 </div>
                 <div class="stat-card">
+                    <span class="stat-icon">🏷</span>
+                    <div class="stat-title">LTV médio</div>
+                    <div class="stat-value" id="ltv">R$ 0,00</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-icon">🎯</span>
+                    <div class="stat-title">CAC estimado</div>
+                    <div class="stat-value" id="cac">R$ 0,00</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-icon">➡️</span>
+                    <div class="stat-title">Conversão Trial → Pago</div>
+                    <div class="stat-value" id="conversionRate">0%</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-icon">💰</span>
+                    <div class="stat-title">Receita mensal</div>
+                    <div class="stat-value" id="monthlyRevenue">R$ 0,00</div>
+                    <div class="stat-change" id="monthlyRevenueChange">0%</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-icon">📈</span>
                     <div class="stat-title">Receita projetada</div>
                     <div class="stat-value" id="projectedRevenue">R$ 0,00</div>
                 </div>
@@ -133,16 +204,66 @@
                     <canvas id="planChart"></canvas>
                 </div>
                 <div class="chart-card">
-                    <h2>Projeção de receita</h2>
+                    <h2>Receita realizada x projetada</h2>
                     <canvas id="revenueChart"></canvas>
                 </div>
             </div>
+
+            <section class="user-section">
+                <h2>Profissionais</h2>
+                <div class="filters">
+                    <input type="text" id="searchInput" placeholder="Buscar...">
+                    <select id="filterStatus">
+                        <option value="">Todos status</option>
+                        <option value="active">Ativo</option>
+                        <option value="trial">Trial</option>
+                        <option value="canceled">Cancelado</option>
+                    </select>
+                    <select id="filterPlan">
+                        <option value="">Todos planos</option>
+                        <option value="monthly">Mensal</option>
+                        <option value="yearly">Anual</option>
+                        <option value="trial">Trial</option>
+                    </select>
+                    <select id="filterSpecialty">
+                        <option value="">Todas especialidades</option>
+                    </select>
+                    <button onclick="exportCSV()">Exportar CSV</button>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Email</th>
+                            <th>Status</th>
+                            <th>Plano</th>
+                            <th>Especialidade</th>
+                            <th>Último login</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody"></tbody>
+                </table>
+            </section>
         </main>
     </div>
+
+    <div id="userModal" class="modal hidden">
+        <div class="modal-content">
+            <h3 id="modalName"></h3>
+            <button onclick="sendEmail()">Enviar e-mail</button>
+            <button onclick="resetPassword()">Resetar senha</button>
+            <button onclick="closeUserModal()">Fechar</button>
+        </div>
+    </div>
+
+    <div id="toastContainer"></div>
 
     <script src="js/supabase-config.js"></script>
     <script>
         const MONTH_NAMES = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+        let usersData = [];
+        const usersCharts = {};
 
         document.addEventListener('DOMContentLoaded', init);
 
@@ -165,73 +286,274 @@
             document.getElementById('dashboard').classList.add('active');
             document.getElementById('loadingScreen').classList.add('hidden');
 
-            await loadDashboardData();
+            document.getElementById('searchInput').addEventListener('input', applyFilters);
+            document.getElementById('filterStatus').addEventListener('change', applyFilters);
+            document.getElementById('filterPlan').addEventListener('change', applyFilters);
+            document.getElementById('filterSpecialty').addEventListener('change', applyFilters);
+
+            await Promise.all([loadDashboardData(), loadUsers()]);
+            setupRealtime();
+            setInterval(() => { loadDashboardData(); loadUsers(); }, 60000);
         }
 
         async function loadDashboardData() {
+            document.body.classList.add('refreshing');
             const now = new Date();
             const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+            const prevStartOfMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
             const startOfYear = new Date(now.getFullYear(), 0, 1);
 
-            const [newUsersRes, trialRes, activeRes, usersYearRes] = await Promise.all([
+            const [
+                newUsersRes, prevNewUsersRes,
+                trialRes, prevTrialRes,
+                activeRes, prevActiveRes,
+                cancelRes, marketingRes,
+                paymentsYearRes, paidThisMonthRes,
+                usersYearRes
+            ] = await Promise.all([
                 supabaseClient.from('users').select('*', { count:'exact', head:true }).gte('created_at', startOfMonth.toISOString()),
+                supabaseClient.from('users').select('*', { count:'exact', head:true }).gte('created_at', prevStartOfMonth.toISOString()).lt('created_at', startOfMonth.toISOString()),
                 supabaseClient.from('subscriptions').select('*', { count:'exact', head:true }).eq('plan','trial').eq('status','active'),
-                supabaseClient.from('subscriptions').select('*').eq('plan','essential').eq('status','active'),
+                supabaseClient.from('subscriptions').select('*', { count:'exact', head:true }).eq('plan','trial').eq('status','active').lt('created_at', startOfMonth.toISOString()),
+                supabaseClient.from('subscriptions').select('*').eq('status','active').neq('plan','trial'),
+                supabaseClient.from('subscriptions').select('*').eq('status','active').neq('plan','trial').lt('created_at', startOfMonth.toISOString()),
+                supabaseClient.from('subscriptions').select('*', { count:'exact', head:true }).eq('status','canceled').gte('canceled_at', startOfMonth.toISOString()),
+                supabaseClient.from('marketing_costs').select('amount').eq('month', now.getMonth()+1).eq('year', now.getFullYear()).single(),
+                supabaseClient.from('payments').select('amount,paid_at').gte('paid_at', startOfYear.toISOString()),
+                supabaseClient.from('subscriptions').select('*', { count:'exact', head:true }).eq('status','active').neq('plan','trial').gte('created_at', startOfMonth.toISOString()),
                 supabaseClient.from('users').select('id,created_at').gte('created_at', startOfYear.toISOString())
             ]);
 
             const newUsers = newUsersRes.count || 0;
+            const prevNewUsers = prevNewUsersRes.count || 0;
             const trialCount = trialRes.count || 0;
+            const prevTrialCount = prevTrialRes.count || 0;
             const activeSubs = activeRes.data || [];
+            const prevActiveSubs = prevActiveRes.data || [];
+            const cancellations = cancelRes.count || 0;
+            const marketingCost = marketingRes.data?.amount || 0;
+            const paymentsYear = paymentsYearRes.data || [];
+            const newPaidThisMonth = paidThisMonthRes.count || 0;
             const usersYear = usersYearRes.data || [];
 
-            let monthlyCount = 0; let yearlyCount = 0;
-            activeSubs.forEach(s => {
-                const start = new Date(s.current_period_start);
-                const end = new Date(s.current_period_end);
-                const diffMonths = (end - start) / (1000*60*60*24*30);
-                if (diffMonths > 1.5) yearlyCount++; else monthlyCount++;
-            });
+            const planCounts = {};
+            activeSubs.forEach(s => { planCounts[s.plan] = (planCounts[s.plan]||0)+1; });
+            const monthlyCount = planCounts['monthly'] || planCounts['mensal'] || 0;
+            const yearlyCount = planCounts['yearly'] || planCounts['anual'] || 0;
             const activeCount = activeSubs.length;
 
+            const prevPlanCounts = {};
+            prevActiveSubs.forEach(s => { prevPlanCounts[s.plan] = (prevPlanCounts[s.plan]||0)+1; });
+            const prevMonthlyCount = prevPlanCounts['monthly'] || prevPlanCounts['mensal'] || 0;
+            const prevYearlyCount = prevPlanCounts['yearly'] || prevPlanCounts['anual'] || 0;
+            const prevActiveCount = prevActiveSubs.length;
+
+            // MRR com valores (exemplo): Mensal R$29, Anual R$348/ano
             const mrr = monthlyCount * 29 + yearlyCount * (348/12);
+            const mrrPrev = prevMonthlyCount * 29 + prevYearlyCount * (348/12);
             const monthsRemaining = 12 - now.getMonth();
             const projected = mrr * monthsRemaining;
 
+            const churnRate = activeCount ? (cancellations / activeCount) * 100 : 0;
+            const arpu = activeCount ? mrr / activeCount : 0;
+            const ltv = churnRate ? arpu / (churnRate/100) : 0;
+            const cac = newUsers ? marketingCost / newUsers : 0;
+            const conversionRate = trialCount ? (newPaidThisMonth / trialCount) * 100 : 0;
+
+            const newUsersChange = prevNewUsers ? ((newUsers - prevNewUsers)/prevNewUsers)*100 : 0;
+            const trialChange = prevTrialCount ? ((trialCount - prevTrialCount)/prevTrialCount)*100 : 0;
+            const activeChange = prevActiveCount ? ((activeCount - prevActiveCount)/prevActiveCount)*100 : 0;
+            const revenueChange = mrrPrev ? ((mrr - mrrPrev)/mrrPrev)*100 : 0;
+
             document.getElementById('newUsers').textContent = newUsers;
+            document.getElementById('newUsersChange').textContent = `${newUsersChange.toFixed(1)}%`;
             document.getElementById('trialUsers').textContent = trialCount;
+            document.getElementById('trialUsersChange').textContent = `${trialChange.toFixed(1)}%`;
             document.getElementById('activeUsers').textContent = activeCount;
+            document.getElementById('activeUsersChange').textContent = `${activeChange.toFixed(1)}%`;
             document.getElementById('monthlySubs').textContent = monthlyCount;
             document.getElementById('yearlySubs').textContent = yearlyCount;
             document.getElementById('monthlyRevenue').textContent = `R$ ${mrr.toFixed(2)}`;
+            document.getElementById('monthlyRevenueChange').textContent = `${revenueChange.toFixed(1)}%`;
             document.getElementById('projectedRevenue').textContent = `R$ ${projected.toFixed(2)}`;
+            document.getElementById('churnRate').textContent = `${churnRate.toFixed(1)}%`;
+            document.getElementById('ltv').textContent = `R$ ${ltv.toFixed(2)}`;
+            document.getElementById('cac').textContent = `R$ ${cac.toFixed(2)}`;
+            document.getElementById('conversionRate').textContent = `${conversionRate.toFixed(1)}%`;
 
-            // Users per month chart
+            // Usuários por mês (acumulado)
             const usersPerMonth = new Array(12).fill(0);
             usersYear.forEach(u => { usersPerMonth[new Date(u.created_at).getMonth()]++; });
+            let cumulative = 0;
+            const cumulativeUsers = usersPerMonth.map(v => cumulative += v);
+
+            if (usersCharts.users) usersCharts.users.destroy();
             const ctxUsers = document.getElementById('usersChart').getContext('2d');
-            new Chart(ctxUsers, {
-                type: 'bar',
-                data: { labels: MONTH_NAMES, datasets: [{ label: 'Usuários', data: usersPerMonth, backgroundColor: '#667eea' }] },
-                options: { scales: { y: { beginAtZero: true } } }
-            });
-
-            // Plan distribution chart
-            const ctxPlan = document.getElementById('planChart').getContext('2d');
-            new Chart(ctxPlan, {
-                type: 'doughnut',
-                data: { labels: ['Mensal','Anual'], datasets: [{ data: [monthlyCount, yearlyCount], backgroundColor: ['#764ba2','#667eea'] }] }
-            });
-
-            // Revenue projection chart
-            const projLabels = MONTH_NAMES.slice(now.getMonth());
-            const projData = new Array(projLabels.length).fill(mrr.toFixed(2));
-            const ctxRev = document.getElementById('revenueChart').getContext('2d');
-            new Chart(ctxRev, {
+            usersCharts.users = new Chart(ctxUsers, {
                 type: 'line',
-                data: { labels: projLabels, datasets: [{ label: 'Receita projetada', data: projData, borderColor: '#48bb78', backgroundColor: 'rgba(72,187,120,0.2)', tension: 0.2 }] },
+                data: { labels: MONTH_NAMES, datasets: [{ label: 'Usuários', data: cumulativeUsers, borderColor: '#667eea', backgroundColor: 'rgba(102,126,234,0.2)', tension: 0.3 }] },
                 options: { scales: { y: { beginAtZero: true } } }
             });
+
+            // Distribuição de planos (barra horizontal)
+            if (usersCharts.plan) usersCharts.plan.destroy();
+            const ctxPlan = document.getElementById('planChart').getContext('2d');
+            usersCharts.plan = new Chart(ctxPlan, {
+                type: 'bar',
+                data: { labels: Object.keys(planCounts), datasets: [{ label: 'Planos', data: Object.values(planCounts), backgroundColor: '#764ba2' }] },
+                options: { indexAxis: 'y', scales: { x: { beginAtZero: true } } }
+            });
+
+            // Receita: realizado x projetado
+            const realized = new Array(12).fill(0);
+            paymentsYear.forEach(p => { realized[new Date(p.paid_at).getMonth()] += p.amount; });
+            const projectedArr = [...realized];
+            for (let i = now.getMonth(); i < 12; i++) projectedArr[i] = mrr;
+
+            if (usersCharts.revenue) usersCharts.revenue.destroy();
+            const ctxRev = document.getElementById('revenueChart').getContext('2d');
+            usersCharts.revenue = new Chart(ctxRev, {
+                type: 'line',
+                data: {
+                    labels: MONTH_NAMES,
+                    datasets: [
+                        { label: 'Realizado', data: realized, borderColor: '#48bb78', backgroundColor: 'rgba(72,187,120,0.2)', tension: 0.2 },
+                        { label: 'Projetado', data: projectedArr, borderColor: '#764ba2', backgroundColor: 'rgba(118,75,162,0.2)', borderDash: [5,5], tension: 0.2 }
+                    ]
+                },
+                options: { scales: { y: { beginAtZero: true } } }
+            });
+
+            document.body.classList.remove('refreshing');
+        }
+
+        async function loadUsers() {
+            const tbody = document.getElementById('usersTableBody');
+            tbody.innerHTML = '<tr><td colspan="7">Carregando...</td></tr>';
+            const { data } = await supabaseClient
+                .from('users')
+                .select('id,name,email,specialty,last_login,subscriptions(plan,status)')
+                .order('created_at', { ascending: false });
+            usersData = data || [];
+
+            const specialties = [...new Set(usersData.map(u => u.specialty).filter(Boolean))];
+            const select = document.getElementById('filterSpecialty');
+            select.innerHTML = '<option value="">Todas especialidades</option>';
+            specialties.forEach(sp => {
+                const opt = document.createElement('option');
+                opt.value = sp; opt.textContent = sp; select.appendChild(opt);
+            });
+
+            renderUsersTable();
+        }
+
+        function renderUsersTable() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('filterStatus').value;
+            const planFilter = document.getElementById('filterPlan').value;
+            const specialtyFilter = document.getElementById('filterSpecialty').value;
+            const tbody = document.getElementById('usersTableBody');
+            tbody.innerHTML = '';
+
+            usersData
+                .filter(u =>
+                    (!search || ( (u.name||'') + (u.email||'') ).toLowerCase().includes(search)) &&
+                    (!statusFilter || (u.subscriptions?.status === statusFilter)) &&
+                    (!planFilter || (u.subscriptions?.plan === planFilter)) &&
+                    (!specialtyFilter || u.specialty === specialtyFilter)
+                )
+                .forEach(u => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${u.name || ''}</td>
+                        <td>${u.email || ''}</td>
+                        <td><span class="status-badge status-${u.subscriptions?.status || 'unknown'}">${u.subscriptions?.status || ''}</span></td>
+                        <td>${u.subscriptions?.plan || ''}</td>
+                        <td>${u.specialty || ''}</td>
+                        <td>${u.last_login ? new Date(u.last_login).toLocaleDateString() : ''}</td>
+                        <td><button onclick="openUserModal('${u.id}')">Ações</button></td>`;
+                    tbody.appendChild(tr);
+                });
+        }
+
+        function applyFilters() { renderUsersTable(); }
+
+        function exportCSV() {
+            const rows = [['Nome','Email','Status','Plano','Especialidade','Último login']];
+            usersData.forEach(u => rows.push([
+                u.name || '',
+                u.email || '',
+                u.subscriptions?.status || '',
+                u.subscriptions?.plan || '',
+                u.specialty || '',
+                u.last_login || ''
+            ]));
+            const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'usuarios.csv';
+            link.click();
+        }
+
+        let currentModalUser;
+
+        function openUserModal(id) {
+            currentModalUser = usersData.find(u => u.id === id);
+            if (!currentModalUser) return;
+            document.getElementById('modalName').textContent = currentModalUser.name || '';
+            document.getElementById('userModal').classList.remove('hidden');
+        }
+
+        function closeUserModal() {
+            document.getElementById('userModal').classList.add('hidden');
+        }
+
+        async function sendEmail() {
+            if (!currentModalUser) return;
+            await supabaseClient.functions.invoke('send-email', { body: { to: currentModalUser.email } });
+            await logAdminAction('send_email', currentModalUser.id);
+            showToast('E-mail enviado');
+            closeUserModal();
+        }
+
+        async function resetPassword() {
+            if (!currentModalUser) return;
+            await supabaseClient.auth.admin.generateLink({ type: 'recovery', email: currentModalUser.email });
+            await logAdminAction('reset_password', currentModalUser.id);
+            showToast('Reset de senha enviado');
+            closeUserModal();
+        }
+
+        async function logAdminAction(action, target) {
+            await supabaseClient.from('admin_logs').insert({ action, target_user: target });
+        }
+
+        function showToast(message) {
+            const container = document.getElementById('toastContainer');
+            const div = document.createElement('div');
+            div.className = 'toast';
+            div.textContent = message;
+            container.appendChild(div);
+            setTimeout(() => div.classList.add('show'), 10);
+            setTimeout(() => {
+                div.classList.remove('show');
+                setTimeout(() => div.remove(), 300);
+            }, 3000);
+        }
+
+        function setupRealtime() {
+            supabaseClient.channel('admin-listener')
+                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'users' }, payload => {
+                    showToast('Novo usuário cadastrado');
+                    loadUsers();
+                    loadDashboardData();
+                })
+                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'payments' }, payload => {
+                    showToast('Nova receita registrada');
+                    loadDashboardData();
+                })
+                .subscribe();
         }
 
         async function logout() {
