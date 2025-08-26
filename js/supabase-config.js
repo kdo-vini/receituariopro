@@ -36,7 +36,10 @@ const RESEND_CONFIG = {
     TEMPLATES: {
         WELCOME: 'welcome',
         TRIAL_EXPIRING: 'trial_expiring',
-        PASSWORD_RESET: 'password_reset'
+        PASSWORD_RESET: 'password_reset',
+        PLAN_EXPIRED: 'plan_expired',
+        APPROVAL: 'approval',
+        REJECTION: 'rejection'
     }
 };
 
@@ -67,231 +70,89 @@ async function sendEmail(to, subject, htmlContent) {
 }
 
 /**
+ * Enviar email baseado em template
+ */
+async function sendEmailTemplate(template, to, data = {}) {
+    try {
+        const { data: result, error } = await supabaseClient.functions.invoke('send-templated-email', {
+            body: { to, template, data }
+        });
+
+        if (error) throw error;
+
+        console.log(`Email template "${template}" enviado:`, result.id);
+        return { success: true, id: result.id };
+    } catch (error) {
+        console.error('Erro ao enviar email template:', error);
+        return { success: false, error: error.message };
+    }
+}
+
+/**
  * Email de boas-vindas para novos usuários
  */
 async function sendWelcomeEmail(user) {
-    const subject = '🎉 Bem-vindo ao Receituário Pro!';
-    const htmlContent = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="UTF-8">
-            <style>
-                body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-                .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-                .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
-                .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
-                .button { display: inline-block; background: #667eea; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; margin: 20px 0; }
-                .features { background: white; padding: 20px; margin: 20px 0; border-radius: 8px; }
-                .feature-item { margin: 10px 0; padding-left: 25px; position: relative; }
-                .feature-item:before { content: "✅"; position: absolute; left: 0; }
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <div class="header">
-                    <h1>Receituário Pro</h1>
-                    <h2>Bem-vindo, Dr(a). ${user.name}!</h2>
-                </div>
-                <div class="content">
-                    <p>Parabéns! Sua conta foi criada com sucesso e você já pode começar a usar o Receituário Pro.</p>
-                    
-                    <div class="features">
-                        <h3>🎁 Seu trial de 30 dias inclui:</h3>
-                        <div class="feature-item">Receituários ilimitados</div>
-                        <div class="feature-item">Todos os templates profissionais</div>
-                        <div class="feature-item">Assinatura digital personalizada</div>
-                        <div class="feature-item">Exportação em PDF e PNG</div>
-                        <div class="feature-item">Histórico completo</div>
-                        <div class="feature-item">Suporte prioritário</div>
-                    </div>
-
-                    <div style="text-align: center;">
-                        <a href="https://receituariopro.com.br/app.html" class="button">🚀 Começar a Usar Agora</a>
-                    </div>
-
-                    <p><strong>Seus dados de acesso:</strong></p>
-                    <ul>
-                        <li><strong>Email:</strong> ${user.email}</li>
-                        <li><strong>Registro:</strong> ${user.council}-${user.state} ${user.registration_number}</li>
-                        <li><strong>Especialidade:</strong> ${user.specialty || 'Não informada'}</li>
-                    </ul>
-
-                    <p>Precisa de ajuda? Responda este email ou entre em contato conosco em <strong>${RESEND_CONFIG.SUPPORT_EMAIL}</strong></p>
-                </div>
-            </div>
-        </body>
-        </html>
-    `;
-
-    return await sendEmail(user.email, subject, htmlContent);
+    return await sendEmailTemplate(RESEND_CONFIG.TEMPLATES.WELCOME, user.email, {
+        name: user.name,
+        email: user.email,
+        council: user.council,
+        state: user.state,
+        registration: user.registration_number,
+        specialty: user.specialty || 'Não informada',
+        support_email: RESEND_CONFIG.SUPPORT_EMAIL,
+        app_url: 'https://receituariopro.com.br/app.html'
+    });
 }
 
 /**
  * Email de aprovação profissional
  */
 async function sendApprovalEmail(user) {
-    const subject = '✅ Cadastro Aprovado - Receituário Pro';
-    const htmlContent = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="UTF-8">
-            <style>
-                body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-                .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-                .header { background: #48bb78; color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
-                .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
-                .button { display: inline-block; background: #48bb78; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; margin: 20px 0; }
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <div class="header">
-                    <h1>🎉 Parabéns!</h1>
-                    <h2>Seu cadastro foi aprovado!</h2>
-                </div>
-                <div class="content">
-                    <p>Olá Dr(a). ${user.name},</p>
-                    
-                    <p>Seu cadastro profissional foi <strong>aprovado</strong> com sucesso! Você já pode acessar o sistema e começar a criar seus receituários digitais.</p>
-
-                    <p><strong>Suas informações aprovadas:</strong></p>
-                    <ul>
-                        <li><strong>Nome:</strong> ${user.name}</li>
-                        <li><strong>Registro:</strong> ${user.council}-${user.state} ${user.registration_number}</li>
-                        <li><strong>Especialidade:</strong> ${user.specialty || 'Não informada'}</li>
-                    </ul>
-
-                    <div style="text-align: center;">
-                        <a href="https://receituariopro.com.br/auth.html" class="button">🚀 Fazer Login</a>
-                    </div>
-
-                    <p>Bem-vindo à família Receituário Pro!</p>
-                    
-                    <p>Atenciosamente,<br>
-                    <strong>Equipe Receituário Pro</strong></p>
-                </div>
-            </div>
-        </body>
-        </html>
-    `;
-
-    return await sendEmail(user.email, subject, htmlContent);
+    return await sendEmailTemplate(RESEND_CONFIG.TEMPLATES.APPROVAL, user.email, {
+        name: user.name,
+        login_url: 'https://receituariopro.com.br/auth.html'
+    });
 }
 
 /**
  * Email de rejeição profissional
  */
 async function sendRejectionEmail(user, reason) {
-    const subject = '❌ Cadastro não aprovado - Receituário Pro';
-    const htmlContent = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="UTF-8">
-            <style>
-                body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-                .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-                .header { background: #f56565; color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
-                .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
-                .reason-box { background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0; }
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <div class="header">
-                    <h1>Receituário Pro</h1>
-                    <h2>Cadastro não aprovado</h2>
-                </div>
-                <div class="content">
-                    <p>Olá ${user.name},</p>
-                    
-                    <p>Infelizmente não foi possível aprovar seu cadastro no momento.</p>
-
-                    <div class="reason-box">
-                        <strong>Motivo:</strong> ${reason}
-                    </div>
-
-                    <p><strong>O que fazer agora?</strong></p>
-                    <ul>
-                        <li>Verifique se seus dados estão corretos</li>
-                        <li>Certifique-se de que o número do registro profissional está válido</li>
-                        <li>Entre em contato conosco para esclarecimentos</li>
-                    </ul>
-
-                    <p>Você pode tentar se cadastrar novamente após corrigir as informações ou entrar em contato conosco em <strong>${RESEND_CONFIG.SUPPORT_EMAIL}</strong></p>
-                    
-                    <p>Atenciosamente,<br>
-                    <strong>Equipe Receituário Pro</strong></p>
-                </div>
-            </div>
-        </body>
-        </html>
-    `;
-
-    return await sendEmail(user.email, subject, htmlContent);
+    return await sendEmailTemplate(RESEND_CONFIG.TEMPLATES.REJECTION, user.email, {
+        name: user.name,
+        reason
+    });
 }
 
 /**
  * Email de trial expirando
  */
 async function sendTrialExpiringEmail(user, daysLeft) {
-    const subject = `⚠️ Seu trial expira em ${daysLeft} dias`;
-    const htmlContent = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="UTF-8">
-            <style>
-                body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-                .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-                .header { background: #ed8936; color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
-                .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
-                .button { display: inline-block; background: #667eea; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; margin: 20px 0; }
-                .price-box { background: white; padding: 20px; margin: 20px 0; border-radius: 8px; text-align: center; border: 2px solid #667eea; }
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <div class="header">
-                    <h1>⏰ Trial Expirando</h1>
-                    <h2>Apenas ${daysLeft} dias restantes!</h2>
-                </div>
-                <div class="content">
-                    <p>Olá Dr(a). ${user.name},</p>
-                    
-                    <p>Seu trial gratuito de 30 dias no Receituário Pro expira em <strong>${daysLeft} dias</strong>!</p>
+    return await sendEmailTemplate(RESEND_CONFIG.TEMPLATES.TRIAL_EXPIRING, user.email, {
+        name: user.name,
+        days_left: String(daysLeft),
+        upgrade_yearly_link: `${STRIPE_LINKS.essential_yearly}?prefilled_email=${encodeURIComponent(user.email)}`,
+        upgrade_monthly_link: `${STRIPE_LINKS.essential_monthly}?prefilled_email=${encodeURIComponent(user.email)}`
+    });
+}
 
-                    <p>Não perca o acesso a todas as funcionalidades que você já conhece:</p>
-                    <ul>
-                        <li>✅ Receituários ilimitados</li>
-                        <li>✅ Templates profissionais</li>
-                        <li>✅ Assinatura digital</li>
-                        <li>✅ Histórico completo</li>
-                        <li>✅ Suporte prioritário</li>
-                    </ul>
+/**
+ * Email para plano expirado
+ */
+async function sendPlanExpiredEmail(user) {
+    return await sendEmailTemplate(RESEND_CONFIG.TEMPLATES.PLAN_EXPIRED, user.email, {
+        name: user.name,
+        upgrade_link: `${STRIPE_LINKS.essential_monthly}?prefilled_email=${encodeURIComponent(user.email)}`
+    });
+}
 
-                    <div class="price-box">
-                        <h3>Plano Essencial</h3>
-                        <p style="font-size: 24px; color: #667eea; margin: 10px 0;"><strong>R$ 29/mês</strong></p>
-                        <p>ou <strong>R$ 348/ano</strong> (2 meses grátis)</p>
-                    </div>
-
-                    <div style="text-align: center;">
-                        <a href="${STRIPE_LINKS.essential_yearly}?prefilled_email=${encodeURIComponent(user.email)}" class="button">💰 Upgrade Anual - Melhor Oferta</a>
-                        <br>
-                        <a href="${STRIPE_LINKS.essential_monthly}?prefilled_email=${encodeURIComponent(user.email)}" class="button">📅 Upgrade Mensal</a>
-                    </div>
-
-                    <p><small>Tem dúvidas? Responda este email ou acesse seu <a href="https://receituariopro.com.br/profile.html">perfil</a> no sistema.</small></p>
-                </div>
-            </div>
-        </body>
-        </html>
-    `;
-
-    return await sendEmail(user.email, subject, htmlContent);
+/**
+ * Email para reset de senha
+ */
+async function sendPasswordResetEmail(email) {
+    return await sendEmailTemplate(RESEND_CONFIG.TEMPLATES.PASSWORD_RESET, email, {
+        support_email: RESEND_CONFIG.SUPPORT_EMAIL
+    });
 }
 
 // ========================================
@@ -662,13 +523,9 @@ async function logoutUser() {
  */
 async function resetPassword(email) {
     try {
-        const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-            redirectTo: `${window.location.origin}/auth.html?reset=true`
-        });
-
-        if (error) throw error;
+        const result = await sendPasswordResetEmail(email);
+        if (!result.success) throw new Error(result.error);
         return { success: true };
-
     } catch (error) {
         console.error('Reset password error:', error);
         return { success: false, error: error.message };
@@ -1369,6 +1226,8 @@ window.emailFunctions = {
     sendApprovalEmail,
     sendRejectionEmail,
     sendTrialExpiringEmail,
+    sendPlanExpiredEmail,
+    sendPasswordResetEmail,
     sendTrialExpiringNotifications
 };
 
