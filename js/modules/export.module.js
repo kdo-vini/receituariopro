@@ -26,7 +26,17 @@ prepareForExport() {
     const editableElements = clone.querySelectorAll('[contenteditable]');
     editableElements.forEach(el => {
         el.removeAttribute('contenteditable');
-    });    // Aplicar estilos de impressão
+    });
+
+    // Remover linhas e placeholders vazios
+    clone.querySelectorAll('.blank-line').forEach(el => {
+        if (!el.textContent.trim()) el.remove();
+    });
+    clone.querySelectorAll('.placeholder').forEach(el => {
+        if (!el.textContent.trim()) el.remove();
+    });
+
+    // Aplicar estilos de impressão
     clone.style.width = '210mm';
     clone.style.minHeight = '297mm';
     clone.style.padding = '20mm';    return clone;

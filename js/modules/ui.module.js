@@ -199,8 +199,9 @@ updatePatientDisplay() {
     
     if (display) {
         const date = this.getFormattedDate();
+        const nameDisplay = patientName || '<span class="placeholder" data-placeholder="Nome do paciente"></span>';
         display.innerHTML = `
-            <p><strong>Paciente:</strong> ${patientName || '_________________________'}</p>
+            <p><strong>Paciente:</strong> ${nameDisplay}</p>
             <p><strong>Data:</strong> ${date}</p>
         `;
     }
@@ -214,8 +215,9 @@ updateDateDisplay() {
     if (display) {
         const patientName = document.getElementById('patientName').value;
         const date = this.getFormattedDate();
+        const nameDisplay = patientName || '<span class="placeholder" data-placeholder="Nome do paciente"></span>';
         display.innerHTML = `
-            <p><strong>Paciente:</strong> ${patientName || '_________________________'}</p>
+            <p><strong>Paciente:</strong> ${nameDisplay}</p>
             <p><strong>Data:</strong> ${date}</p>
         `;
     }

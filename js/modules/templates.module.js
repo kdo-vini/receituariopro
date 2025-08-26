@@ -15,15 +15,14 @@ loadTemplates() {
             title: 'Receituário de Medicação',
             icon: '💊',
             content: `<strong>USO INTERNO</strong><br><br>
-
-________________________________<br>
-Posologia: _____________________<br>
-Quantidade: ____________________<br><br>
-________________________________<br>
-Posologia: _____________________<br>
-Quantidade: ____________________<br><br>
+<span class="blank-line" contenteditable="true"></span><br>
+Posologia: <span class="blank-line" contenteditable="true"></span><br>
+Quantidade: <span class="blank-line" contenteditable="true"></span><br><br>
+<span class="blank-line" contenteditable="true"></span><br>
+Posologia: <span class="blank-line" contenteditable="true"></span><br>
+Quantidade: <span class="blank-line" contenteditable="true"></span><br><br>
 <strong>Orientações:</strong><br>
-_________________________________`
+<span class="blank-line" contenteditable="true"></span>`
 },
         exames: {
             title: 'Solicitação de Exames',
@@ -35,21 +34,21 @@ _________________________________`
 ☐ Triglicerídeos<br>
 ☐ TSH e T4 livre<br>
 ☐ Urina tipo I<br>
-☐ _______________________________<br><br>
+☐ <span class="blank-line" contenteditable="true"></span><br><br>
 <strong>Hipótese diagnóstica / CID-10:</strong><br>
 <span class="cid-field" contenteditable="false" onclick="window.CIDModule.openSearch(this)">
 <span class="cid-placeholder">Clique para buscar CID...</span>
 </span><br><br>
-_________________________________`
+<span class="blank-line" contenteditable="true"></span>`
 },        procedimento: {
             title: 'Encaminhamento',
             icon: '🏥',
             content: `<strong>ENCAMINHAMENTO MÉDICO</strong><br><br>
 Prezado(a) Colega,<br><br>
 Encaminho o(a) paciente para:<br>
-_________________________________<br><br>
+<span class="blank-line" contenteditable="true"></span><br><br>
 Motivo do encaminhamento:<br>
-_________________________________<br><br>
+<span class="blank-line" contenteditable="true"></span><br><br>
 <strong>Diagnóstico / CID-10:</strong><br>
 <span class="cid-field" contenteditable="false" onclick="window.CIDModule.openSearch(this)">
 <span class="cid-placeholder">Clique para buscar CID...</span>
@@ -60,8 +59,8 @@ Atenciosamente,`
             icon: '📋',
             content: `<strong>ATESTADO MÉDICO</strong><br><br>
 Atesto que o(a) paciente acima necessita se afastar de suas atividades por:<br>
-_________________________________<br><br>
-Período: _____ dias<br><br>
+<span class="blank-line" contenteditable="true"></span><br><br>
+Período: <span class="blank-line short" contenteditable="true"></span> dias<br><br>
 <strong>CID-10:</strong><br>
 <span class="cid-field" contenteditable="false" onclick="window.CIDModule.openSearch(this)">
 <span class="cid-placeholder">Clique para buscar CID...</span>
@@ -72,14 +71,14 @@ Por ser verdade, firmo o presente.`
             icon: '📄',
             content: `<strong>LAUDO MÉDICO</strong><br><br>
 <strong>Exame realizado:</strong><br>
-_________________________________<br><br>
+<span class="blank-line" contenteditable="true"></span><br><br>
 <strong>Achados:</strong><br>
-_________________________________<br><br>
+<span class="blank-line" contenteditable="true"></span><br><br>
 <strong>Conclusão / CID-10:</strong><br>
 <span class="cid-field" contenteditable="false" onclick="window.CIDModule.openSearch(this)">
 <span class="cid-placeholder">Clique para buscar CID...</span>
 </span><br><br>
-_________________________________`
+<span class="blank-line" contenteditable="true"></span>`
 },        livre: {
             title: 'Receituário Livre',
             icon: '✏️',
