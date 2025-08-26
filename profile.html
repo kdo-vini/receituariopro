@@ -1287,38 +1287,103 @@ async function debugSubscriptionConnection(userId) {
         // IMAGE UPLOAD TO SUPABASE STORAGE
         // ========================================
         async function uploadImage(dataUrl, type) {
-            try {
-                // Convert data URL to blob
-                const response = await fetch(dataUrl);
-                const blob = await response.blob();
-                
-                // Create unique filename
-                const timestamp = Date.now();
-                const filename = `${currentUser.id}_${type}_${timestamp}.png`;
-                
-                // Upload to Supabase Storage
-                const { data, error } = await supabaseClient.storage
-                    .from('user-assets')
-                    .upload(filename, blob, {
-                        contentType: 'image/png',
-                        upsert: true
-                    });
-                
-                if (error) throw error;
-                
-                // Get public URL
-                const { data: { publicUrl } } = supabaseClient.storage
-                    .from('user-assets')
-                    .getPublicUrl(filename);
-                
-                return publicUrl;
-                
-            } catch (error) {
-                console.error('Error uploading image:', error);
-                showToast(`Erro ao fazer upload da ${type === 'logo' ? 'logo' : 'assinatura'}`, 'error');
-                return null;
-            }
+    try {
+        console.log('Iniciando upload de', type);
+        
+        // Convert data URL to blob
+        const response = await fetch(dataUrl);
+        const blob = await response.blob();
+        
+        // Verificar tamanho do arquivo (máximo 2MB)
+        if (blob.size > 2 * 1024 * 1024) {
+            throw new Error('Arquivo muito grande. Máximo 2MB.');
         }
+        
+        // Create unique filename with user ID
+        const timestamp = Date.now();
+        const fileExtension = blob.type.split('/')[1] || 'png';
+        const filename = `${currentUser.id}/${type}_${timestamp}.${fileExtension}`;
+        
+        console.log('Uploading to:', filename);
+        
+        // ✅ VERSÃO 1: Upload com path organizado
+        const { data, error } = await supabaseClient.storage
+            .from('user-assets')
+            .upload(filename, blob, {
+                contentType: blob.type,
+                cacheControl: '3600',
+                upsert: true
+            });
+
+        if (error) {
+            console.error('Erro no upload versão 1:', error);
+            
+            // ✅ VERSÃO 2: Fallback com filename simples
+            const simpleFilename = `${currentUser.id}_${type}_${timestamp}.${fileExtension}`;
+            console.log('Tentando upload simples:', simpleFilename);
+            
+            const { data: data2, error: error2 } = await supabaseClient.storage
+                .from('user-assets')
+                .upload(simpleFilename, blob, {
+                    contentType: blob.type,
+                    cacheControl: '3600',
+                    upsert: true
+                });
+                
+            if (error2) {
+                console.error('Erro no upload versão 2:', error2);
+                throw error2;
+            }
+            
+            // Get public URL for version 2
+            const { data: { publicUrl } } = supabaseClient.storage
+                .from('user-assets')
+                .getPublicUrl(simpleFilename);
+            
+            console.log('✅ Upload simples bem-sucedido:', publicUrl);
+            return publicUrl;
+        }
+        
+        // Get public URL for version 1
+        const { data: { publicUrl } } = supabaseClient.storage
+            .from('user-assets')
+            .getPublicUrl(filename);
+        
+        console.log('✅ Upload organizado bem-sucedido:', publicUrl);
+        return publicUrl;
+        
+    } catch (error) {
+        console.error('Error uploading image:', error);
+        
+        // ✅ VERSÃO 3: Último recurso - salvar como base64 no banco
+        console.log('Tentando salvar como base64 no banco de dados...');
+        
+        try {
+            // Salvar diretamente na coluna do usuário como fallback
+            const columnName = type === 'logo' ? 'logo_url' : 'signature_url';
+            
+            const { error: dbError } = await supabaseClient
+                .from('users')
+                .update({
+                    [columnName]: dataUrl, // Salvar como data URL
+                    updated_at: new Date().toISOString()
+                })
+                .eq('id', currentUser.id);
+                
+            if (dbError) throw dbError;
+            
+            console.log('✅ Fallback: salvo como base64 no banco');
+            showToast(`${type === 'logo' ? 'Logo' : 'Assinatura'} salva com sucesso!`, 'success');
+            
+            return dataUrl; // Retornar data URL
+            
+        } catch (dbError) {
+            console.error('Erro no fallback do banco:', dbError);
+            showToast(`Erro ao fazer upload da ${type === 'logo' ? 'logo' : 'assinatura'}`, 'error');
+            return null;
+        }
+    }
+}
 
         function hasSignature() {
             const imageData = signatureCtx.getImageData(0, 0, signatureCanvas.width, signatureCanvas.height);

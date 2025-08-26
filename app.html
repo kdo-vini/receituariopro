@@ -1137,7 +1137,49 @@ Altura: <input type="text" placeholder="170" style="width: 50px; border: none; b
         console.error('Subscription status error:', error);
     }
 }
-
+// ✅ FUNÇÃO loadTemplate CORRIGIDA
+function loadTemplate(templateName) {
+    const template = templates[templateName];
+    if (!template) {
+        console.error(`Template ${templateName} not found`);
+        return;
+    }
+    
+    currentTemplate = templateName;
+    
+    // Update active template button
+    document.querySelectorAll('.template-card').forEach(card => {
+        card.classList.remove('active');
+    });
+    
+    const activeButton = document.querySelector(`[data-template="${templateName}"]`);
+    if (activeButton) {
+        activeButton.classList.add('active');
+    }
+    
+    // Update content
+    const contentDisplay = document.getElementById('prescriptionDisplay');
+    const textarea = document.getElementById('prescriptionText');
+    
+    if (template.content) {
+        contentDisplay.innerHTML = template.content;
+        textarea.value = template.content;
+        
+        // ✅ RECONFIGURAR SISTEMA CID APÓS CARREGAR TEMPLATE
+        setTimeout(() => {
+            const newCidInputs = contentDisplay.querySelectorAll('[data-cid="true"]');
+            newCidInputs.forEach(input => {
+                if (!input.parentNode.querySelector('.cid-suggestions')) {
+                    createCidAutocomplete(input);
+                }
+            });
+        }, 500);
+        
+    } else {
+        contentDisplay.innerHTML = '<div contenteditable="true" style="min-height: 400px; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; line-height: 1.8; background: white; white-space: pre-wrap;">Digite aqui o conteúdo do receituário...</div>';
+        textarea.value = '';
+    }
+}
 // Função auxiliar para criar trial se necessário
 async function createTrialIfNeeded(userId) {
     try {
