@@ -26,11 +26,7 @@
             --danger: #e53e3e;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -43,11 +39,8 @@
             position: fixed; top: 0; left: 0;
             width: 100%; height: 100%;
             background: var(--gradient);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            z-index: 1000;
+            display: flex; align-items: center; justify-content: center;
+            color: white; z-index: 1000;
             transition: opacity 0.3s;
         }
         .loading-screen.hidden { opacity: 0; pointer-events: none; }
@@ -59,9 +52,7 @@
         .admin-header {
             background: white;
             padding: 1rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            display: flex; justify-content: space-between; align-items: center;
             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
 
@@ -89,16 +80,14 @@
         .chart-card h2 { font-size: 1.1rem; margin-bottom: 1rem; color: var(--text-dark); }
 
         /* Users table */
-        .user-section h2 { margin-top: 0.5rem; margin-bottom: 0.75rem; color: var(--text-dark); }
         .filters { display: flex; gap: 1rem; margin: 1rem 0; flex-wrap: wrap; }
-        .filters input, .filters select { padding: 0.5rem; border: 1px solid #cbd5e0; border-radius: 8px; background: #fff; }
+        .filters input, .filters select { padding: 0.5rem; border: 1px solid #cbd5e0; border-radius: 8px; }
         .filters button { padding: 0.5rem 1rem; border: none; background: var(--primary); color: white; border-radius: 8px; cursor: pointer; }
 
-        table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        table { width: 100%; border-collapse: collapse; }
         th, td { padding: 0.75rem; border-bottom: 1px solid #e2e8f0; text-align: left; }
-        thead th { background: #f1f5f9; font-weight: 600; color: var(--text-dark); }
 
-        .status-badge { padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; color: white; display: inline-block; }
+        .status-badge { padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; color: white; }
         .status-active { background: var(--success); }
         .status-trial { background: var(--warning); color: black; }
         .status-canceled { background: var(--danger); }
@@ -265,6 +254,14 @@
         let usersData = [];
         const usersCharts = {};
 
+        function isMonthly(plan) {
+            return (plan || '').toLowerCase().includes('month') || (plan || '').toLowerCase().includes('mensal');
+        }
+
+        function isYearly(plan) {
+            return (plan || '').toLowerCase().includes('year') || (plan || '').toLowerCase().includes('anual');
+        }
+
         document.addEventListener('DOMContentLoaded', init);
 
         async function init() {
@@ -308,15 +305,15 @@
                 trialRes, prevTrialRes,
                 activeRes, prevActiveRes,
                 cancelRes, marketingRes,
-                paymentsYearRes, paidThisMonthRes,
+                paymentsYearRes, newPaidThisMonthRes,
                 usersYearRes
             ] = await Promise.all([
                 supabaseClient.from('users').select('*', { count:'exact', head:true }).gte('created_at', startOfMonth.toISOString()),
                 supabaseClient.from('users').select('*', { count:'exact', head:true }).gte('created_at', prevStartOfMonth.toISOString()).lt('created_at', startOfMonth.toISOString()),
                 supabaseClient.from('subscriptions').select('*', { count:'exact', head:true }).eq('plan','trial').eq('status','active'),
                 supabaseClient.from('subscriptions').select('*', { count:'exact', head:true }).eq('plan','trial').eq('status','active').lt('created_at', startOfMonth.toISOString()),
-                supabaseClient.from('subscriptions').select('*').eq('status','active').neq('plan','trial'),
-                supabaseClient.from('subscriptions').select('*').eq('status','active').neq('plan','trial').lt('created_at', startOfMonth.toISOString()),
+                supabaseClient.from('subscriptions').select('plan,status').eq('status','active').neq('plan','trial'),
+                supabaseClient.from('subscriptions').select('plan,status').eq('status','active').neq('plan','trial').lt('created_at', startOfMonth.toISOString()),
                 supabaseClient.from('subscriptions').select('*', { count:'exact', head:true }).eq('status','canceled').gte('canceled_at', startOfMonth.toISOString()),
                 supabaseClient.from('marketing_costs').select('amount').eq('month', now.getMonth()+1).eq('year', now.getFullYear()).single(),
                 supabaseClient.from('payments').select('amount,paid_at').gte('paid_at', startOfYear.toISOString()),
@@ -333,26 +330,29 @@
             const cancellations = cancelRes.count || 0;
             const marketingCost = marketingRes.data?.amount || 0;
             const paymentsYear = paymentsYearRes.data || [];
-            const newPaidThisMonth = paidThisMonthRes.count || 0;
+            const newPaidThisMonth = newPaidThisMonthRes.count || 0;
             const usersYear = usersYearRes.data || [];
 
             const planCounts = {};
-            activeSubs.forEach(s => { planCounts[s.plan] = (planCounts[s.plan]||0)+1; });
-            const monthlyCount = planCounts['monthly'] || planCounts['mensal'] || 0;
-            const yearlyCount = planCounts['yearly'] || planCounts['anual'] || 0;
+            activeSubs.forEach(s => { const key = s.plan || 'unknown'; planCounts[key] = (planCounts[key]||0)+1; });
+            const monthlyCount = activeSubs.filter(s => isMonthly(s.plan)).length;
+            const yearlyCount = activeSubs.filter(s => isYearly(s.plan)).length;
             const activeCount = activeSubs.length;
 
-            const prevPlanCounts = {};
-            prevActiveSubs.forEach(s => { prevPlanCounts[s.plan] = (prevPlanCounts[s.plan]||0)+1; });
-            const prevMonthlyCount = prevPlanCounts['monthly'] || prevPlanCounts['mensal'] || 0;
-            const prevYearlyCount = prevPlanCounts['yearly'] || prevPlanCounts['anual'] || 0;
+            const prevMonthlyCount = prevActiveSubs.filter(s => isMonthly(s.plan)).length;
+            const prevYearlyCount = prevActiveSubs.filter(s => isYearly(s.plan)).length;
             const prevActiveCount = prevActiveSubs.length;
 
-            // MRR com valores (exemplo): Mensal R$29, Anual R$348/ano
             const mrr = monthlyCount * 29 + yearlyCount * (348/12);
-            const mrrPrev = prevMonthlyCount * 29 + prevYearlyCount * (348/12);
-            const monthsRemaining = 12 - now.getMonth();
-            const projected = mrr * monthsRemaining;
+            const monthlyRevenue = paymentsYear
+                .filter(p => new Date(p.paid_at).getMonth() === now.getMonth())
+                .reduce((sum,p) => sum + p.amount, 0);
+            const prevMonthlyRevenue = paymentsYear
+                .filter(p => new Date(p.paid_at).getMonth() === now.getMonth()-1)
+                .reduce((sum,p) => sum + p.amount, 0);
+            const realizedRevenue = paymentsYear.reduce((sum,p) => sum + p.amount, 0);
+            const monthsRemaining = 11 - now.getMonth();
+            const projected = realizedRevenue + monthlyRevenue * monthsRemaining;
 
             const churnRate = activeCount ? (cancellations / activeCount) * 100 : 0;
             const arpu = activeCount ? mrr / activeCount : 0;
@@ -363,7 +363,7 @@
             const newUsersChange = prevNewUsers ? ((newUsers - prevNewUsers)/prevNewUsers)*100 : 0;
             const trialChange = prevTrialCount ? ((trialCount - prevTrialCount)/prevTrialCount)*100 : 0;
             const activeChange = prevActiveCount ? ((activeCount - prevActiveCount)/prevActiveCount)*100 : 0;
-            const revenueChange = mrrPrev ? ((mrr - mrrPrev)/mrrPrev)*100 : 0;
+            const revenueChange = prevMonthlyRevenue ? ((monthlyRevenue - prevMonthlyRevenue)/prevMonthlyRevenue)*100 : 0;
 
             document.getElementById('newUsers').textContent = newUsers;
             document.getElementById('newUsersChange').textContent = `${newUsersChange.toFixed(1)}%`;
@@ -373,7 +373,7 @@
             document.getElementById('activeUsersChange').textContent = `${activeChange.toFixed(1)}%`;
             document.getElementById('monthlySubs').textContent = monthlyCount;
             document.getElementById('yearlySubs').textContent = yearlyCount;
-            document.getElementById('monthlyRevenue').textContent = `R$ ${mrr.toFixed(2)}`;
+            document.getElementById('monthlyRevenue').textContent = `R$ ${monthlyRevenue.toFixed(2)}`;
             document.getElementById('monthlyRevenueChange').textContent = `${revenueChange.toFixed(1)}%`;
             document.getElementById('projectedRevenue').textContent = `R$ ${projected.toFixed(2)}`;
             document.getElementById('churnRate').textContent = `${churnRate.toFixed(1)}%`;
@@ -381,7 +381,7 @@
             document.getElementById('cac').textContent = `R$ ${cac.toFixed(2)}`;
             document.getElementById('conversionRate').textContent = `${conversionRate.toFixed(1)}%`;
 
-            // Usuários por mês (acumulado)
+            // Users per month cumulative line
             const usersPerMonth = new Array(12).fill(0);
             usersYear.forEach(u => { usersPerMonth[new Date(u.created_at).getMonth()]++; });
             let cumulative = 0;
@@ -395,7 +395,7 @@
                 options: { scales: { y: { beginAtZero: true } } }
             });
 
-            // Distribuição de planos (barra horizontal)
+            // Plan distribution chart (horizontal bar)
             if (usersCharts.plan) usersCharts.plan.destroy();
             const ctxPlan = document.getElementById('planChart').getContext('2d');
             usersCharts.plan = new Chart(ctxPlan, {
@@ -404,11 +404,11 @@
                 options: { indexAxis: 'y', scales: { x: { beginAtZero: true } } }
             });
 
-            // Receita: realizado x projetado
+            // Revenue chart (realized vs projected)
             const realized = new Array(12).fill(0);
             paymentsYear.forEach(p => { realized[new Date(p.paid_at).getMonth()] += p.amount; });
             const projectedArr = [...realized];
-            for (let i = now.getMonth(); i < 12; i++) projectedArr[i] = mrr;
+            for (let i = now.getMonth(); i < 12; i++) projectedArr[i] = monthlyRevenue;
 
             if (usersCharts.revenue) usersCharts.revenue.destroy();
             const ctxRev = document.getElementById('revenueChart').getContext('2d');
@@ -434,7 +434,10 @@
                 .from('users')
                 .select('id,name,email,specialty,last_login,subscriptions(plan,status)')
                 .order('created_at', { ascending: false });
-            usersData = data || [];
+            usersData = (data || []).map(u => {
+                const sub = Array.isArray(u.subscriptions) ? u.subscriptions.find(s => s.status === 'active') : u.subscriptions;
+                return { ...u, subscription: sub };
+            });
 
             const specialties = [...new Set(usersData.map(u => u.specialty).filter(Boolean))];
             const select = document.getElementById('filterSpecialty');
@@ -457,9 +460,14 @@
 
             usersData
                 .filter(u =>
-                    (!search || ( (u.name||'') + (u.email||'') ).toLowerCase().includes(search)) &&
-                    (!statusFilter || (u.subscriptions?.status === statusFilter)) &&
-                    (!planFilter || (u.subscriptions?.plan === planFilter)) &&
+                    (!search || ((u.name || '') + (u.email || '')).toLowerCase().includes(search)) &&
+                    (!statusFilter || (u.subscription?.status === statusFilter)) &&
+                    (
+                        !planFilter ||
+                        (planFilter === 'monthly' && isMonthly(u.subscription?.plan)) ||
+                        (planFilter === 'yearly' && isYearly(u.subscription?.plan)) ||
+                        u.subscription?.plan === planFilter
+                    ) &&
                     (!specialtyFilter || u.specialty === specialtyFilter)
                 )
                 .forEach(u => {
@@ -467,8 +475,8 @@
                     tr.innerHTML = `
                         <td>${u.name || ''}</td>
                         <td>${u.email || ''}</td>
-                        <td><span class="status-badge status-${u.subscriptions?.status || 'unknown'}">${u.subscriptions?.status || ''}</span></td>
-                        <td>${u.subscriptions?.plan || ''}</td>
+                        <td><span class="status-badge status-${u.subscription?.status || 'unknown'}">${u.subscription?.status || ''}</span></td>
+                        <td>${u.subscription?.plan || ''}</td>
                         <td>${u.specialty || ''}</td>
                         <td>${u.last_login ? new Date(u.last_login).toLocaleDateString() : ''}</td>
                         <td><button onclick="openUserModal('${u.id}')">Ações</button></td>`;
@@ -483,12 +491,12 @@
             usersData.forEach(u => rows.push([
                 u.name || '',
                 u.email || '',
-                u.subscriptions?.status || '',
-                u.subscriptions?.plan || '',
+                u.subscription?.status || '',
+                u.subscription?.plan || '',
                 u.specialty || '',
                 u.last_login || ''
             ]));
-            const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
+            const csv = rows.map(r => r.map(v => `"${v}"`).join(',')).join('\n');
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
@@ -505,9 +513,7 @@
             document.getElementById('userModal').classList.remove('hidden');
         }
 
-        function closeUserModal() {
-            document.getElementById('userModal').classList.add('hidden');
-        }
+        function closeUserModal() { document.getElementById('userModal').classList.add('hidden'); }
 
         async function sendEmail() {
             if (!currentModalUser) return;
@@ -544,12 +550,12 @@
 
         function setupRealtime() {
             supabaseClient.channel('admin-listener')
-                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'users' }, payload => {
+                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'users' }, () => {
                     showToast('Novo usuário cadastrado');
                     loadUsers();
                     loadDashboardData();
                 })
-                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'payments' }, payload => {
+                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'payments' }, () => {
                     showToast('Nova receita registrada');
                     loadDashboardData();
                 })
