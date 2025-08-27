@@ -390,17 +390,17 @@
 </head>
 <body>
     <!-- Include Supabase Config -->
-    <script src="js/supabase-config.js"></script>
+    <script src="/js/supabase-config.js"></script>
     
     <div class="container">
         <!-- Header -->
         <div class="header">
             <h1>
-                <img src="img/saas-logo.png" alt="Logo" style="height: 32px;">
+                <img src="/img/saas-logo.png" alt="Logo" style="height: 32px;">
                 Meu Perfil
             </h1>
             <div class="nav-buttons">
-                <a href="app.html" class="btn btn-white">← Voltar ao Sistema</a>
+                <a href="/app" class="btn btn-white">← Voltar ao Sistema</a>
                 <button class="btn btn-white" onclick="logout()">Sair</button>
             </div>
         </div>
@@ -594,7 +594,7 @@
             // Check authentication
             const session = await checkSession();
             if (!session) {
-                window.location.href = 'auth.html';
+                window.location.href = '/auth';
                 return;
             }
 
@@ -676,7 +676,7 @@ async function loadSubscriptionData(userId) {
         if (error) {
             console.error('Erro ao buscar subscription:', error);
             planStatus.textContent = 'Erro ao carregar plano';
-            trialInfo.innerHTML = `<p style="color: var(--error);">Erro: ${error.message}</p>`;
+            trialInfo.innerHTML = '<p style="color: var(--error);">Erro ao carregar informações do plano</p>';
             upgradeBtn.textContent = 'Contatar Suporte';
             upgradeBtn.className = 'btn-primary error';
             return;
@@ -788,7 +788,7 @@ async function loadSubscriptionData(userId) {
     } catch (error) {
         console.error('Error loading subscription data:', error);
         document.getElementById('planStatus').textContent = 'Erro ao carregar plano';
-        document.getElementById('trialInfo').innerHTML = `<p style="color: var(--error);">Erro: ${error.message}</p>`;
+        document.getElementById('trialInfo').innerHTML = '<p style="color: var(--error);">Erro ao carregar informações do plano</p>';
     }
 }
 
@@ -1406,10 +1406,10 @@ async function debugSubscriptionConnection(userId) {
         async function logout() {
             try {
                 await supabaseClient.auth.signOut();
-                window.location.href = 'auth.html';
+                window.location.href = '/auth';
             } catch (error) {
                 console.error('Logout error:', error);
-                window.location.href = 'auth.html';
+                window.location.href = '/auth';
             }
         }
 
