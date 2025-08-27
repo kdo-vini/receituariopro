@@ -9,7 +9,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase-config.js"></script>
-
+<script>
+    // Debug para verificar se o Supabase carregou
+    console.log('Supabase disponível?', typeof window.supabase !== 'undefined');
+    if (window.supabase) {
+        console.log('Versão do Supabase:', window.supabase.version || 'versão não detectada');
+    }
+</script>
     <style>
         :root {
             --primary: #667eea;

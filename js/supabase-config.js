@@ -10,7 +10,14 @@ const SUPABASE_URL = "https://kqumjmacwlpaxfuziooy.supabase.co"; // pública
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtxdW1qbWFjd2xwYXhmdXppb295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU1NDI3NDUsImV4cCI6MjA3MTExODc0NX0.gwCdzsL5YjfNx_Krav5l12PtuReHxibOQBLc80b-4UE"; // ANON KEY pública
 
 // Cria client global
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+let supabaseClient;
+// Verificar se a biblioteca Supabase está carregada
+if (typeof window !== 'undefined' && window.supabase) {
+    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    console.log('Supabase client inicializado com sucesso');
+} else {
+    console.error('Biblioteca Supabase não encontrada! Verificar se está carregada.');
+}
 
 // ========================================
 // CONFIGURAÇÕES DO STRIPE
@@ -220,132 +227,124 @@ async function registerProfessional(userData) {
     }
 }
 
-/**
- * Login de usuário - VERSÃO COM FALLBACK PARA RLS
- */
 async function loginUser(email, password) {
     try {
         console.log('Tentando login para:', email);
         
         // 1. Fazer login
-        const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({
+        const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
             email,
             password
         });
 
         if (authError) {
-            console.error('Erro de auth:', authError);
+            console.error('Erro no login:', authError);
             throw authError;
         }
 
-        console.log('Login auth sucesso:', authData.user?.id);
+        console.log('Login auth sucesso:', authData.user.id);
 
-        // 2. Buscar dados do usuário - COM FALLBACK PARA RLS
-        let user = null;
-        let userError = null;
-        
-        try {
-            // Tentar busca normal primeiro
-            const { data: userData, error: normalError } = await supabaseClient
-                .from('users')
-                .select('*')
-                .eq('id', authData.user.id)
-                .single();
-                
-            if (normalError) throw normalError;
-            user = userData;
+        // 2. Buscar dados do usuário - CORRIGIDO para evitar recursão
+        // Usar uma abordagem mais simples
+        const { data: user, error: userError } = await supabase
+            .from('users')
+            .select('*')
+            .eq('id', authData.user.id)
+            .single();
+
+        if (userError) {
+            console.error('Erro ao buscar usuário:', userError);
             
-        } catch (relsError) {
-            console.warn('Erro RLS na busca normal, tentando via função fetch-user:', relsError);
-
-            try {
-                const { data: fnData, error: fnError } = await supabaseClient.functions.invoke('fetch-user', {
-                    body: { id: authData.user.id, email }
-                });
-
-                if (fnError) throw fnError;
-
-                user = fnData?.user;
-
-                if (!user) {
-                    console.log('Usuário não encontrado, tentando criar...');
-
-                    const { data: newUser, error: createError } = await supabaseClient
+            // Se der erro de RLS, tentar criar o registro do usuário se não existir
+            if (userError.code === '42P17' || userError.code === 'PGRST116') {
+                console.log('Tentando criar registro de usuário...');
+                
+                // Verificar se o usuário existe
+                const { data: existingUser } = await supabase
+                    .from('users')
+                    .select('id')
+                    .eq('id', authData.user.id)
+                    .maybeSingle();
+                
+                if (!existingUser) {
+                    // Criar registro básico do usuário
+                    const { data: newUser, error: createError } = await supabase
                         .from('users')
                         .insert({
                             id: authData.user.id,
-                            email: email,
+                            email: authData.user.email,
                             name: authData.user.user_metadata?.name || email.split('@')[0],
                             status: 'active',
                             is_admin: email === 'techne.br@gmail.com'
                         })
                         .select()
                         .single();
-
+                    
                     if (createError) {
                         console.error('Erro ao criar usuário:', createError);
                         throw createError;
                     }
-
-                    user = newUser;
-                    console.log('Usuário criado com sucesso:', user);
+                    
+                    return { success: true, user: newUser, isAdmin: newUser.is_admin };
                 }
-
-            } catch (fallbackError2) {
-                console.error('Fallback também falhou:', fallbackError2);
-                throw fallbackError2;
             }
+            
+            throw userError;
         }
-
-        if (!user) {
-            throw new Error('Não foi possível carregar dados do usuário');
-        }
-
-        console.log('User data carregada:', user.name);
 
         // 3. Verificar se é admin
         if (email === 'techne.br@gmail.com' || user.is_admin) {
             return { success: true, user, isAdmin: true };
         }
 
-        // 4. Verificar status do usuário regular
-        if (user.status === 'pending') {
-            await supabaseClient.auth.signOut();
-            return { 
-                success: false, 
-                error: 'Sua conta ainda está em validação. Aguarde até 24h.' 
-            };
-        }
-
-        if (user.status === 'rejected') {
-            await supabaseClient.auth.signOut();
-            return { 
-                success: false, 
-                error: 'Seu cadastro foi rejeitado. Entre em contato com o suporte.' 
-            };
-        }
-
         if (user.status === 'suspended') {
-            await supabaseClient.auth.signOut();
+            await supabase.auth.signOut();
             return { 
                 success: false, 
                 error: 'Sua conta está suspensa. Entre em contato com o suporte.' 
             };
         }
 
-        // 5. Verificar trial status - COM TRATAMENTO DE ERRO
+        // 5. Verificar trial status
+        const { data: subscription } = await supabase
+            .from('subscriptions')
+            .select('*')
+            .eq('user_id', authData.user.id)
+            .eq('status', 'active')
+            .maybeSingle();
+
         let trialStatus = null;
-        try {
-            trialStatus = await checkTrialStatus(authData.user.id);
-        } catch (trialError) {
-            console.warn('Erro ao verificar trial status:', trialError);
-            // Continuar sem trial status se der erro
-            trialStatus = { 
-                has_access: true, 
-                message: 'Erro ao verificar trial, mas permitindo acesso' 
-            };
+        if (subscription) {
+            if (subscription.plan === 'trial' && subscription.trial_ends_at) {
+                const trialEnd = new Date(subscription.trial_ends_at);
+                const now = new Date();
+                const daysLeft = Math.ceil((trialEnd - now) / (1000 * 60 * 60 * 24));
+                
+                trialStatus = {
+                    has_access: daysLeft > 0,
+                    days_left: Math.max(0, daysLeft),
+                    reason: daysLeft <= 0 ? 'trial_expired' : null
+                };
+            } else {
+                trialStatus = { has_access: true };
+            }
+        } else {
+            // Se não tem assinatura, criar trial
+            const trialEndDate = new Date();
+            trialEndDate.setDate(trialEndDate.getDate() + 30);
+            
+            await supabase
+                .from('subscriptions')
+                .insert({
+                    user_id: authData.user.id,
+                    plan: 'trial',
+                    status: 'active',
+                    trial_ends_at: trialEndDate.toISOString()
+                });
+            
+            trialStatus = { has_access: true, days_left: 30 };
         }
-        
+
         return { 
             success: true, 
             user, 
@@ -355,21 +354,7 @@ async function loginUser(email, password) {
 
     } catch (error) {
         console.error('Login error:', error);
-        
-        let errorMessage = 'Erro ao fazer login. Tente novamente.';
-        
-        if (error.message?.includes('Invalid login credentials')) {
-            errorMessage = 'E-mail ou senha incorretos.';
-        } else if (error.message?.includes('Email not confirmed')) {
-            errorMessage = 'Confirme seu e-mail antes de fazer login.';
-        } else if (error.message?.includes('network')) {
-            errorMessage = 'Erro de conexão. Verifique sua internet.';
-        } else if (error.code === '42P17') {
-            errorMessage = 'Erro de configuração do sistema. Contate o suporte.';
-        }
-        
-        const details = error.message || JSON.stringify(error);
-        return { success: false, error: errorMessage, details };
+        return { success: false, error: error.message };
     }
 }
 /**
