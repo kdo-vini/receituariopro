@@ -193,6 +193,18 @@ async function registerProfessional(userData) {
 
         console.log('Auth user criado:', authData.user?.id);
 
+        // Garantir sessão ativa antes de manipular tabelas protegidas
+        if (!authData.session) {
+            const { error: loginError } = await supabaseClient.auth.signInWithPassword({
+                email: userData.email,
+                password: userData.password
+            });
+            if (loginError) {
+                console.error('Erro ao autenticar após signup:', loginError);
+                throw loginError;
+            }
+        }
+
         // 2. Criar registro na tabela users
         const { data: user, error: userError } = await supabaseClient
             .from('users')
@@ -213,12 +225,6 @@ async function registerProfessional(userData) {
 
         if (userError) {
             console.error('Erro user:', userError);
-            // Se der erro, tentar deletar o auth user criado
-            try {
-                await supabaseClient.auth.admin.deleteUser(authData.user.id);
-            } catch (cleanupError) {
-                console.error('Erro ao limpar auth user:', cleanupError);
-            }
             throw userError;
         }
 

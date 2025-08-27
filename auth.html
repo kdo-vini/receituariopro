@@ -185,6 +185,33 @@
             display: block;
             animation: fadeIn 0.3s;
         }
+
+        /* 🔧 Registro temporariamente desativado */
+        #registerPanel {
+            position: relative;
+        }
+
+        .register-blur {
+            filter: blur(4px);
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .register-maintenance-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            width: 80%;
+            max-width: 400px;
+            z-index: 1;
+            color: var(--text-dark);
+        }
         
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
@@ -558,119 +585,123 @@
             
             <!-- Register Panel -->
             <div class="form-panel" id="registerPanel">
-                <h2 class="form-title">Começar Trial Gratuito</h2>
-                <p class="form-subtitle">30 dias grátis • Acesso completo • Sem cartão de crédito</p>
-                
-                <form id="registerForm">
-                    <div class="form-group">
-                        <label for="registerName">Nome Completo <span class="required">*</span></label>
-                        <input type="text" id="registerName" class="form-control" required>
-                        <span class="error-message">Nome é obrigatório</span>
-                        <span class="form-helper">Este nome aparecerá em seus receituários</span>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="registerEmail">E-mail Profissional <span class="required">*</span></label>
-                        <input type="email" id="registerEmail" class="form-control" required>
-                        <span class="error-message">E-mail inválido</span>
-                    </div>
-                    
-                    <div class="input-group">
+                <!-- 🔧 Registro em manutenção: remova este bloco para reativar -->
+                <div class="register-blur">
+                    <h2 class="form-title">Começar Trial Gratuito</h2>
+                    <p class="form-subtitle">30 dias grátis • Acesso completo • Sem cartão de crédito</p>
+
+                    <form id="registerForm">
                         <div class="form-group">
-                            <label for="registerCouncil">Conselho <span class="required">*</span></label>
-                            <div class="select-wrapper">
-                                <select id="registerCouncil" class="form-control" required>
-                                    <option value="">Selecione</option>
-                                    <option value="CRM">CRM - Medicina</option>
-                                    <option value="CRO">CRO - Odontologia</option>
-                                    <option value="COREN">COREN - Enfermagem</option>
-                                    <option value="CRF">CRF - Farmácia</option>
-                                    <option value="CREFITO">CREFITO - Fisioterapia</option>
-                                    <option value="CRN">CRN - Nutrição</option>
-                                    <option value="CRFA">CRFa - Fonoaudiologia</option>
-                                    <option value="CRP">CRP - Psicologia</option>
-                                </select>
+                            <label for="registerName">Nome Completo <span class="required">*</span></label>
+                            <input type="text" id="registerName" class="form-control" required>
+                            <span class="error-message">Nome é obrigatório</span>
+                            <span class="form-helper">Este nome aparecerá em seus receituários</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="registerEmail">E-mail Profissional <span class="required">*</span></label>
+                            <input type="email" id="registerEmail" class="form-control" required>
+                            <span class="error-message">E-mail inválido</span>
+                        </div>
+
+                        <div class="input-group">
+                            <div class="form-group">
+                                <label for="registerCouncil">Conselho <span class="required">*</span></label>
+                                <div class="select-wrapper">
+                                    <select id="registerCouncil" class="form-control" required>
+                                        <option value="">Selecione</option>
+                                        <option value="CRM">CRM - Medicina</option>
+                                        <option value="CRO">CRO - Odontologia</option>
+                                        <option value="COREN">COREN - Enfermagem</option>
+                                        <option value="CRF">CRF - Farmácia</option>
+                                        <option value="CREFITO">CREFITO - Fisioterapia</option>
+                                        <option value="CRN">CRN - Nutrição</option>
+                                        <option value="CRFA">CRFa - Fonoaudiologia</option>
+                                        <option value="CRP">CRP - Psicologia</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="registerState">Estado <span class="required">*</span></label>
+                                <div class="select-wrapper">
+                                    <select id="registerState" class="form-control" required>
+                                        <option value="">UF</option>
+                                        <option value="AC">AC</option>
+                                        <option value="AL">AL</option>
+                                        <option value="AP">AP</option>
+                                        <option value="AM">AM</option>
+                                        <option value="BA">BA</option>
+                                        <option value="CE">CE</option>
+                                        <option value="DF">DF</option>
+                                        <option value="ES">ES</option>
+                                        <option value="GO">GO</option>
+                                        <option value="MA">MA</option>
+                                        <option value="MT">MT</option>
+                                        <option value="MS">MS</option>
+                                        <option value="MG">MG</option>
+                                        <option value="PA">PA</option>
+                                        <option value="PB">PB</option>
+                                        <option value="PR">PR</option>
+                                        <option value="PE">PE</option>
+                                        <option value="PI">PI</option>
+                                        <option value="RJ">RJ</option>
+                                        <option value="RN">RN</option>
+                                        <option value="RS">RS</option>
+                                        <option value="RO">RO</option>
+                                        <option value="RR">RR</option>
+                                        <option value="SC">SC</option>
+                                        <option value="SP">SP</option>
+                                        <option value="SE">SE</option>
+                                        <option value="TO">TO</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
-                        
+
                         <div class="form-group">
-                            <label for="registerState">Estado <span class="required">*</span></label>
-                            <div class="select-wrapper">
-                                <select id="registerState" class="form-control" required>
-                                    <option value="">UF</option>
-                                    <option value="AC">AC</option>
-                                    <option value="AL">AL</option>
-                                    <option value="AP">AP</option>
-                                    <option value="AM">AM</option>
-                                    <option value="BA">BA</option>
-                                    <option value="CE">CE</option>
-                                    <option value="DF">DF</option>
-                                    <option value="ES">ES</option>
-                                    <option value="GO">GO</option>
-                                    <option value="MA">MA</option>
-                                    <option value="MT">MT</option>
-                                    <option value="MS">MS</option>
-                                    <option value="MG">MG</option>
-                                    <option value="PA">PA</option>
-                                    <option value="PB">PB</option>
-                                    <option value="PR">PR</option>
-                                    <option value="PE">PE</option>
-                                    <option value="PI">PI</option>
-                                    <option value="RJ">RJ</option>
-                                    <option value="RN">RN</option>
-                                    <option value="RS">RS</option>
-                                    <option value="RO">RO</option>
-                                    <option value="RR">RR</option>
-                                    <option value="SC">SC</option>
-                                    <option value="SP">SP</option>
-                                    <option value="SE">SE</option>
-                                    <option value="TO">TO</option>
-                                </select>
-                            </div>
+                            <label for="registerNumber">Número do Registro <span class="required">*</span></label>
+                            <input type="text" id="registerNumber" class="form-control" placeholder="Ex: 123456" required>
+                            <span class="error-message">Número de registro inválido</span>
+                            <span class="form-helper">Apenas números, sem pontos ou traços</span>
                         </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="registerNumber">Número do Registro <span class="required">*</span></label>
-                        <input type="text" id="registerNumber" class="form-control" placeholder="Ex: 123456" required>
-                        <span class="error-message">Número de registro inválido</span>
-                        <span class="form-helper">Apenas números, sem pontos ou traços</span>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="registerSpecialty">Especialidade</label>
-                        <input type="text" id="registerSpecialty" class="form-control" placeholder="Ex: Clínica Geral">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="registerPhone">WhatsApp</label>
-                        <input type="tel" id="registerPhone" class="form-control" placeholder="(11) 98765-4321">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="registerPassword">Senha <span class="required">*</span></label>
-                        <input type="password" id="registerPassword" class="form-control" required>
-                        <span class="error-message">Senha deve ter no mínimo 8 caracteres</span>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="registerPasswordConfirm">Confirmar Senha <span class="required">*</span></label>
-                        <input type="password" id="registerPasswordConfirm" class="form-control" required>
-                        <span class="error-message">As senhas não coincidem</span>
-                    </div>
-                    
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="acceptTerms" required>
-                        <label for="acceptTerms">
-                            Li e aceito os <a href="#" onclick="showTermsModal(); return false;">Termos de Uso</a> e a 
-                            <a href="#" onclick="showTermsModal(); return false;">Política de Privacidade</a>
-                        </label>
-                    </div>
-                    
-                    <button type="submit" class="btn btn-primary">
-                        <span id="registerBtnText">🎁 Começar Trial Grátis</span>
-                    </button>
-                </form>
+
+                        <div class="form-group">
+                            <label for="registerSpecialty">Especialidade</label>
+                            <input type="text" id="registerSpecialty" class="form-control" placeholder="Ex: Clínica Geral">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="registerPhone">WhatsApp</label>
+                            <input type="tel" id="registerPhone" class="form-control" placeholder="(11) 98765-4321">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="registerPassword">Senha <span class="required">*</span></label>
+                            <input type="password" id="registerPassword" class="form-control" required>
+                            <span class="error-message">Senha deve ter no mínimo 8 caracteres</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="registerPasswordConfirm">Confirmar Senha <span class="required">*</span></label>
+                            <input type="password" id="registerPasswordConfirm" class="form-control" required>
+                            <span class="error-message">As senhas não coincidem</span>
+                        </div>
+
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="acceptTerms" required>
+                            <label for="acceptTerms">
+                                Li e aceito os <a href="#" onclick="showTermsModal(); return false;">Termos de Uso</a> e a
+                                <a href="#" onclick="showTermsModal(); return false;">Política de Privacidade</a>
+                            </label>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">
+                            <span id="registerBtnText">🎁 Começar Trial Grátis</span>
+                        </button>
+                    </form>
+                </div>
+                <div class="register-maintenance-message">Cadastros temporariamente indisponíveis para manutenção</div>
             </div>
             
             <!-- Recover Panel -->
