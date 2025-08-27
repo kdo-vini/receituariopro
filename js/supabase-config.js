@@ -7,7 +7,7 @@
 // CONFIGURAÇÕES DO SUPABASE
 // ========================================
 const SUPABASE_URL = "https://kqumjmacwlpaxfuziooy.supabase.co"; // pública
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtxdW1qbWFjd2xwYXhmdXppb295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU1NDI3NDUsImV4cCI6MjA3MTExODc0NX0.gwCdzsL5YjfNx_Krav5l12PtuReHxibOQBLc80b-4UE"; // ANON KEY pública
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtxdW1qbWFjd2xwYXhmdXppb295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU1NDI3NDUsImV4cCI6MjA3MTExODc0NX0.gwCdzsL5YjfNx_Krav5l12PtuReHxibOQBLc80b-4UE"; // ANON KEY publica
 
 // Cria client global
 let supabaseClient;
@@ -107,7 +107,7 @@ async function sendWelcomeEmail(user) {
         registration: user.registration_number,
         specialty: user.specialty || 'Não informada',
         support_email: RESEND_CONFIG.SUPPORT_EMAIL,
-        app_url: 'https://receituariopro.com.br/app.html'
+        app_url: 'https://receituariopro.com.br/app'
     });
 }
 
@@ -117,7 +117,7 @@ async function sendWelcomeEmail(user) {
 async function sendApprovalEmail(user) {
     return await sendEmailTemplate(RESEND_CONFIG.TEMPLATES.APPROVAL, user.email, {
         name: user.name,
-        login_url: 'https://receituariopro.com.br/auth.html'
+        login_url: 'https://receituariopro.com.br/auth'
     });
 }
 
@@ -159,7 +159,7 @@ async function sendPlanExpiredEmail(user) {
 async function sendPasswordResetEmail(email) {
     try {
         const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-            redirectTo: 'https://receituariopro.com.br/update-password.html'
+            redirectTo: 'https://receituariopro.com.br/update-password'
         });
 
         if (error) throw error;
@@ -351,10 +351,18 @@ async function loginUser(email, password) {
             isAdmin: false,
             trialStatus 
         };
-
     } catch (error) {
         console.error('Login error:', error);
-        return { success: false, error: error.message };
+        let errorMessage = 'Erro ao fazer login. Verifique suas credenciais.';
+        const msg = error.message || '';
+        if (msg.includes('Invalid login credentials')) {
+            errorMessage = 'Credenciais inválidas. Verifique e tente novamente.';
+        } else if (msg.includes('Email not confirmed')) {
+            errorMessage = 'E-mail não confirmado. Verifique sua caixa de entrada.';
+        } else if (msg.toLowerCase().includes('network')) {
+            errorMessage = 'Erro de conexão. Verifique sua internet.';
+        }
+        return { success: false, error: errorMessage };
     }
 }
 /**
@@ -485,7 +493,12 @@ async function updatePassword(newPassword) {
         return { success: true };
     } catch (error) {
         console.error('Update password error:', error);
-        return { success: false, error: error.message };
+        let errorMessage = 'Erro ao atualizar senha. Tente novamente.';
+        const msg = error.message || '';
+        if (msg.toLowerCase().includes('network')) {
+            errorMessage = 'Erro de conexão. Verifique sua internet.';
+        }
+        return { success: false, error: errorMessage };
     }
 }
 
@@ -1110,9 +1123,8 @@ supabaseClient.auth.onAuthStateChange((event, session) => {
         cache.clear(); // Limpar cache ao fazer logout
         
         // Só redireciona se não estiver já na página de auth ou index
-        if (!window.location.pathname.includes('auth.html') && 
-            !window.location.pathname.includes('index.html')) {
-            window.location.href = '/auth.html';
+        if (!window.location.pathname.startsWith('/auth') && window.location.pathname !== '/') {
+            window.location.href = '/auth';
         }
     }
     

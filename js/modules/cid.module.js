@@ -376,8 +376,7 @@ async searchCID(query) {
     const resultsContainer = document.getElementById('cidSearchResults');
     resultsContainer.innerHTML = `
         <div class="cid-no-results">
-            Erro ao buscar. Tente novamente.
-            <br><small>${error.message}</small>
+            Erro ao buscar. Tente novamente mais tarde.
         </div>
     `;
 }

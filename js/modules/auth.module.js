@@ -23,7 +23,7 @@ async initialize() {
         
         // Verificar se é admin
         if (this.isAdmin()) {
-            window.location.href = 'admin.html';
+            window.location.href = '/admin';
             return false;
         }
 
@@ -81,7 +81,7 @@ async logout() {
  * Redirecionar para login
  */
 redirectToLogin() {
-    window.location.href = 'auth.html';
+    window.location.href = '/auth';
 }
 
 /**
