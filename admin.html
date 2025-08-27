@@ -114,7 +114,7 @@
     <div class="dashboard" id="dashboard">
         <header class="admin-header">
             <div class="admin-logo">
-                <img src="img/logo.png" alt="Logo">
+                <img src="img/saas-logo.png" alt="Logo">
                 <span>Receituário Pro</span>
             </div>
             <div class="admin-user">
@@ -304,8 +304,7 @@
                 newUsersRes, prevNewUsersRes,
                 trialRes, prevTrialRes,
                 activeRes, prevActiveRes,
-                cancelRes, marketingRes,
-                paymentsYearRes, newPaidThisMonthRes,
+                cancelRes, newPaidThisMonthRes,
                 usersYearRes
             ] = await Promise.all([
                 supabaseClient.from('users').select('*', { count:'exact', head:true }).gte('created_at', startOfMonth.toISOString()),
@@ -314,9 +313,7 @@
                 supabaseClient.from('subscriptions').select('*', { count:'exact', head:true }).eq('plan','trial').eq('status','active').lt('created_at', startOfMonth.toISOString()),
                 supabaseClient.from('subscriptions').select('plan,status').eq('status','active').neq('plan','trial'),
                 supabaseClient.from('subscriptions').select('plan,status').eq('status','active').neq('plan','trial').lt('created_at', startOfMonth.toISOString()),
-                supabaseClient.from('subscriptions').select('*', { count:'exact', head:true }).eq('status','canceled').gte('canceled_at', startOfMonth.toISOString()),
-                supabaseClient.from('marketing_costs').select('amount').eq('month', now.getMonth()+1).eq('year', now.getFullYear()).single(),
-                supabaseClient.from('payments').select('amount,paid_at').gte('paid_at', startOfYear.toISOString()),
+                supabaseClient.from('subscriptions').select('*', { count:'exact', head:true }).eq('status','canceled'),
                 supabaseClient.from('subscriptions').select('*', { count:'exact', head:true }).eq('status','active').neq('plan','trial').gte('created_at', startOfMonth.toISOString()),
                 supabaseClient.from('users').select('id,created_at').gte('created_at', startOfYear.toISOString())
             ]);
@@ -328,8 +325,8 @@
             const activeSubs = activeRes.data || [];
             const prevActiveSubs = prevActiveRes.data || [];
             const cancellations = cancelRes.count || 0;
-            const marketingCost = marketingRes.data?.amount || 0;
-            const paymentsYear = paymentsYearRes.data || [];
+            const marketingCost = 0;
+            const paymentsYear = [];
             const newPaidThisMonth = newPaidThisMonthRes.count || 0;
             const usersYear = usersYearRes.data || [];
 
@@ -430,14 +427,18 @@
         async function loadUsers() {
             const tbody = document.getElementById('usersTableBody');
             tbody.innerHTML = '<tr><td colspan="7">Carregando...</td></tr>';
-            const { data } = await supabaseClient
+            const { data: users } = await supabaseClient
                 .from('users')
-                .select('id,name,email,specialty,last_login,subscriptions(plan,status)')
+                .select('id,name,email,specialty')
                 .order('created_at', { ascending: false });
-            usersData = (data || []).map(u => {
-                const sub = Array.isArray(u.subscriptions) ? u.subscriptions.find(s => s.status === 'active') : u.subscriptions;
-                return { ...u, subscription: sub };
-            });
+
+            let subsByUser = {};
+            const { data: subs } = await supabaseClient
+                .from('subscriptions')
+                .select('user_id,plan,status');
+            (subs || []).forEach(s => { subsByUser[s.user_id] = s; });
+
+            usersData = (users || []).map(u => ({ ...u, subscription: subsByUser[u.id] }));
 
             const specialties = [...new Set(usersData.map(u => u.specialty).filter(Boolean))];
             const select = document.getElementById('filterSpecialty');
