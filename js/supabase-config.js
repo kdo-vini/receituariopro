@@ -174,14 +174,19 @@ async function sendPasswordResetEmail(email) {
 async function registerProfessional(userData) {
     try {
         console.log('Iniciando registro profissional...', userData);
-        
-        // 1. Criar auth user
+
+        // Cria usuário de autenticação; confirmação de e-mail é necessária
         const { data: authData, error: authError } = await supabaseClient.auth.signUp({
             email: userData.email,
             password: userData.password,
             options: {
                 data: {
-                    name: userData.name
+                    name: userData.name,
+                    council: userData.council,
+                    state: userData.state,
+                    registration_number: userData.registrationNumber,
+                    specialty: userData.specialty || null,
+                    phone: userData.phone || null
                 }
             }
         });
@@ -192,81 +197,12 @@ async function registerProfessional(userData) {
         }
 
         console.log('Auth user criado:', authData.user?.id);
+        console.log('Cadastro iniciado. Confirme o e-mail para ativar a conta.');
 
-        // Garantir sessão ativa antes de manipular tabelas protegidas
-        if (!authData.session) {
-            const { error: loginError } = await supabaseClient.auth.signInWithPassword({
-                email: userData.email,
-                password: userData.password
-            });
-            if (loginError) {
-                console.error('Erro ao autenticar após signup:', loginError);
-                throw loginError;
-            }
-        }
-
-        // 2. Criar registro na tabela users
-        const { data: user, error: userError } = await supabaseClient
-            .from('users')
-            .insert({
-                id: authData.user.id,
-                email: userData.email,
-                name: userData.name,
-                council: userData.council,
-                state: userData.state,
-                registration_number: userData.registrationNumber,
-                specialty: userData.specialty || null,
-                phone: userData.phone || null,
-                status: 'active', // Aprovação automática para trial
-                is_admin: false
-            })
-            .select()
-            .single();
-
-        if (userError) {
-            console.error('Erro user:', userError);
-            throw userError;
-        }
-
-        console.log('User criado:', user);
-
-        // 3. Criar assinatura trial (30 dias)
-        const trialEndDate = new Date();
-        trialEndDate.setDate(trialEndDate.getDate() + 30);
-
-        const { data: subscription, error: subError } = await supabaseClient
-            .from('subscriptions')
-            .insert({
-                user_id: authData.user.id,
-                plan: 'trial',
-                status: 'active',
-                trial_ends_at: trialEndDate.toISOString()
-            })
-            .select()
-            .single();
-
-        if (subError) {
-            console.error('Erro subscription:', subError);
-            throw subError;
-        }
-
-        console.log('Subscription criada:', subscription);
-
-        // 4. Enviar email de boas-vindas
-        try {
-            await sendWelcomeEmail(user);
-            console.log('Email de boas-vindas enviado');
-        } catch (emailError) {
-            console.error('Erro ao enviar email de boas-vindas:', emailError);
-            // Não falhar o registro por causa do email
-        }
-
-        return { success: true, user, subscription };
-
+        return { success: true, user: authData.user };
     } catch (error) {
         console.error('Registration error:', error);
-        
-        // Mensagens de erro mais específicas
+
         let errorMessage = 'Erro ao criar conta. Tente novamente.';
 
         if (error.message?.includes('already registered')) {
@@ -279,7 +215,6 @@ async function registerProfessional(userData) {
             errorMessage = 'Erro de conexão. Verifique sua internet.';
         }
 
-        // Retorna também detalhes técnicos para facilitar depuração
         const details = error.message || JSON.stringify(error);
         return { success: false, error: errorMessage, details };
     }
