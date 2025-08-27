@@ -232,7 +232,7 @@ async function loginUser(email, password) {
         console.log('Tentando login para:', email);
         
         // 1. Fazer login
-        const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+        const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({
             email,
             password
         });
@@ -246,7 +246,7 @@ async function loginUser(email, password) {
 
         // 2. Buscar dados do usuário - CORRIGIDO para evitar recursão
         // Usar uma abordagem mais simples
-        const { data: user, error: userError } = await supabase
+        const { data: user, error: userError } = await supabaseClient
             .from('users')
             .select('*')
             .eq('id', authData.user.id)
@@ -260,7 +260,7 @@ async function loginUser(email, password) {
                 console.log('Tentando criar registro de usuário...');
                 
                 // Verificar se o usuário existe
-                const { data: existingUser } = await supabase
+                const { data: existingUser } = await supabaseClient
                     .from('users')
                     .select('id')
                     .eq('id', authData.user.id)
@@ -268,7 +268,7 @@ async function loginUser(email, password) {
                 
                 if (!existingUser) {
                     // Criar registro básico do usuário
-                    const { data: newUser, error: createError } = await supabase
+                    const { data: newUser, error: createError } = await supabaseClient
                         .from('users')
                         .insert({
                             id: authData.user.id,
@@ -298,7 +298,7 @@ async function loginUser(email, password) {
         }
 
         if (user.status === 'suspended') {
-            await supabase.auth.signOut();
+            await supabaseClient.auth.signOut();
             return { 
                 success: false, 
                 error: 'Sua conta está suspensa. Entre em contato com o suporte.' 
@@ -306,7 +306,7 @@ async function loginUser(email, password) {
         }
 
         // 5. Verificar trial status
-        const { data: subscription } = await supabase
+        const { data: subscription } = await supabaseClient
             .from('subscriptions')
             .select('*')
             .eq('user_id', authData.user.id)
@@ -333,7 +333,7 @@ async function loginUser(email, password) {
             const trialEndDate = new Date();
             trialEndDate.setDate(trialEndDate.getDate() + 30);
             
-            await supabase
+            await supabaseClient
                 .from('subscriptions')
                 .insert({
                     user_id: authData.user.id,
