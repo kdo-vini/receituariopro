@@ -92,11 +92,23 @@
         .status-trial { background: var(--warning); color: black; }
         .status-canceled { background: var(--danger); }
 
+        .action-button {
+            padding: 0.25rem 0.75rem;
+            background: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
         /* Modal */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 1001; }
         .modal-content { background: white; padding: 2rem; border-radius: 12px; width: 300px; display: flex; flex-direction: column; gap: 1rem; }
         .modal.hidden { display: none; }
         .modal-content button { padding: 0.5rem 1rem; border: none; background: var(--primary); color: white; border-radius: 8px; cursor: pointer; }
+        .modal-content button.danger { background: var(--danger); }
+        .modal-content button.close { background: var(--gray-light); color: var(--text-dark); }
 
         /* Toast */
         #toastContainer { position: fixed; bottom: 1rem; right: 1rem; z-index: 1100; }
@@ -114,7 +126,7 @@
     <div class="dashboard" id="dashboard">
         <header class="admin-header">
             <div class="admin-logo">
-                <img src="img/logo.png" alt="Logo">
+                <img src="img/saas-logo.png" alt="Logo">
                 <span>Receituário Pro</span>
             </div>
             <div class="admin-user">
@@ -240,9 +252,9 @@
     <div id="userModal" class="modal hidden">
         <div class="modal-content">
             <h3 id="modalName"></h3>
-            <button onclick="sendEmail()">Enviar e-mail</button>
             <button onclick="resetPassword()">Resetar senha</button>
-            <button onclick="closeUserModal()">Fechar</button>
+            <button class="danger" onclick="deleteUser()">Excluir usuário</button>
+            <button class="close" onclick="closeUserModal()">Fechar</button>
         </div>
     </div>
 
@@ -259,7 +271,8 @@
         }
 
         function isYearly(plan) {
-            return (plan || '').toLowerCase().includes('year') || (plan || '').toLowerCase().includes('anual');
+            const p = (plan || '').toLowerCase();
+            return p.includes('year') || p.includes('anual') || p.includes('annual');
         }
 
         document.addEventListener('DOMContentLoaded', init);
@@ -304,8 +317,7 @@
                 newUsersRes, prevNewUsersRes,
                 trialRes, prevTrialRes,
                 activeRes, prevActiveRes,
-                cancelRes, marketingRes,
-                paymentsYearRes, newPaidThisMonthRes,
+                cancelRes, newPaidThisMonthRes,
                 usersYearRes
             ] = await Promise.all([
                 supabaseClient.from('users').select('*', { count:'exact', head:true }).gte('created_at', startOfMonth.toISOString()),
@@ -314,9 +326,7 @@
                 supabaseClient.from('subscriptions').select('*', { count:'exact', head:true }).eq('plan','trial').eq('status','active').lt('created_at', startOfMonth.toISOString()),
                 supabaseClient.from('subscriptions').select('plan,status').eq('status','active').neq('plan','trial'),
                 supabaseClient.from('subscriptions').select('plan,status').eq('status','active').neq('plan','trial').lt('created_at', startOfMonth.toISOString()),
-                supabaseClient.from('subscriptions').select('*', { count:'exact', head:true }).eq('status','canceled').gte('canceled_at', startOfMonth.toISOString()),
-                supabaseClient.from('marketing_costs').select('amount').eq('month', now.getMonth()+1).eq('year', now.getFullYear()).single(),
-                supabaseClient.from('payments').select('amount,paid_at').gte('paid_at', startOfYear.toISOString()),
+                supabaseClient.from('subscriptions').select('*', { count:'exact', head:true }).eq('status','canceled'),
                 supabaseClient.from('subscriptions').select('*', { count:'exact', head:true }).eq('status','active').neq('plan','trial').gte('created_at', startOfMonth.toISOString()),
                 supabaseClient.from('users').select('id,created_at').gte('created_at', startOfYear.toISOString())
             ]);
@@ -328,8 +338,7 @@
             const activeSubs = activeRes.data || [];
             const prevActiveSubs = prevActiveRes.data || [];
             const cancellations = cancelRes.count || 0;
-            const marketingCost = marketingRes.data?.amount || 0;
-            const paymentsYear = paymentsYearRes.data || [];
+            const marketingCost = 0;
             const newPaidThisMonth = newPaidThisMonthRes.count || 0;
             const usersYear = usersYearRes.data || [];
 
@@ -343,16 +352,13 @@
             const prevYearlyCount = prevActiveSubs.filter(s => isYearly(s.plan)).length;
             const prevActiveCount = prevActiveSubs.length;
 
-            const mrr = monthlyCount * 29 + yearlyCount * (348/12);
-            const monthlyRevenue = paymentsYear
-                .filter(p => new Date(p.paid_at).getMonth() === now.getMonth())
-                .reduce((sum,p) => sum + p.amount, 0);
-            const prevMonthlyRevenue = paymentsYear
-                .filter(p => new Date(p.paid_at).getMonth() === now.getMonth()-1)
-                .reduce((sum,p) => sum + p.amount, 0);
-            const realizedRevenue = paymentsYear.reduce((sum,p) => sum + p.amount, 0);
-            const monthsRemaining = 11 - now.getMonth();
-            const projected = realizedRevenue + monthlyRevenue * monthsRemaining;
+            const MONTHLY_PRICE = 39;
+            const YEARLY_PRICE = 29;
+            const mrr = monthlyCount * MONTHLY_PRICE + yearlyCount * YEARLY_PRICE;
+            const prevMrr = prevMonthlyCount * MONTHLY_PRICE + prevYearlyCount * YEARLY_PRICE;
+            const monthlyRevenue = mrr;
+            const prevMonthlyRevenue = prevMrr;
+            const projected = monthlyRevenue * 12;
 
             const churnRate = activeCount ? (cancellations / activeCount) * 100 : 0;
             const arpu = activeCount ? mrr / activeCount : 0;
@@ -406,9 +412,8 @@
 
             // Revenue chart (realized vs projected)
             const realized = new Array(12).fill(0);
-            paymentsYear.forEach(p => { realized[new Date(p.paid_at).getMonth()] += p.amount; });
-            const projectedArr = [...realized];
-            for (let i = now.getMonth(); i < 12; i++) projectedArr[i] = monthlyRevenue;
+            for (let i = 0; i <= now.getMonth(); i++) realized[i] = monthlyRevenue;
+            const projectedArr = new Array(12).fill(monthlyRevenue);
 
             if (usersCharts.revenue) usersCharts.revenue.destroy();
             const ctxRev = document.getElementById('revenueChart').getContext('2d');
@@ -430,14 +435,18 @@
         async function loadUsers() {
             const tbody = document.getElementById('usersTableBody');
             tbody.innerHTML = '<tr><td colspan="7">Carregando...</td></tr>';
-            const { data } = await supabaseClient
+            const { data: users } = await supabaseClient
                 .from('users')
-                .select('id,name,email,specialty,last_login,subscriptions(plan,status)')
+                .select('id,name,email,specialty')
                 .order('created_at', { ascending: false });
-            usersData = (data || []).map(u => {
-                const sub = Array.isArray(u.subscriptions) ? u.subscriptions.find(s => s.status === 'active') : u.subscriptions;
-                return { ...u, subscription: sub };
-            });
+
+            let subsByUser = {};
+            const { data: subs } = await supabaseClient
+                .from('subscriptions')
+                .select('user_id,plan,status');
+            (subs || []).forEach(s => { subsByUser[s.user_id] = s; });
+
+            usersData = (users || []).map(u => ({ ...u, subscription: subsByUser[u.id] }));
 
             const specialties = [...new Set(usersData.map(u => u.specialty).filter(Boolean))];
             const select = document.getElementById('filterSpecialty');
@@ -479,7 +488,7 @@
                         <td>${u.subscription?.plan || ''}</td>
                         <td>${u.specialty || ''}</td>
                         <td>${u.last_login ? new Date(u.last_login).toLocaleDateString() : ''}</td>
-                        <td><button onclick="openUserModal('${u.id}')">Ações</button></td>`;
+                        <td><button class="action-button" onclick="openUserModal('${u.id}')">Ações</button></td>`;
                     tbody.appendChild(tr);
                 });
         }
@@ -515,20 +524,27 @@
 
         function closeUserModal() { document.getElementById('userModal').classList.add('hidden'); }
 
-        async function sendEmail() {
-            if (!currentModalUser) return;
-            await supabaseClient.functions.invoke('send-email', { body: { to: currentModalUser.email } });
-            await logAdminAction('send_email', currentModalUser.id);
-            showToast('E-mail enviado');
-            closeUserModal();
-        }
-
         async function resetPassword() {
             if (!currentModalUser) return;
             await supabaseClient.auth.admin.generateLink({ type: 'recovery', email: currentModalUser.email });
             await logAdminAction('reset_password', currentModalUser.id);
             showToast('Reset de senha enviado');
             closeUserModal();
+        }
+
+        async function deleteUser() {
+            if (!currentModalUser) return;
+            const id = currentModalUser.id;
+            for (const table of ['subscriptions','prescriptions','consent_records']) {
+                await supabaseClient.from(table).delete().eq('user_id', id);
+            }
+            await supabaseClient.from('admin_logs').delete().eq('target_user', id);
+            await supabaseClient.from('users').delete().eq('id', id);
+            await supabaseClient.auth.admin.deleteUser(id);
+            showToast('Usuário excluído');
+            closeUserModal();
+            await loadUsers();
+            await loadDashboardData();
         }
 
         async function logAdminAction(action, target) {
