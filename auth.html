@@ -186,7 +186,9 @@
             animation: fadeIn 0.3s;
         }
 
-        /* 🔧 Registro temporariamente desativado */
+        /*
+        // 🔧 Registro temporariamente desativado
+        // As regras abaixo foram comentadas para reativar o formulário de registro.
         #registerPanel {
             position: relative;
         }
@@ -212,6 +214,7 @@
             z-index: 1;
             color: var(--text-dark);
         }
+        */
         
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
@@ -585,12 +588,11 @@
             
             <!-- Register Panel -->
             <div class="form-panel" id="registerPanel">
-                <!-- 🔧 Registro em manutenção: remova este bloco para reativar -->
-                <div class="register-blur">
-                    <h2 class="form-title">Começar Trial Gratuito</h2>
-                    <p class="form-subtitle">30 dias grátis • Acesso completo • Sem cartão de crédito</p>
+                <!-- Formulário de registro reativado -->
+                <h2 class="form-title">Começar Trial Gratuito</h2>
+                <p class="form-subtitle">30 dias grátis • Acesso completo • Sem cartão de crédito</p>
 
-                    <form id="registerForm">
+                <form id="registerForm">
                         <div class="form-group">
                             <label for="registerName">Nome Completo <span class="required">*</span></label>
                             <input type="text" id="registerName" class="form-control" required>
@@ -696,12 +698,10 @@
                             </label>
                         </div>
 
-                        <button type="submit" class="btn btn-primary">
-                            <span id="registerBtnText">🎁 Começar Trial Grátis</span>
-                        </button>
-                    </form>
-                </div>
-                <div class="register-maintenance-message">Cadastros temporariamente indisponíveis para manutenção</div>
+                    <button type="submit" class="btn btn-primary">
+                        <span id="registerBtnText">🎁 Começar Trial Grátis</span>
+                    </button>
+                </form>
             </div>
             
             <!-- Recover Panel -->
