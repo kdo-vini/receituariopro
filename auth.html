@@ -186,7 +186,9 @@
             animation: fadeIn 0.3s;
         }
 
-        /* 🔧 Registro temporariamente desativado */
+        /*
+        // 🔧 Registro temporariamente desativado
+        // As regras abaixo foram comentadas para reativar o formulário de registro.
         #registerPanel {
             position: relative;
         }
@@ -212,6 +214,7 @@
             z-index: 1;
             color: var(--text-dark);
         }
+        */
         
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
@@ -585,12 +588,11 @@
             
             <!-- Register Panel -->
             <div class="form-panel" id="registerPanel">
-                <!-- 🔧 Registro em manutenção: remova este bloco para reativar -->
-                <div class="register-blur">
-                    <h2 class="form-title">Começar Trial Gratuito</h2>
-                    <p class="form-subtitle">30 dias grátis • Acesso completo • Sem cartão de crédito</p>
+                <!-- Formulário de registro reativado -->
+                <h2 class="form-title">Começar Trial Gratuito</h2>
+                <p class="form-subtitle">30 dias grátis • Acesso completo • Sem cartão de crédito</p>
 
-                    <form id="registerForm">
+                <form id="registerForm">
                         <div class="form-group">
                             <label for="registerName">Nome Completo <span class="required">*</span></label>
                             <input type="text" id="registerName" class="form-control" required>
@@ -696,12 +698,10 @@
                             </label>
                         </div>
 
-                        <button type="submit" class="btn btn-primary">
-                            <span id="registerBtnText">🎁 Começar Trial Grátis</span>
-                        </button>
-                    </form>
-                </div>
-                <div class="register-maintenance-message">Cadastros temporariamente indisponíveis para manutenção</div>
+                    <button type="submit" class="btn btn-primary">
+                        <span id="registerBtnText">🎁 Começar Trial Grátis</span>
+                    </button>
+                </form>
             </div>
             
             <!-- Recover Panel -->
@@ -962,13 +962,15 @@
                         window.location.href = 'app.html';
                     }, 1000);
                 } else {
-                    showAlert(result.error || 'Erro ao fazer login', 'error');
+                    const detail = result.details ? ` Detalhes: ${result.details}` : '';
+                    showAlert(`${result.error}${detail}`, 'error');
                     button.disabled = false;
                     btnText.textContent = 'Entrar';
                 }
             } catch (error) {
                 console.error('Login error:', error);
-                showAlert('Erro ao fazer login. Tente novamente.', 'error');
+                const message = error.message || error;
+                showAlert(`Erro ao fazer login: ${message}`, 'error');
                 button.disabled = false;
                 btnText.textContent = 'Entrar';
             }
@@ -1042,19 +1044,22 @@
                 if (result.success) {
                     // ✅ MOSTRAR MODAL DE SUCESSO ATUALIZADO
                     showSuccessModal();
-                    
+
                     // Reset form
                     e.target.reset();
                     button.disabled = false;
                     btnText.textContent = '🎁 Começar Trial Grátis';
                 } else {
-                    showAlert(result.error || 'Erro ao criar conta', 'error');
+                    // Exibir detalhes técnicos quando disponíveis
+                    const detail = result.details ? ` Detalhes: ${result.details}` : '';
+                    showAlert(`${result.error}${detail}`, 'error');
                     button.disabled = false;
                     btnText.textContent = '🎁 Começar Trial Grátis';
                 }
             } catch (error) {
                 console.error('Registration error:', error);
-                showAlert('Erro ao criar conta. Tente novamente.', 'error');
+                const message = error.message || error;
+                showAlert(`Erro ao criar conta: ${message}`, 'error');
                 button.disabled = false;
                 btnText.textContent = '🎁 Começar Trial Grátis';
             }
