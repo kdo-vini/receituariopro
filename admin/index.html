@@ -126,7 +126,7 @@
     <div class="dashboard" id="dashboard">
         <header class="admin-header">
             <div class="admin-logo">
-                <img src="img/saas-logo.png" alt="Logo">
+                <img src="/img/saas-logo.png" alt="Logo">
                 <span>Receituário Pro</span>
             </div>
             <div class="admin-user">
@@ -260,7 +260,7 @@
 
     <div id="toastContainer"></div>
 
-    <script src="js/supabase-config.js"></script>
+    <script src="/js/supabase-config.js"></script>
     <script>
         const MONTH_NAMES = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
         let usersData = [];
@@ -279,7 +279,7 @@
 
         async function init() {
             const { data: { session } } = await supabaseClient.auth.getSession();
-            if (!session) { window.location.href = 'auth.html'; return; }
+            if (!session) { window.location.href = '/auth'; return; }
 
             const { data: user, error } = await supabaseClient
                 .from('users')
@@ -288,7 +288,7 @@
                 .single();
 
             if (error || !user?.is_admin) {
-                window.location.href = 'index.html';
+                window.location.href = '/';
                 return;
             }
 
@@ -580,7 +580,7 @@
 
         async function logout() {
             await supabaseClient.auth.signOut();
-            window.location.href = 'index.html';
+            window.location.href = '/';
         }
     </script>
 </body>

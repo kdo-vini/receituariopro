@@ -16,7 +16,7 @@ ReceituarioPro é um SaaS de geração de receituários médicos. A aplicação 
    - Injetar essas variáveis no `js/supabase-config.js` durante o build ou via script backend.
    - Remover qualquer chave embutida no frontend e rotacionar credenciais existentes.
 2. **Remover código legado**
-   - Arquivos como `css/styles.css` e `js/app.js` não são utilizados pelo `app.html`.
+   - Arquivos como `css/styles.css` e `js/app.js` não são utilizados pelo `app`.
    - Consolidar funcionalidades duplicadas dos módulos antigos (`js/*.js`) nos módulos atuais (`js/modules`).
 3. **Unificar utilitários de UI e templates**
    - Centralizar toasts e indicadores de carregamento no `js/modules/ui.module.js`.
@@ -47,7 +47,7 @@ ReceituarioPro é um SaaS de geração de receituários médicos. A aplicação 
 - Animações e interações
 - Links para autenticação e pagamento
 
-### 2. Sistema de Autenticação (`auth.html`)
+### 2. Sistema de Autenticação (`auth`)
 - Login, cadastro e recuperação de senha
 - Validação de campos
 - Integração parcial com Supabase

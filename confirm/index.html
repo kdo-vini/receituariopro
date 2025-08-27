@@ -6,7 +6,7 @@
     <title>Confirmação de Email - Receituário Pro</title>
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="js/supabase-config.js"></script>
+    <script src="/js/supabase-config.js"></script>
     
     <style>
         :root {
@@ -161,7 +161,7 @@
                 Sua conta foi confirmada com sucesso. 
                 Você será redirecionado para o login em <span id="countdown">5</span> segundos...
             </p>
-            <a href="auth.html" class="btn">Ir para Login</a>
+            <a href="/auth" class="btn">Ir para Login</a>
         </div>
         
         <!-- Estado: Erro -->
@@ -175,7 +175,7 @@
                 O link pode ter expirado ou já foi utilizado.
             </p>
             <div class="error-details" id="errorDetails" style="display: none;"></div>
-            <a href="auth.html" class="btn">Voltar ao Login</a>
+            <a href="/auth" class="btn">Voltar ao Login</a>
         </div>
         
         <!-- Estado: Reset de Senha -->
@@ -274,7 +274,7 @@
                         countdownEl.textContent = seconds;
                         if (seconds <= 0) {
                             clearInterval(interval);
-                            window.location.href = 'auth.html';
+                            window.location.href = '/auth';
                         }
                     }, 1000);
                     
@@ -285,7 +285,7 @@
                 }
             } catch (error) {
                 console.error('Confirmation error:', error);
-                showError('Erro ao confirmar email: ' + error.message);
+                showError('Erro ao confirmar email. Tente novamente.');
             }
         }
         
@@ -306,7 +306,7 @@
                 
             } catch (error) {
                 console.error('Reset error:', error);
-                showError('Erro ao processar reset: ' + error.message);
+                showError('Erro ao processar redefinição de senha. Tente novamente.');
             }
         }
         
@@ -343,11 +343,11 @@
                 // Sign out and redirect
                 setTimeout(async () => {
                     await supabaseClient.auth.signOut();
-                    window.location.href = 'auth.html';
+                    window.location.href = '/auth';
                 }, 3000);
                 
             } catch (error) {
-                alert('Erro ao redefinir senha: ' + error.message);
+                alert('Erro ao redefinir senha. Tente novamente.');
             }
         });
         
@@ -362,11 +362,11 @@
                 if (error) throw error;
                 
                 // Redirect to app
-                window.location.href = 'app.html';
+                window.location.href = '/app';
                 
             } catch (error) {
                 console.error('Magic link error:', error);
-                showError('Erro ao processar login: ' + error.message);
+                showError('Erro ao processar login. Tente novamente.');
             }
         }
         

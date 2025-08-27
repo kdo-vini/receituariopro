@@ -8,7 +8,7 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="js/supabase-config.js"></script>
+    <script src="/js/supabase-config.js"></script>
 <script>
     // Debug para verificar se o Supabase carregou
     console.log('Supabase disponível?', typeof window.supabase !== 'undefined');
@@ -528,7 +528,7 @@
         <div class="auth-sidebar">
             <div class="sidebar-content">
                 <div class="logo-section">
-                    <img src="img/saas-logo.png" alt="Receituário Pro">
+                    <img src="/img/saas-logo.png" alt="Receituário Pro">
                     <h1>Receituário Pro</h1>
                 </div>
                 <h2>Sistema Exclusivo para Profissionais da Saúde</h2>
@@ -952,7 +952,7 @@
                             showAlert('Seu trial de 30 dias expirou. Faça upgrade para continuar usando o sistema.', 'warning');
                             // Redirecionar para página de pagamento após 3 segundos
                             setTimeout(() => {
-                                window.location.href = 'index.html#pricing';
+                                window.location.href = '/#pricing';
                             }, 3000);
                         } else {
                             showAlert('Problema com sua assinatura. Entre em contato com o suporte.', 'error');
@@ -965,7 +965,7 @@
                     // ✅ LOGIN SUCESSO - REDIRECIONAR PARA APP
                     showAlert('Login realizado com sucesso! Redirecionando...', 'success');
                     setTimeout(() => {
-                        window.location.href = 'app.html';
+                        window.location.href = '/app';
                     }, 1000);
                 } else {
                     const detail = result.details ? ` Detalhes: ${result.details}` : '';
@@ -975,8 +975,7 @@
                 }
             } catch (error) {
                 console.error('Login error:', error);
-                const message = error.message || error;
-                showAlert(`Erro ao fazer login: ${message}`, 'error');
+                showAlert('Erro inesperado ao fazer login. Tente novamente.', 'error');
                 button.disabled = false;
                 btnText.textContent = 'Entrar';
             }
@@ -1064,8 +1063,7 @@
                 }
             } catch (error) {
                 console.error('Registration error:', error);
-                const message = error.message || error;
-                showAlert(`Erro ao criar conta: ${message}`, 'error');
+                showAlert('Erro inesperado ao criar conta. Tente novamente.', 'error');
                 button.disabled = false;
                 btnText.textContent = '🎁 Começar Trial Grátis';
             }
