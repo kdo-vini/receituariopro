@@ -7,7 +7,7 @@
 // CONFIGURAÇÕES DO SUPABASE
 // ========================================
 const SUPABASE_URL = "https://kqumjmacwlpaxfuziooy.supabase.co"; // pública
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtxdW1qbWFjd2xwYXhmdXppb295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU1NDI3NDUsImV4cCI6MjA3MTExODc0NX0.gwCdzsL5YjfNx_Krav5l12PtuReHxibOQBLc80b-4UE"; // ANON KEY pública
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtxdW1qbWFjd2xwYXhmdXppb295Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU1NDI3NDUsImV4cCI6MjA3MTExODc0NX0.gwCdzsL5YjfNx_Krav5l12PtuReHxibOQBLc80b-4UE"; // ANON KEY publica
 
 // Cria client global
 let supabaseClient;
@@ -1123,7 +1123,7 @@ supabaseClient.auth.onAuthStateChange((event, session) => {
         cache.clear(); // Limpar cache ao fazer logout
         
         // Só redireciona se não estiver já na página de auth ou index
-        if (!window.location.pathname.startswith('/auth') and window.location.pathname != '/') {
+        if (!window.location.pathname.startsWith('/auth') && window.location.pathname !== '/') {
             window.location.href = '/auth';
         }
     }
