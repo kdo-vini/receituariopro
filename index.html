@@ -1641,16 +1641,17 @@ const animateCounters = () => {
             });
         }
 
-        // Form submission handlers (add your logic here)
-        document.querySelectorAll('.btn-primary').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                if (btn.textContent.includes('Teste') || btn.textContent.includes('Começar')) {
-                    e.preventDefault();
-                    // Add your signup/trial logic here
-                    alert('Redirecionando para cadastro...');
-                }
+            // Form submission handlers (add your logic here)
+            document.querySelectorAll('.btn-primary').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    if (btn.textContent.includes('Teste') || btn.textContent.includes('Começar')) {
+                        e.preventDefault();
+                        // Redireciona para a página de autenticação
+                        window.location.href = 'auth';
+                    }
+                });
             });
-        });
+
     </script>
 </body>
 </html>
