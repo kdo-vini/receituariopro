@@ -268,7 +268,7 @@ async function registerProfessional(userData) {
         
         // Mensagens de erro mais específicas
         let errorMessage = 'Erro ao criar conta. Tente novamente.';
-        
+
         if (error.message?.includes('already registered')) {
             errorMessage = 'Este e-mail já está cadastrado. Tente fazer login.';
         } else if (error.message?.includes('invalid email')) {
@@ -278,8 +278,10 @@ async function registerProfessional(userData) {
         } else if (error.message?.includes('network')) {
             errorMessage = 'Erro de conexão. Verifique sua internet.';
         }
-        
-        return { success: false, error: errorMessage };
+
+        // Retorna também detalhes técnicos para facilitar depuração
+        const details = error.message || JSON.stringify(error);
+        return { success: false, error: errorMessage, details };
     }
 }
 
@@ -435,7 +437,8 @@ async function loginUser(email, password) {
             errorMessage = 'Erro de configuração do sistema. Contate o suporte.';
         }
         
-        return { success: false, error: errorMessage };
+        const details = error.message || JSON.stringify(error);
+        return { success: false, error: errorMessage, details };
     }
 }
 /**
