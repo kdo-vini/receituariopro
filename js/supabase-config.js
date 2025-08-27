@@ -256,26 +256,20 @@ async function loginUser(email, password) {
             user = userData;
             
         } catch (relsError) {
-            console.warn('Erro RLS na busca normal, tentando com service role:', relsError);
-            
-            // Fallback: usar uma query mais simples ou service key
+            console.warn('Erro RLS na busca normal, tentando via função fetch-user:', relsError);
+
             try {
-                const { data: fallbackData, error: fallbackError } = await supabaseClient
-                    .from('users')
-                    .select('*')
-                    .eq('email', email)  // Buscar por email em vez de ID
-                    .single();
-                    
-                if (fallbackError) throw fallbackError;
-                user = fallbackData;
-                
-            } catch (fallbackError2) {
-                console.error('Fallback também falhou:', fallbackError2);
-                
-                // Último recurso: criar usuário se não existir
-                if (fallbackError2.code === 'PGRST116') { // Nenhum resultado
+                const { data: fnData, error: fnError } = await supabaseClient.functions.invoke('fetch-user', {
+                    body: { id: authData.user.id, email }
+                });
+
+                if (fnError) throw fnError;
+
+                user = fnData?.user;
+
+                if (!user) {
                     console.log('Usuário não encontrado, tentando criar...');
-                    
+
                     const { data: newUser, error: createError } = await supabaseClient
                         .from('users')
                         .insert({
@@ -287,17 +281,19 @@ async function loginUser(email, password) {
                         })
                         .select()
                         .single();
-                        
+
                     if (createError) {
                         console.error('Erro ao criar usuário:', createError);
                         throw createError;
                     }
-                    
+
                     user = newUser;
                     console.log('Usuário criado com sucesso:', user);
-                } else {
-                    throw fallbackError2;
                 }
+
+            } catch (fallbackError2) {
+                console.error('Fallback também falhou:', fallbackError2);
+                throw fallbackError2;
             }
         }
 
